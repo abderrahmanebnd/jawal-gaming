@@ -1,0 +1,5 @@
+{
+  "serverPort": "3000",
+  "frontend": "http://185.158.132.240",
+  "cookieSecretKey": "7tR#H2$t1550fs@Kq8*F"
+}

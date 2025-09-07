@@ -1,0 +1,78 @@
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+}
+
+.btn:focus {
+  box-shadow: none !important;
+}
+
+.form-control:focus {
+  background-color: #666 !important;
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none !important;
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2.5rem;
+  }
+}
+
+.nav-pills .nav-link {
+  border-radius: 25px !important;
+}
+
+.sticky-top {
+  backdrop-filter: blur(10px);
+}
+
+.main-container {
+  padding-left: 140px;
+  padding-right: 140px;
+}
+
+.header {
+  padding-left: 140px;
+  padding-right: 140px;
+}
+
+.footers {
+  padding-left: 140px;
+  padding-right: 140px;
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .header {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .footers {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}

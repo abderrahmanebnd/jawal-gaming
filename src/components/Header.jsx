@@ -1,0 +1,48 @@
+import { Menu, X } from 'lucide-react';
+import { CONSTANTS } from '../shared/constants';
+import logo from "@assets/logo.png"
+import ColorToggle from "../shared/ColorToggle";
+
+const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
+  <header className="sticky-top header shadow-sm" style={{ backgroundColor: document.body.getAttribute("data-theme") === "light" ? " #ffffffff" : "#333131", borderBottom: `2px solid ${document.body.getAttribute("data-theme") === "light" ? " #ffffffff" : "#272727ff"}` }}>
+    <nav className="navbar  p-0 py-1 navbar-expand-lg navbar-dark">
+      <div className="container">
+        <a className="navbar-brand fw-bold fs-3" href="/" style={{ color: document.body.getAttribute("data-theme") === "light" ? " #333131" : "#ffffffff" }}>
+          <img width={100} src={logo} />
+        </a>
+
+        <button 
+          className="navbar-toggler border-1 p-0 "
+          type="button"
+          onClick={onMenuToggle}
+          style={{ boxShadow: 'none' }}>
+          {isMenuOpen ? <X size={34} color={document.body.getAttribute("data-theme") === "light" ? " #b2de43" : "#b2de43"} /> : <Menu size={34} color={document.body.getAttribute("data-theme") === "light" ? " #b2de43" : "#b2de43"} />}
+        </button>
+
+        <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`}>
+          <ul className="navbar-nav ms-auto">
+            {navLinks.map(link => (
+              <li key={link.id} className="nav-item">
+                <a className="nav-link px-3 py-2 mx-1 rounded transition-all pt-md-3" 
+                   href={link.url}
+                   style={{ color: document.body.getAttribute("data-theme") === "light" ? " #333131" : "#ffffffff" }}
+                   onMouseEnter={(e) => e.target.style.backgroundColor = document.body.getAttribute("data-theme") === "light" ? " #f3f3f3ff" : "#333131"}
+                   onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}>
+                  {link.title}
+                </a>
+              </li>
+            ))}
+            {/* Add the ColorToggle button as a nav item */}
+            <li className="nav-item">
+              <div className="nav-link px-3 py-2 mx-1" style={{ cursor: 'default' }}>
+                <ColorToggle setTheme={setTheme} />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+);
+
+export default Header;

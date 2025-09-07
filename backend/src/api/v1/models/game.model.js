@@ -1,0 +1,279 @@
+const { getPool } = require("../../../config/db");
+
+/**
+ * This function adds or updates game items
+ * @param {number|null} _id - Game ID for update, null for insert
+ * @param {string} title - Game title
+ * @param {string} description - Game description
+ * @param {string} url - Game URL
+ * @param {string} thumbnail - Game thumbnail URL
+ * @returns {Object} Operation result
+ */
+async function addGames(_id, title, description, url, thumbnail) {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  
+  try {
+    // Start transaction
+    await connection.beginTransaction();
+    
+    let result;
+    
+    if (_id) {
+      // Update existing game
+      const updateQuery = `
+        UPDATE GAMES 
+        SET title = ?, description = ?, url = ?, thumbnail = ?, status = 'ACTIVE', updatedDate = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `;
+      
+      const [updateResult] = await connection.execute(updateQuery, [title, description, url, thumbnail, _id]);
+      
+      if (updateResult.affectedRows === 0) {
+        throw new Error("No game found with the given ID");
+      }
+      
+      result = {
+        acknowledged: true,
+        modifiedCount: updateResult.affectedRows,
+        upsertedId: null,
+        upsertedCount: 0,
+        matchedCount: updateResult.affectedRows
+      };
+    } else {
+      // Insert new game
+      const insertQuery = `
+        INSERT INTO GAMES (title, description, url, thumbnail, status)
+        VALUES (?, ?, ?, ?, 'ACTIVE')
+      `;
+      
+      const [insertResult] = await connection.execute(insertQuery, [title, description, url, thumbnail]);
+      
+      result = {
+        acknowledged: true,
+        insertedId: insertResult.insertId
+      };
+    }
+    
+    // Commit transaction
+    await connection.commit();
+    
+    return result;
+  } catch (error) {
+    // Rollback transaction on error
+    await connection.rollback();
+    throw new Error(`Unable to save game: ${error.message}`);
+  } finally {
+    connection.release();
+  }
+}
+
+/**
+ * This model function is used to get game count
+ * @returns {number} Count of active games
+ */
+async function gameCount() {
+  const pool = getPool();
+  
+  try {
+    const query = `SELECT COUNT(*) as count FROM GAMES WHERE status = ?`;
+    const [rows] = await pool.execute(query, ['ACTIVE']);
+    
+    return rows[0].count;
+  } catch (error) {
+    throw new Error(`Unable to get game count: ${error.message}`);
+  }
+}
+
+/**
+ * This model function is used to get all games with pagination
+ * FIX: MySQL doesn't allow parameterized LIMIT/OFFSET, so we build the query string
+ * @param {number} page - Page number (default: 1)
+ * @param {number} limit - Items per page (default: 10)
+ * @returns {Array} Array of game objects
+ */
+async function getGames(page = 1, limit = 10) {
+  const pool = getPool();
+  
+  try {
+    // Validate and sanitize parameters
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    
+    // Ensure minimum values
+    const validPage = Math.max(1, pageNum);
+    const validLimit = Math.max(1, Math.min(100, limitNum)); // Max 100 items per page
+    
+    const offset = (validPage - 1) * validLimit;
+    
+    // FIX: Build query with literal LIMIT/OFFSET values instead of parameters
+    const query = `
+      SELECT id, title, description, url, thumbnail, status, createDate, updatedDate, liked, viewed
+      FROM GAMES 
+      WHERE status = ?
+      ORDER BY createDate DESC
+      LIMIT ${validLimit} OFFSET ${offset}
+    `;
+    
+    console.log('Executing query:', query);
+    console.log('With status parameter:', ['ACTIVE']);
+    
+    const [rows] = await pool.execute(query, ['ACTIVE']);
+    
+    return rows;
+  } catch (error) {
+    console.error('getGames error details:', error);
+    throw new Error(`Unable to fetch games: ${error.message}`);
+  }
+}
+
+
+
+
+
+/**
+ * This model function is used to get game by title
+ * @param {string} title - Game title
+ * @returns {Object|null} Game object or null if not found
+ */
+async function getByTitle(title) {
+  const pool = getPool();
+  
+  try {
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      throw new Error("Valid title is required");
+    }
+    
+    const gameTitle = title.trim();
+    
+    const query = `
+      SELECT id, title, description, url, thumbnail, status, createDate, updatedDate,liked, viewed
+      FROM GAMES 
+      WHERE title = ? AND status = ?
+    `;
+    
+    console.log('Searching for game with title:', gameTitle);
+    
+    const [rows] = await pool.execute(query, [gameTitle, 'ACTIVE']);
+    
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('getByTitle error details:', error);
+    throw new Error(`Unable to fetch game: ${error.message}`);
+  }
+}
+
+
+
+
+
+
+
+/**
+ * This model function is used to get game by ID
+ * @param {number} id - Game ID
+ * @returns {Object|null} Game object or null if not found
+ */
+async function getByIds(id) {
+  const pool = getPool();
+  
+  try {
+    if (!id || isNaN(parseInt(id))) {
+      throw new Error("Invalid ID format");
+    }
+    
+    const gameId = parseInt(id);
+    
+    const query = `
+      SELECT id, title, description, url, thumbnail, status, createDate, updatedDate
+      FROM GAMES 
+      WHERE id = ?
+    `;
+    
+    const [rows] = await pool.execute(query, [gameId]);
+    
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('getByIds error details:', error);
+    throw new Error(`Unable to fetch game: ${error.message}`);
+  }
+}
+
+/**
+ * This model function deletes a game from the GAMES table
+ * @param {number} id - The ID of the game to delete
+ * @returns {Object} The deletion result
+ */
+async function deleteGames(id) {
+  const pool = getPool();
+  
+  try {
+    if (!id || isNaN(parseInt(id))) {
+      throw new Error("Invalid ID format");
+    }
+    
+    const gameId = parseInt(id);
+    
+    const query = `DELETE FROM GAMES WHERE id = ?`;
+    const [result] = await pool.execute(query, [gameId]);
+    
+    if (result.affectedRows === 1) {
+      return { 
+        message: "Game deleted successfully" 
+      };
+    } else {
+      throw new Error("No matching game found to delete.");
+    }
+  } catch (error) {
+    console.error('deleteGames error details:', error);
+    throw new Error(`Failed to delete game: ${error.message}`);
+  }
+}
+
+/**
+ * Alternative method using query() instead of execute() for LIMIT/OFFSET
+ * This method uses regular query instead of prepared statements for LIMIT/OFFSET
+ * @param {number} page - Page number
+ * @param {number} limit - Items per page
+ * @returns {Array} Array of game objects
+ */
+async function getGamesWithQuery(page = 1, limit = 10) {
+  const pool = getPool();
+  
+  try {
+    // Validate and sanitize parameters
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    
+    const validPage = Math.max(1, pageNum);
+    const validLimit = Math.max(1, Math.min(100, limitNum));
+    
+    const offset = (validPage - 1) * validLimit;
+    
+    // Use query() method instead of execute() and escape the status manually
+    const connection = await pool.getConnection();
+    
+    try {
+      const query = `
+        SELECT id, title, description, url, thumbnail, status, createDate, updatedDate
+        FROM GAMES 
+        WHERE status = 'ACTIVE'
+        ORDER BY createDate DESC
+        LIMIT ${validLimit} OFFSET ${offset}
+      `;
+      
+      console.log('Executing query with query() method:', query);
+      
+      const [rows] = await connection.query(query);
+      
+      return rows;
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error('getGamesWithQuery error details:', error);
+    throw new Error(`Unable to fetch games: ${error.message}`);
+  }
+}
+
+module.exports = { addGames, getGames, getByIds,getByTitle, gameCount, deleteGames, getGamesWithQuery };
