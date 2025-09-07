@@ -13,7 +13,7 @@ const dbConfig = {
   queueLimit: 0,
   acquireTimeout: 60000,
   timeout: 60000,
-  reconnect: true
+  // reconnect: true
 };
 
 let pool;
