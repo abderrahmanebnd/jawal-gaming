@@ -1,10 +1,10 @@
 // /utility/storage.js
 const STORAGE_KEYS = {
-  FAVORITES: 'gamehub_favorites',
-  GAMES: 'gamehub_games',
-  NAV_LINKS: 'gamehub_nav_links',
-  FOOTER_LINKS: 'gamehub_footer_links',
-  ADMIN_SESSION: 'gamehub_admin_session'
+  FAVORITES: 'jawalgames_favorites',
+  GAMES: 'jawalgames_games',
+  NAV_LINKS: 'jawalgames_nav_links',
+  FOOTER_LINKS: 'jawalgames_footer_links',
+  ADMIN_SESSION: 'jawalgames_admin_session'
 };
 
 export class StorageManager {

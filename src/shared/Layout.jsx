@@ -41,7 +41,7 @@ const Layout = ({
         
         {/* Additional SEO */}
         <meta name="robots" content="index, follow" />
-        <meta name="author" content="GameHub" />
+        <meta name="author" content="jawalgames" />
         <link rel="canonical" href={SEO_CONFIG.siteUrl} />
       </Helmet>
       
