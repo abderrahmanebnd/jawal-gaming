@@ -23,7 +23,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
           <ul className="navbar-nav ms-auto">
             {navLinks.map(link => (
               <li key={link.id} className="nav-item">
-                <a className="nav-link px-3 py-2 mx-1 rounded transition-all pt-md-3" 
+                <a className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none" 
                    href={link.url}
                    style={{ color: document.body.getAttribute("data-theme") === "light" ? " #333131" : "#ffffffff" }}
                    onMouseEnter={(e) => e.target.style.backgroundColor = document.body.getAttribute("data-theme") === "light" ? " #f3f3f3ff" : "#333131"}

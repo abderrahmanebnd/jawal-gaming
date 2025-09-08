@@ -2,6 +2,7 @@ import { CONSTANTS } from "../shared/constants";
 import appStore from "../assets/app_store.png";
 import googlePlay from "../assets/google_play.png";
 
+
 // /components/Footer.jsx
 const Footer = ({ footerLinks }) => (
   <footer
@@ -18,37 +19,10 @@ const Footer = ({ footerLinks }) => (
       }`,
     }}
   >
-    <style>
-      {`
-        .footer-link {
-          position: relative;
-          transition: color 0.3s ease, transform 0.2s ease;
-        }
-
-        .footer-link::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          bottom: -3px;
-          width: 0%;
-          height: 2px;
-          background-color: ${CONSTANTS.COLORS.greenMainColor};
-          transition: width 0.3s ease;
-        }
-
-        .footer-link:hover {
-          color: ${CONSTANTS.COLORS.greenMainColor} !important;
-          transform: translateY(-2px);
-        }
-
-        .footer-link:hover::after {
-          width: 100%;
-        }
-      `}
-    </style>
-
     <div className="container">
-      <div className="row align-items-center">
+      <div className="row align-items-center"
+     
+      >
         <div className="col-md-6 mb-3 mb-md-0">
           <div className="d-flex gap-3 justify-content-center justify-content-md-start">
             <a
@@ -76,7 +50,9 @@ const Footer = ({ footerLinks }) => (
 
         {/* links */}
         <div className="col-md-6 d-flex justify-content-end">
-          <div className="d-flex gap-4 justify-content-end d-none d-md-block">
+          <div className="gap-4 justify-content-end d-none d-md-block p-2"
+         
+          >
             {footerLinks.map((link) => (
               <a
                 key={link.id}
