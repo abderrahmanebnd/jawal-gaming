@@ -251,7 +251,7 @@ const HomePage = () => {
   return (
     <div className="container" style={{ overflowY: "auto" }}>
       {/* Navigation Tabs */}
-      <div className="mb-4 mt-5">
+      <div className="mb-4 mt-2">
         <ul className="nav nav-pills justify-content-center">
           <li className="nav-item me-2">
             <button
@@ -261,7 +261,7 @@ const HomePage = () => {
               style={{
                 backgroundColor:
                   activeTab === "all"
-                    ? CONSTANTS.COLORS.primary
+                    ? CONSTANTS.COLORS.greenMainColor
                     : "transparent",
                 color:
                   activeTab === "all"
@@ -270,7 +270,7 @@ const HomePage = () => {
                     ? "#000000ff"
                     : "#ffffffff",
                 border: `2px solid ${
-                  activeTab === "all" ? CONSTANTS.COLORS.primary : "#555"
+                  activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : "#555"
                 }`,
                 transition: "all 0.3s ease",
               }}
@@ -279,7 +279,7 @@ const HomePage = () => {
               Games ({allGames.length})
             </button>
           </li>
-          <li className="nav-item">
+          <li className="nav-item me-2">
             <button
               className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold transition-all ${
                 activeTab === "favorites" ? "active" : ""
@@ -323,6 +323,34 @@ const HomePage = () => {
                 }
               />
               Favorites ({favoriteGames.length})
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold transition-all ${
+                activeTab === "top-games" ? "active" : ""
+              }`}
+              style={{
+                backgroundColor:
+                  activeTab === "top-games"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : "transparent",
+                color:
+                  activeTab === "top-games"
+                    ? "#ffffffff"
+                    : document.body.getAttribute("data-theme") === "light"
+                    ? "#000000ff"
+                    : "#ffffffff",
+                border: `2px solid ${
+                  activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : "#555"
+                }`,
+                transition: "all 0.3s ease",
+              }}
+              onClick={() => handleTabChange("top-games")}
+            >
+           
+              Top Games
+              {/* TODO make sure to modify this to take the length of the top games */}
             </button>
           </li>
         </ul>
