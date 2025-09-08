@@ -259,10 +259,7 @@ const HomePage = () => {
                 activeTab === "all" ? "active" : ""
               }`}
               style={{
-                backgroundColor:
-                  activeTab === "all"
-                    ? CONSTANTS.COLORS.greenMainColor
-                    : "transparent",
+                backgroundColor: "transparent",
                 color:
                   activeTab === "all"
                     ? "#ffffffff"
@@ -270,13 +267,25 @@ const HomePage = () => {
                     ? "#000000ff"
                     : "#ffffffff",
                 border: `2px solid ${
-                  activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : "#555"
+                  activeTab === "all"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : CONSTANTS.COLORS.yellowMainColor
                 }`,
                 transition: "all 0.3s ease",
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+              }}
               onClick={() => handleTabChange("all")}
             >
+              <span style={{
+                color: activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff"),
+              }}>
               Games ({allGames.length})
+              </span>
             </button>
           </li>
           <li className="nav-item me-2">
@@ -296,9 +305,17 @@ const HomePage = () => {
                     ? "#000000ff"
                     : "#ffffffff",
                 border: `2px solid ${
-                  activeTab === "favorites" ? CONSTANTS.COLORS.danger : "#555"
+                  activeTab === "favorites"
+                    ? CONSTANTS.COLORS.danger
+                    : CONSTANTS.COLORS.yellowMainColor
                 }`,
                 transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
               }}
               onClick={() => handleTabChange("favorites")}
             >
@@ -331,10 +348,7 @@ const HomePage = () => {
                 activeTab === "top-games" ? "active" : ""
               }`}
               style={{
-                backgroundColor:
-                  activeTab === "top-games"
-                    ? CONSTANTS.COLORS.greenMainColor
-                    : "transparent",
+                backgroundColor: "transparent",
                 color:
                   activeTab === "top-games"
                     ? "#ffffffff"
@@ -342,14 +356,25 @@ const HomePage = () => {
                     ? "#000000ff"
                     : "#ffffffff",
                 border: `2px solid ${
-                  activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : "#555"
+                  activeTab === "top-games"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : CONSTANTS.COLORS.yellowMainColor
                 }`,
                 transition: "all 0.3s ease",
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+              }}
               onClick={() => handleTabChange("top-games")}
             >
-           
+              <span style={{
+                color: activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff"),
+              }}>
               Top Games
+              </span>
               {/* TODO make sure to modify this to take the length of the top games */}
             </button>
           </li>
