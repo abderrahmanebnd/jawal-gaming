@@ -13,8 +13,10 @@ export const apiEndPoints = {
   //Game Management
   addGame: `${BASE_URL}/api/v1/game/add-game`,
   viewGame: `${BASE_URL}/api/v1/game/view-game`,
-    byIdGame: `${BASE_URL}/api/v1/game/id-game`,
+  byIdGame: `${BASE_URL}/api/v1/game/id-game`,
   deleteGame: `${BASE_URL}/api/v1/game/delete-game`,
+  topGames: `${BASE_URL}/api/v1/game/top`,
+
 
   //Nav Management
   addNav: `${BASE_URL}/api/v1/nav/add-nav`,

@@ -276,4 +276,32 @@ async function getGamesWithQuery(page = 1, limit = 10) {
   }
 }
 
-module.exports = { addGames, getGames, getByIds,getByTitle, gameCount, deleteGames, getGamesWithQuery };
+
+/**
+ * Get top N most-liked ACTIVE games
+ * @param {number} limit - number of games to return (1..100)
+ * @returns {Array} rows
+ */
+async function getTopLikedGames(limit = 10) {
+  const pool = getPool();
+
+  try {
+    // sanitize and clamp limit
+    const n = Math.max(1, Math.min(100, parseInt(limit) || 10));
+
+    const query = `
+      SELECT id, title, description, url, thumbnail, status, createDate, updatedDate, liked, viewed
+      FROM GAMES
+      WHERE status = 'ACTIVE'
+      ORDER BY liked DESC, viewed DESC, createDate DESC
+      LIMIT ${n}
+    `;
+
+    const [rows] = await pool.query(query);
+    return rows;
+  } catch (error) {
+    throw new Error(`Unable to fetch top liked games: ${error.message}`);
+  }
+}
+
+module.exports = { addGames, getGames, getByIds,getByTitle, gameCount, deleteGames, getGamesWithQuery, getTopLikedGames };

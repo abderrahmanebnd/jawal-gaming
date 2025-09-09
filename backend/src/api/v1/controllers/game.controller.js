@@ -6,6 +6,7 @@ const {
   getByTitle,
   gameCount,
   deleteGames,
+  getTopLikedGames,
 } = require("../models/game.model");
 const fs = require("fs");
 const path = require("path");
@@ -208,5 +209,29 @@ exports.viewAllGames = async (req, res) => {
   } catch (error) {
     console.log("viewAllGames ERROR::", error);
     commonResponse(res, 500, null, error?.message, "v1-game-server-009");
+  }
+};
+
+exports.getTopGames = async (req, res) => {
+  try {
+    const raw = req.query.n;
+    const n = parseInt(raw, 10);
+
+    if (raw !== undefined && (Number.isNaN(n) || n < 1)) {
+      return commonResponse(
+        res,
+        400,
+        null,
+        "Parameter n must be a positive integer",
+        "v1-game-server-010"
+      );
+    }
+
+    const limit = Math.max(1, Math.min(100, n || 10));
+    const rows = await getTopLikedGames(limit);
+
+    return commonResponse(res, 200, { data: rows, count: rows.length });
+  } catch (error) {
+    return commonResponse(res, 500, null, error?.message, "v1-game-server-011");
   }
 };
