@@ -45,7 +45,7 @@ const BackToTopButton = () => {
         e.currentTarget.style.transform = "scale(1.2)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "#f8f9fa";
+        e.currentTarget.style.backgroundColor = "#e2f3e7";
         e.currentTarget.style.transform = "scale(1)";
       }}
     >

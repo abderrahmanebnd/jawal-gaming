@@ -1,7 +1,7 @@
 export const CONSTANTS = {
   COLORS: {
     background: "#333131",
-    lightBackground: "#FFF",
+    lightBackground: "#c6c4c6",
     text: "#FFF",
     darkText: "#000000ff",
     primary: "#007bff",

@@ -205,10 +205,10 @@ const FooterComponent = () => {
             <div className="d-flex align-items-center d-none d-md-block">
               <LinkIcon size={28} color={CONSTANTS.COLORS.primary} className="me-3" />
               <div>
-                <h3 className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>
+                <h3 className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>
                   Footer Links Management
                 </h3>
-                <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>Manage footer navigation links</p>
+                <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>Manage footer navigation links</p>
               </div>
             </div>
             <button
@@ -232,10 +232,10 @@ const FooterComponent = () => {
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div className="mt-4">
-              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>
+              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>
                 Footer Links ({footerLinks.length})
               </p>
-              <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>Configure your website footer navigation</p>
+              <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>Configure your website footer navigation</p>
             </div>
             {FooterLoading && (
               <div className="spinner-border text-primary" role="status">

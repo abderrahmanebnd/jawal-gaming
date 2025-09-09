@@ -250,7 +250,7 @@ const HomePage = () => {
 
   // TODO:we can use framer-motion to animate the cards on hover and on load
   return (
-    <div className="container" style={{ overflowY: "auto" }}>
+    <div className="container" style={{ overflowY: "auto",}}>
       {/* Navigation Tabs */}
       <div className="mb-4 mt-2">
         <ul className="nav nav-pills justify-content-center">
@@ -263,10 +263,10 @@ const HomePage = () => {
                 backgroundColor: "transparent",
                 color:
                   activeTab === "all"
-                    ? "#ffffffff"
+                    ? "#c6c4c6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#ffffffff",
+                    : "#c6c4c6",
                 border: `2px solid ${
                   activeTab === "all"
                     ? CONSTANTS.COLORS.greenMainColor
@@ -282,10 +282,17 @@ const HomePage = () => {
               }}
               onClick={() => handleTabChange("all")}
             >
-              <span style={{
-                color: activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff"),
-              }}>
-              Games ({allGames.length})
+              <span
+                style={{
+                  color:
+                    activeTab === "all"
+                      ? CONSTANTS.COLORS.greenMainColor
+                      : document.body.getAttribute("data-theme") === "light"
+                      ? "#000000ff"
+                      : "#c6c4c6",
+                }}
+              >
+                All Games
               </span>
             </button>
           </li>
@@ -295,19 +302,16 @@ const HomePage = () => {
                 activeTab === "favorites" ? "active" : ""
               }`}
               style={{
-                backgroundColor:
-                  activeTab === "favorites"
-                    ? CONSTANTS.COLORS.danger
-                    : "transparent",
+                backgroundColor: "transparent",
                 color:
                   activeTab === "favorites"
-                    ? "#ffffffff"
+                    ? "#c6c4c6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#ffffffff",
+                    : "#c6c4c6",
                 border: `2px solid ${
                   activeTab === "favorites"
-                    ? CONSTANTS.COLORS.danger
+                    ? CONSTANTS.COLORS.greenMainColor
                     : CONSTANTS.COLORS.yellowMainColor
                 }`,
                 transition: "all 0.3s ease",
@@ -326,21 +330,32 @@ const HomePage = () => {
                 fill={
                   activeTab === "favorites"
                     ? document.body.getAttribute("data-theme") === "light"
-                      ? "#ffffffff"
-                      : "#f3f3f3ff"
+                      ? CONSTANTS.COLORS.greenMainColor
+                      : CONSTANTS.COLORS.greenMainColor
                     : "none"
                 }
                 color={
                   activeTab === "favorites"
                     ? document.body.getAttribute("data-theme") === "light"
-                      ? "#fffdfdff"
-                      : "#fffefeff"
+                      ? CONSTANTS.COLORS.greenMainColor
+                      : CONSTANTS.COLORS.greenMainColor
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
                     : "#f4f3f3ff"
                 }
               />
-              Favorites ({favoriteGames.length})
+              <span
+                style={{
+                  color:
+                    activeTab === "favorites"
+                      ? CONSTANTS.COLORS.greenMainColor
+                      : document.body.getAttribute("data-theme") === "light"
+                      ? "#000000ff"
+                      : "#c6c4c6",
+                }}
+              >
+                Favorites ({favoriteGames.length}){" "}
+              </span>
             </button>
           </li>
           <li className="nav-item">
@@ -352,10 +367,10 @@ const HomePage = () => {
                 backgroundColor: "transparent",
                 color:
                   activeTab === "top-games"
-                    ? "#ffffffff"
+                    ? "#c6c4c6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#ffffffff",
+                    : "#c6c4c6",
                 border: `2px solid ${
                   activeTab === "top-games"
                     ? CONSTANTS.COLORS.greenMainColor
@@ -371,10 +386,17 @@ const HomePage = () => {
               }}
               onClick={() => handleTabChange("top-games")}
             >
-              <span style={{
-                color: activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff"),
-              }}>
-              Top Games
+              <span
+                style={{
+                  color:
+                    activeTab === "top-games"
+                      ? CONSTANTS.COLORS.greenMainColor
+                      : document.body.getAttribute("data-theme") === "light"
+                      ? "#000000ff"
+                      : "#c6c4c6",
+                }}
+              >
+                Top Games
               </span>
               {/* TODO make sure to modify this to take the length of the top games */}
             </button>
@@ -384,7 +406,7 @@ const HomePage = () => {
 
       {/* Games Grid */}
       <div
-        className="row  mt-md-4 m-auto"
+        className="row mt-md-4 m-auto"
         style={{
           overflowX: "hidden",
         }}
