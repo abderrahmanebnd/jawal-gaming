@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ThumbsUp, Eye } from "lucide-react";
+import { ChevronLeft, ThumbsUp, Eye, Heart } from "lucide-react";
 import AdBanner from "../../components/AdBanner";
 import GamePlayer from "../../components/GamePlayer";
 import GameCard from "../../components/GameCard";
@@ -7,6 +7,8 @@ import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+import { StorageManager } from "../../shared/storage";
 
 const GamePage = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -46,13 +48,12 @@ const GamePage = () => {
   // Initialize localStorage data
   useEffect(() => {
     try {
-      const savedFavorites = JSON.parse(
-        localStorage.getItem("favorites") || "[]"
-      );
+      const savedFavorites = StorageManager.getFavorites();
+
       const savedLikedGames = JSON.parse(
         localStorage.getItem("likedGames") || "[]"
       );
-      setFavorites(savedFavorites);
+      setFavorites(Array.isArray(savedFavorites) ? savedFavorites : []);
       setLikedGames(savedLikedGames);
     } catch (error) {
       console.error("Error loading data from localStorage:", error);
@@ -173,23 +174,19 @@ const GamePage = () => {
   // Handle favorite toggle with proper localStorage sync
   const handleToggleFavorite = useCallback((gameId) => {
     if (!gameId) return;
-
-    setFavorites((prevFavorites) => {
-      const isCurrentlyFavorited = prevFavorites.includes(gameId);
-      const updatedFavorites = isCurrentlyFavorited
-        ? prevFavorites.filter((id) => id !== gameId)
-        : [...prevFavorites, gameId];
-
-      try {
-        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      } catch (error) {
-        console.error("Error saving favorites to localStorage:", error);
-        return prevFavorites; // Return previous state if save fails
-      }
-
-      return updatedFavorites;
+    setFavorites((prev) => {
+      const isFav = prev.includes(gameId);
+      const updated = isFav
+        ? prev.filter((id) => id !== gameId)
+        : [...prev, gameId];
+      // persist
+      StorageManager.setFavorites(updated);
+      return updated;
     });
   }, []);
+
+  // derived flag for current game
+  const isCurrentFavorited = !!(game?.id && favorites.includes(game.id));
 
   const handleGameClick = useCallback(
     (gameToNavigate) => {
@@ -289,7 +286,7 @@ const GamePage = () => {
           <h1
             className="display-5 fw-bold mb-2"
             style={{
-              color: isDark ? "#ffffffff" : "#000000ff",
+              color: isDark ? "#ffffff" : "#000000ff",
             }}
           >
             {game?.title}
@@ -386,6 +383,50 @@ const GamePage = () => {
                   {formatNumber(gameStats.views)}
                 </span>
               </button>
+
+              {/* add to favorites */}
+              <button
+                className="d-flex align-items-center gap-2 px-2 py-2 justify-content-center rounded-pill"
+                onClick={() => game?.id && handleToggleFavorite(game.id)}
+                aria-pressed={isCurrentFavorited}
+                title={
+                  isCurrentFavorited
+                    ? "Remove from favorites"
+                    : "Add to favorites"
+                }
+                style={{
+                  background: isCurrentFavorited
+                    ? "linear-gradient(45deg, #ff6b6b, #f06595)"
+                    : isDark
+                    ? "#495057"
+                    : "#f8f9fa",
+                  border: `1px solid ${
+                    isCurrentFavorited
+                      ? "#f06595"
+                      : isDark
+                      ? "#6c757d"
+                      : "#dee2e6"
+                  }`,
+                  color: isCurrentFavorited
+                    ? "#ffffff"
+                    : isDark
+                    ? "#adb5bd"
+                    : "#6c757d",
+                  transition: "all 0.25s ease",
+                }}
+              >
+                <Heart
+                  size={26}
+                  color={
+                    isCurrentFavorited
+                      ? "#ffffff"
+                      : isDark
+                      ? "#adb5bd"
+                      : "#6c757d"
+                  }
+                  fill={isCurrentFavorited ? "#ffffff33" : "none"}
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -395,25 +436,25 @@ const GamePage = () => {
           <h3
             className="mb-4 text-center"
             style={{
-              color: isDark ? "#ffffffff" : "#000000ff",
+              color: isDark ? "#ffffff" : "#000000ff",
             }}
           >
             More Games
           </h3>
           <div className="row m-auto">
-               {moreGames
-            ?.slice()
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 12)
-            .map((moreGame) => (
-              <GameCard
-                key={moreGame.id}
-                game={moreGame}
-                onGameClick={handleGameClick}
-                onToggleFavorite={handleToggleFavorite}
-                isFavorited={favorites.includes(moreGame.id)}
-              />
-          ))}
+            {moreGames
+              ?.slice()
+              .sort(() => Math.random() - 0.5)
+              .slice(0, 12)
+              .map((moreGame) => (
+                <GameCard
+                  key={moreGame.id}
+                  game={moreGame}
+                  onGameClick={handleGameClick}
+                  onToggleFavorite={handleToggleFavorite}
+                  isFavorited={favorites.includes(moreGame.id)}
+                />
+              ))}
           </div>
         </div>
       </div>
