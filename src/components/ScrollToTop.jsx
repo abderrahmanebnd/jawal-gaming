@@ -1,16 +1,15 @@
+// components/ScrollToTop.jsx
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const ScrollToTop = () => {
-  // Extract path property
   const { pathname } = useLocation();
 
-  // Automatically scroll to top whenever pathname changes
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname]);
 
-  return <></>;
+  return null;
 };
 
 export default ScrollToTop;

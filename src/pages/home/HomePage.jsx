@@ -248,6 +248,7 @@ const HomePage = () => {
     );
   }
 
+  // TODO:we can use framer-motion to animate the cards on hover and on load
   return (
     <div className="container" style={{ overflowY: "auto" }}>
       {/* Navigation Tabs */}

@@ -20,6 +20,7 @@ import { apiEndPoints } from "./api/api";
 import useApi from "./hooks/useApi";
 import ScrollToTop from "./components/ScrollToTop";
 import ColorToggle from "./shared/ColorToggle";
+import BackToTopButton from "./components/BackToTopButton";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState("/");
@@ -174,6 +175,7 @@ const App = () => {
       />
 
       <ScrollToTop />
+      <BackToTopButton />
     </div>
   );
 };
