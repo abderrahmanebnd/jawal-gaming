@@ -205,10 +205,10 @@ const NavComponent = () => {
             <div className="d-flex align-items-center d-none d-md-block">
               <Navigation size={32} color={CONSTANTS.COLORS.primary} className="me-3" />
               <div>
-                <h3 className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>
+                <h3 className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
                   Navigation Management
                 </h3>
-                <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>Manage your website navigation menu</p>
+                <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>Manage your website navigation menu</p>
               </div>
             </div>
             <button
@@ -232,10 +232,10 @@ const NavComponent = () => {
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div className="mt-4">
-              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>
+              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
                 Navigation Links ({navLinks.length})
               </p>
-              <p className="mb-0 " style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#ffffffff" }}>Configure your website main navigation</p>
+              <p className="mb-0 " style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>Configure your website main navigation</p>
             </div>
             {NavLoading && (
               <div className="spinner-border text-primary" role="status">
