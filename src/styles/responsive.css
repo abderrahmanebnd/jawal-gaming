@@ -1,5 +1,62 @@
 /* /styles/responsive.css */
 
+/* Fullscreen Game Player */
+.game-player.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: #000;
+}
+
+.game-player.fullscreen iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+.game-card {
+  width: 100%;           
+  aspect-ratio: 1/1;          
+  background-color: #2a2a2a45;
+  cursor: pointer;
+  transform: scale(1);
+  border-radius: 32px;
+
+  border: 2px solid #fff035;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.game-card:hover { border-color: #b6e642; }
+
+@media (max-width: 400px) {
+  .game-card {border-radius: 26px;  
+ }
+}
+@media (min-width: 576px) {
+  .game-card { 
+    height: 160px;  
+ }
+}
+
+@media (min-width: 768px) {
+  .game-card { height: 170px; }
+}
+
+@media (min-width: 992px) {
+  .game-card { height: 180px; }
+}
+
+@media (min-width: 1200px) {
+  .game-card { 
+    height: 170px;
+    border-radius: 36px; }
+}
+
+
 /* Mobile First Responsive Design */
 
 /* Extra Small devices (portrait phones, less than 576px) */
@@ -10,10 +67,6 @@
   
   .lead {
     font-size: 1rem;
-  }
-  
-  .game-card {
-    margin-bottom: 1rem;
   }
   
   .navbar-brand {
@@ -38,17 +91,14 @@
   .display-4 {
     font-size: 2.5rem;
   }
-  
-  .game-card:hover {
-    transform: scale(1.02) translateY(-3px);
-  }
 }
+
+
+
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991.98px) {
-  .game-card:hover {
-    transform: scale(1.05) translateY(-5px);
-  }
+
   
   .navbar-nav {
     flex-direction: row;
@@ -105,41 +155,5 @@
   
   .admin-dashboard .card-body {
     padding: 1.5rem;
-  }
-}
-
-/* Fullscreen Game Player */
-.game-player.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  background: #000;
-}
-
-.game-player.fullscreen iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.game-card{
-  width: 180px;
-  height: 180px;
-  background-color: #2a2a2a45;
-  cursor: pointer;
-  transform: scale(1);
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  border: 2px solid #444;
-  border-radius: 60px;
-
-}
-
-@media (max-width: 768px) {
- .game-card{
-    width: 160px;
-    height: 160px;
   }
 }

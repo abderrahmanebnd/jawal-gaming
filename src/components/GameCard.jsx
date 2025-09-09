@@ -1,5 +1,6 @@
 import { Heart, Play } from 'lucide-react';
 import "../styles/responsive.css";
+import { CONSTANTS } from '../shared/constants';
 const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick }) => {
   // Handle image loading error
   const handleImageError = (e) => {
@@ -7,18 +8,18 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick }) => {
   };
 
   return (
-    <div className="mb-3 col-md-2 col-6 pt-2 " >
+    <div className="mb-3 pt-2 col-4 col-md-3 col-xl-2">
       <div 
         className="game-card  mx-md-2 mx-1 position-relative overflow-hidden shadow-0"
-
+   
         onClick={() => onGameClick(game)}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.borderColor = '#007bff';
+          // e.currentTarget.style.borderColor = CONSTANTS.COLORS.greenMainColor;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.borderColor = '#444';
+          // e.currentTarget.style.borderColor = '#444';
         }}
       >
         {/* Game Image - Full Container */}

@@ -383,7 +383,7 @@ const HomePage = () => {
 
       {/* Games Grid */}
       <div
-        className="row mt-md-4 m-auto"
+        className="row  mt-md-4 m-auto"
         style={{
           overflowX: "hidden",
         }}
@@ -463,3 +463,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+// TODO: make sure that the buttons shape , as he want it , and the links in the footer and in the navigation bar

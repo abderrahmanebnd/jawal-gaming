@@ -22,9 +22,9 @@
   transition: all 0.3s ease;
 }
 
-.game-card:hover {
+/* .game-card:hover {
   transform: translateY(-5px);
-}
+} */
 
 .btn:focus {
   box-shadow: none !important;
