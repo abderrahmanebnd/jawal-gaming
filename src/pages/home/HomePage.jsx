@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../shared/constants";
 import GameCard from "../../components/GameCard";
 import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
+import { StorageManager } from "../../shared/storage";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -13,8 +14,7 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [allGames, setAllGames] = useState([]);
   const [favorites, setFavorites] = useState(
-    JSON.parse(localStorage.getItem("favorites") || "[]")
-  );
+    StorageManager.getFavorites() || []);
   const [pageSize, setPageSize] = useState(20);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -153,7 +153,7 @@ const HomePage = () => {
 
       // Update localStorage immediately
       try {
-        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+        StorageManager.setFavorites(updatedFavorites);
       } catch (error) {
         console.error("Error saving favorites to localStorage:", error);
       }

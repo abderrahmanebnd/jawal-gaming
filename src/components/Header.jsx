@@ -11,7 +11,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
     style={{
       backgroundColor:
         document.body.getAttribute("data-theme") === "light"
-          ? "#e7e8e6"
+          ? " #e7e8e6"
           : "#333131",
       borderBottom: `2px solid ${
         document.body.getAttribute("data-theme") === "light"
@@ -29,10 +29,18 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
             color:
               document.body.getAttribute("data-theme") === "light"
                 ? " #333131"
-                : "#e7e8e6",
+                : "#ffffffff",
           }}
         >
-          <img width={100} src={logo} />
+          <img
+            width={100}
+            src={
+              document.body.getAttribute("data-theme") === "light"
+                ? lightModeLogo
+                : logo
+            }
+            alt="Jawal Games"
+          />
         </a>
 
         <button
@@ -41,24 +49,16 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
           onClick={onMenuToggle}
           style={{ boxShadow: "none" }}
         >
-          {isMenuOpen ? (
-            <X
-              size={34}
-              color={
-                document.body.getAttribute("data-theme") === "light"
-                  ? " #b2de43"
-                  : "#b2de43"
-              }
-            />
+          {document.body.getAttribute("data-theme") === "light" ? (
+            isMenuOpen ? (
+              <X size={34} color="#b2de43" />
+            ) : (
+              <img src={menuIcon} width={34} height={34} alt="Menu" />
+            )
+          ) : isMenuOpen ? (
+            <X size={34} color="#b2de43" />
           ) : (
-            <Menu
-              size={34}
-              color={
-                document.body.getAttribute("data-theme") === "light"
-                  ? " #b2de43"
-                  : "#b2de43"
-              }
-            />
+            <Menu size={34} color="#b2de43" />
           )}
         </button>
 
@@ -73,12 +73,12 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
                     color:
                       document.body.getAttribute("data-theme") === "light"
                         ? " #333131"
-                        : "#e7e8e6",
+                        : "#ffffffff",
                   }}
                   onMouseEnter={(e) =>
                     (e.target.style.backgroundColor =
                       document.body.getAttribute("data-theme") === "light"
-                        ? " #e7e8e690"
+                        ? " #f3f3f3ff"
                         : "#333131")
                   }
                   onMouseLeave={(e) =>
