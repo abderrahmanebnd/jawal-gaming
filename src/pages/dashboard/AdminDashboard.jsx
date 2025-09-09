@@ -85,7 +85,7 @@ const AdminDashboard = () => {
           </div>
           <div>
             <h3 className="mb-0 fw-bold" 
-                style={{ color: isDark ? "#ffffff" : "#000000" }}>
+                style={{ color: isDark ? "#e7e8e6" : "#000000" }}>
               Admin Dashboard
             </h3>
             <p className="mb-0 small" 
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <small className="fw-semibold d-block" 
-                     style={{ color: isDark ? "#ffffff" : "#000000" }}>
+                     style={{ color: isDark ? "#e7e8e6" : "#000000" }}>
                 Administrator
               </small>
               <small style={{ color: isDark ? "#adb5bd" : "#6c757d" }}>
@@ -175,7 +175,7 @@ const AdminDashboard = () => {
                   color:
                     activeSection === section.key
                       ? "#fff"
-                      : isDark ? "#ffffff" : "#000000",
+                      : isDark ? "#e7e8e6" : "#000000",
                   border: `2px solid ${
                     activeSection === section.key
                       ? CONSTANTS.COLORS.primary
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                 onMouseLeave={(e) => {
                   if (activeSection !== section.key) {
                     e.currentTarget.style.borderColor = "#555";
-                    e.currentTarget.style.color = isDark ? "#ffffff" : "#000000";
+                    e.currentTarget.style.color = isDark ? "#e7e8e6" : "#000000";
                   }
                 }}
               >
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
           <div className="modal-dialog modal-dialog-centered modal-sm">
             <div 
               className="modal-content border-0 shadow-lg"
-              style={{ backgroundColor: isDark ? '#2c3e50' : '#ffffff' }}
+              style={{ backgroundColor: isDark ? '#2c3e50' : '#e7e8e6' }}
             >
               <div className="modal-header border-0 pb-2">
                 <div className="d-flex align-items-center w-100">
@@ -237,7 +237,7 @@ const AdminDashboard = () => {
                     <AlertTriangle size={18} />
                   </div>
                   <h5 className="modal-title mb-0 fw-bold" 
-                      style={{ color: isDark ? '#ffffff' : '#000000' }}>
+                      style={{ color: isDark ? '#e7e8e6' : '#000000' }}>
                     Sign Out Confirmation
                   </h5>
                 </div>
