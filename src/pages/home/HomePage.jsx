@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../shared/constants";
 import GameCard from "../../components/GameCard";
 import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
+import { StorageManager } from "../../shared/storage";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -13,13 +14,14 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [allGames, setAllGames] = useState([]);
   const [favorites, setFavorites] = useState(
-    JSON.parse(localStorage.getItem("favorites") || "[]")
+    StorageManager.getFavorites() || []
   );
   const [pageSize, setPageSize] = useState(20);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-
+  const [topGames, setTopGames] = useState([]);
+  const [topLoaded, setTopLoaded] = useState(false);
   const pageSizeIncrement = 20;
 
   // API hook
@@ -30,11 +32,48 @@ const HomePage = () => {
     error,
   } = useApi();
 
+  // A second API instance so we don’t overwrite data/loading from the “all” list
+  const {
+    get: getTopGames,
+    data: topGamesResponse,
+    source: topGamesSource,
+    error: topError,
+    loading: topLoading, // if your hook doesn’t expose this, you can ignore it
+  } = useApi();
+
   // Refs for infinite scroll optimization
   const loadingRef = useRef(loading);
   const hasMoreRef = useRef(hasMore);
   const scrollTimeoutRef = useRef(null);
   const lastPageSizeRef = useRef(5);
+
+
+useEffect(() => {
+  if (activeTab === "top-games" && !topLoaded) {
+    const url = apiEndPoints.topGames; // e.g., "/api/games/top"
+    const params = { n: 24 }; // fixed to 24
+    const headers = { "Content-Type": "application/json" };
+    getTopGames(url, params, headers, true);
+  }
+}, [activeTab, topLoaded, getTopGames]);
+
+// Handle top games response
+useEffect(() => {
+  if (topGamesResponse?.status === 200) {
+    const rows = topGamesResponse?.data?.data || [];
+    setTopGames(rows);
+    setTopLoaded(true);
+  }
+}, [topGamesResponse]);
+
+// Cleanup cancel token for top-games request
+useEffect(() => {
+  return () => {
+    if (topGamesSource) {
+      topGamesSource.cancel("Component unmounted (top games)");
+    }
+  };
+}, [topGamesSource]);
 
   // Sync refs with state
   useEffect(() => {
@@ -153,7 +192,7 @@ const HomePage = () => {
 
       // Update localStorage immediately
       try {
-        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+        StorageManager.setFavorites(updatedFavorites);
       } catch (error) {
         console.error("Error saving favorites to localStorage:", error);
       }
@@ -188,8 +227,12 @@ const HomePage = () => {
   );
 
   // Get displayed games based on active tab
-  const displayedGames = activeTab === "favorites" ? favoriteGames : allGames;
-
+const displayedGames =
+  activeTab === "favorites"
+    ? favoriteGames
+    : activeTab === "top-games"
+    ? topGames
+    : allGames;
   // Sync favorites with localStorage on mount
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -250,7 +293,7 @@ const HomePage = () => {
 
   // TODO:we can use framer-motion to animate the cards on hover and on load
   return (
-    <div className="container" style={{ overflowY: "auto",}}>
+    <div className="container" style={{ overflowY: "auto" }}>
       {/* Navigation Tabs */}
       <div className="mb-4 mt-2">
         <ul className="nav nav-pills justify-content-center">
