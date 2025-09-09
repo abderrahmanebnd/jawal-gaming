@@ -10,7 +10,7 @@ const Footer = ({ footerLinks }) => (
     style={{
       backgroundColor:
         document.body.getAttribute("data-theme") === "light"
-          ? "#c6c4c6"
+          ? "#e7e8e6"
           : "#333131",
       borderTop: `2px solid ${
         document.body.getAttribute("data-theme") === "light"
@@ -62,7 +62,7 @@ const Footer = ({ footerLinks }) => (
                   color:
                     document.body.getAttribute("data-theme") === "light"
                       ? "#333131"
-                      : "#c6c4c6",
+                      : "#e7e8e6",
                 }}
               >
                 {link.title}
@@ -83,7 +83,7 @@ const Footer = ({ footerLinks }) => (
                 color:
                   document.body.getAttribute("data-theme") === "light"
                     ? "#333131"
-                    : "#c6c4c6",
+                    : "#e7e8e6",
               }}
             >
               {link.title}

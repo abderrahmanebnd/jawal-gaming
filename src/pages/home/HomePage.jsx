@@ -263,10 +263,10 @@ const HomePage = () => {
                 backgroundColor: "transparent",
                 color:
                   activeTab === "all"
-                    ? "#c6c4c6"
+                    ? "#e7e8e6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#c6c4c6",
+                    : "#e7e8e6",
                 border: `2px solid ${
                   activeTab === "all"
                     ? CONSTANTS.COLORS.greenMainColor
@@ -289,7 +289,7 @@ const HomePage = () => {
                       ? CONSTANTS.COLORS.greenMainColor
                       : document.body.getAttribute("data-theme") === "light"
                       ? "#000000ff"
-                      : "#c6c4c6",
+                      : "#e7e8e6",
                 }}
               >
                 All Games
@@ -305,10 +305,10 @@ const HomePage = () => {
                 backgroundColor: "transparent",
                 color:
                   activeTab === "favorites"
-                    ? "#c6c4c6"
+                    ? "#e7e8e6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#c6c4c6",
+                    : "#e7e8e6",
                 border: `2px solid ${
                   activeTab === "favorites"
                     ? CONSTANTS.COLORS.greenMainColor
@@ -351,7 +351,7 @@ const HomePage = () => {
                       ? CONSTANTS.COLORS.greenMainColor
                       : document.body.getAttribute("data-theme") === "light"
                       ? "#000000ff"
-                      : "#c6c4c6",
+                      : "#e7e8e6",
                 }}
               >
                 Favorites ({favoriteGames.length}){" "}
@@ -367,10 +367,10 @@ const HomePage = () => {
                 backgroundColor: "transparent",
                 color:
                   activeTab === "top-games"
-                    ? "#c6c4c6"
+                    ? "#e7e8e6"
                     : document.body.getAttribute("data-theme") === "light"
                     ? "#000000ff"
-                    : "#c6c4c6",
+                    : "#e7e8e6",
                 border: `2px solid ${
                   activeTab === "top-games"
                     ? CONSTANTS.COLORS.greenMainColor
@@ -393,7 +393,7 @@ const HomePage = () => {
                       ? CONSTANTS.COLORS.greenMainColor
                       : document.body.getAttribute("data-theme") === "light"
                       ? "#000000ff"
-                      : "#c6c4c6",
+                      : "#e7e8e6",
                 }}
               >
                 Top Games

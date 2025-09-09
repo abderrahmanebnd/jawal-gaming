@@ -9,11 +9,11 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
     style={{
       backgroundColor:
         document.body.getAttribute("data-theme") === "light"
-          ? "#c6c4c6"
+          ? "#e7e8e6"
           : "#333131",
       borderBottom: `2px solid ${
         document.body.getAttribute("data-theme") === "light"
-          ? " #c6c4c6"
+          ? " #e7e8e6"
           : "#272727ff"
       }`,
     }}
@@ -27,7 +27,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
             color:
               document.body.getAttribute("data-theme") === "light"
                 ? " #333131"
-                : "#c6c4c6",
+                : "#e7e8e6",
           }}
         >
           <img width={100} src={logo} />
@@ -71,12 +71,12 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
                     color:
                       document.body.getAttribute("data-theme") === "light"
                         ? " #333131"
-                        : "#c6c4c6",
+                        : "#e7e8e6",
                   }}
                   onMouseEnter={(e) =>
                     (e.target.style.backgroundColor =
                       document.body.getAttribute("data-theme") === "light"
-                        ? " #c6c4c690"
+                        ? " #e7e8e690"
                         : "#333131")
                   }
                   onMouseLeave={(e) =>

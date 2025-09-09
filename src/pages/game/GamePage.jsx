@@ -289,7 +289,7 @@ const GamePage = () => {
           <h1
             className="display-5 fw-bold mb-2"
             style={{
-              color: isDark ? "#c6c4c6" : "#000000ff",
+              color: isDark ? "#e7e8e6" : "#000000ff",
             }}
           >
             {game?.title}
@@ -395,7 +395,7 @@ const GamePage = () => {
           <h3
             className="mb-4 text-center"
             style={{
-              color: isDark ? "#c6c4c6" : "#000000ff",
+              color: isDark ? "#e7e8e6" : "#000000ff",
             }}
           >
             More Games

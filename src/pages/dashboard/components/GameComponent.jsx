@@ -305,10 +305,10 @@ const handleGameSubmit = async () => {
             <div className="d-flex align-items-center d-none d-md-block">
               <GamepadIcon size={32} color={CONSTANTS.COLORS.primary} className="me-3" />
               <div>
-                <h3 className="mb-0 fw-bold" style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6"  }}>
+                <h3 className="mb-0 fw-bold" style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6"  }}>
                   Game Management
                 </h3>
-                <p className="mb-0 " style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6"  }}>Add and manage your game collection</p>
+                <p className="mb-0 " style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6"  }}>Add and manage your game collection</p>
               </div>
             </div>
         
@@ -335,10 +335,10 @@ const handleGameSubmit = async () => {
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div className="mb-0 mt-md-4">
-              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>
+              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
                 Your Games ({games.length})
               </p>
-              <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#c6c4c6" }}>Manage your game collection</p>
+              <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>Manage your game collection</p>
             </div>
             {gameLoading && (
               <div className="spinner-border text-primary" role="status">
