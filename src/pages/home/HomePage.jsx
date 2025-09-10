@@ -6,58 +6,72 @@ import GameCard from "../../components/GameCard";
 import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
 import { StorageManager } from "../../shared/storage";
+import useGames from "../../hooks/useGames";
 
-const TOP_GAMES_NUMBER = 24; // Fixed number of top games to fetch
+const TOP_GAMES_NUMBER = 24;
+const PAGE_SIZE = 20;
+
 const HomePage = () => {
   const navigate = useNavigate();
 
-  // State management
+  // tabs + favorites
   const [activeTab, setActiveTab] = useState("all");
-  const [allGames, setAllGames] = useState([]);
-  const [favorites, setFavorites] = useState(
-    StorageManager.getFavorites() || []
-  );
-  const [pageSize, setPageSize] = useState(20);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState(StorageManager.getFavorites() || []);
+  const [favoriteList, setFavoriteList] = useState([]);
+  const [favMutating, setFavMutating] = useState(false);
+
+  // “All” tab paging state (tutorial style)
+  const [pageNumber, setPageNumber] = useState(1);
+
+  // Hook for “All” games with infinite scroll
+  const { games: allGames, hasMore, loading, error } = useGames(pageNumber, PAGE_SIZE);
+
+
+  // Top games
   const [topGames, setTopGames] = useState([]);
   const [topLoaded, setTopLoaded] = useState(false);
-  const pageSizeIncrement = 20;
+  const { get: getTopGames, data: topGamesResponse, source: topGamesSource,loading:loadingTopGames } = useApi();
 
-  const [favMutating, setFavMutating] = useState(false);
-  const [favoriteIds, setFavoriteIds] = useState(StorageManager.getFavorites());
-  const [favoriteList, setFavoriteList] = useState([]);
+  // Favorites batch API
+  const { get: getFavoritesBatch, data: favoritesResponse, source: favoritesSource,loading:loadingFavorites } = useApi();
 
-  // API hook
-  const {
-    get: getGames,
-    data: gameResponse,
-    source: gameSource,
-    error,
-  } = useApi();
+  // Observe the last card like in the tutorial
+  const observer = useRef(null);
+  const lastGameRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && activeTab === "all") {
+          setPageNumber((prev) => prev + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, activeTab]
+  );
 
-  // A second API instance so we don’t overwrite data/loading from the “all” list
-  const {
-    get: getTopGames,
-    data: topGamesResponse,
-    source: topGamesSource,
-    error: topError,
-    loading: topLoading,
-  } = useApi();
+  // Top games: fetch once when tab is opened
+  useEffect(() => {
+    if (activeTab !== "top-games" || topLoaded) return;
+    const url = apiEndPoints.topGames;
+    const params = { n: TOP_GAMES_NUMBER };
+    const headers = { "Content-Type": "application/json" };
+    getTopGames(url, params, headers, true);
+  }, [activeTab, topLoaded, getTopGames]);
 
-  const {
-    get: getFavoritesBatch,
-    data: favoritesResponse,
-    source: favoritesSource,
-  } = useApi();
+  useEffect(() => {
+    if (topGamesResponse?.status === 200) {
+      setTopGames(topGamesResponse?.data?.data || []);
+      setTopLoaded(true);
+    }
+  }, [topGamesResponse]);
 
-  // Refs for infinite scroll optimization
-  const loadingRef = useRef(loading);
-  const hasMoreRef = useRef(hasMore);
-  const scrollTimeoutRef = useRef(null);
-  const lastPageSizeRef = useRef(5);
+  useEffect(() => {
+    return () => topGamesSource?.cancel?.("unmount top-games");
+  }, [topGamesSource]);
 
+  // Favorites: fetch list when opening the tab
   useEffect(() => {
     if (activeTab !== "favorites") return;
     const ids = StorageManager.getFavorites() || [];
@@ -65,285 +79,125 @@ const HomePage = () => {
       setFavoriteList([]);
       return;
     }
-    const url = apiEndPoints.getGamesByIds; // e.g., "/api/games/by-ids"
-    const params = { ids: ids.join(",") }; // no offset/limit => fetch all
+    const url = apiEndPoints.getGamesByIds;
+    const params = { ids: ids.join(",") };
     const headers = { "Content-Type": "application/json" };
     getFavoritesBatch(url, params, headers, true);
   }, [activeTab, getFavoritesBatch]);
 
   useEffect(() => {
-    if (activeTab === "top-games" && !topLoaded) {
-      const url = apiEndPoints.topGames;
-      const params = { n: TOP_GAMES_NUMBER }; // fixed to 24
-      const headers = { "Content-Type": "application/json" };
-      getTopGames(url, params, headers, true);
-    }
-  }, [activeTab, topLoaded, getTopGames]);
-
-  useEffect(() => {
     if (favoritesResponse?.status === 200) {
       const rows = favoritesResponse?.data?.data || [];
-      // De-dup and sort to match favorites ID order
       const ids = StorageManager.getFavorites() || [];
-      const byId = new Map();
-      for (const g of rows)
-        if (g && g.id != null && !byId.has(g.id)) byId.set(g.id, g);
-      const ordered = ids.map((id) => byId.get(id)).filter(Boolean);
-      setFavoriteList(ordered);
+      // keep original order
+      const byId = new Map(rows.map((g) => [g.id, g]));
+      setFavoriteList(ids.map((id) => byId.get(id)).filter(Boolean));
     }
   }, [favoritesResponse]);
+
   useEffect(() => {
-    return () => {
-      favoritesSource?.cancel?.("Component unmounted (favorites)");
-    };
+    return () => favoritesSource?.cancel?.("unmount favorites");
   }, [favoritesSource]);
 
-  // Handle top games response
-  useEffect(() => {
-    if (topGamesResponse?.status === 200) {
-      const rows = topGamesResponse?.data?.data || [];
-      setTopGames(rows);
-      setTopLoaded(true);
-    }
-  }, [topGamesResponse]);
+  const handleToggleFavorite = useCallback(
+    async (gameId) => {
+      if (!gameId) return;
+      if (activeTab === "favorites" && favMutating) return;
 
-  // Cleanup cancel token for top-games request
-  useEffect(() => {
-    return () => {
-      if (topGamesSource) {
-        topGamesSource.cancel("Component unmounted (top games)");
-      }
-    };
-  }, [topGamesSource]);
+      let updatedIds = [];
+      setFavoriteIds((prev) => {
+        const exists = prev.includes(gameId);
+        const next = exists ? prev.filter((id) => id !== gameId) : [...prev, gameId];
+        try { StorageManager.setFavorites(next); } catch {}
+        updatedIds = next;
+        return next;
+      });
 
-  // Sync refs with state
-  useEffect(() => {
-    loadingRef.current = loading;
-  }, [loading]);
-
-  useEffect(() => {
-    hasMoreRef.current = hasMore;
-  }, [hasMore]);
-
-  // Fetch games function with increased page size
-  const fetchGames = useCallback(
-    async (newPageSize = 20, isInitial = false) => {
-      if (loading && !isInitial) return;
-
-      setLoading(true);
-      if (isInitial) setInitialLoading(true);
-
-      try {
-        const url = apiEndPoints.viewGame;
-        const params = { pageNo: 1, pageSize: newPageSize };
-        const headers = { "Content-Type": "application/json" };
-        await getGames(url, params, headers, true);
-        lastPageSizeRef.current = newPageSize;
-      } catch (err) {
-        console.error("Error fetching games:", err);
-      } finally {
-        setLoading(false);
-        if (isInitial) setInitialLoading(false);
+      if (activeTab === "favorites") {
+        try {
+          setFavMutating(true);
+          const ids = StorageManager.getFavorites() || updatedIds || [];
+          if (!ids.length) {
+            setFavoriteList([]);
+            return;
+          }
+          const url = apiEndPoints.getGamesByIds;
+          const params = { ids: ids.join(",") };
+          const headers = { "Content-Type": "application/json" };
+          await getFavoritesBatch(url, params, headers, true);
+        } finally {
+          setFavMutating(false);
+        }
       }
     },
-    [getGames, loading]
+    [activeTab, favMutating, getFavoritesBatch]
   );
 
-  // Initial load
-  useEffect(() => {
-    fetchGames(5, true);
-  }, []);
-
-  // Handle page size change for infinite scroll
-  useEffect(() => {
-    if (pageSize > 5) {
-      const data = fetchGames(pageSize);
-    }
-  }, [pageSize]);
-
-  // Update allGames when new data arrives
-  useEffect(() => {
-    if (gameResponse?.status === 200) {
-      const newGames = gameResponse?.data?.data || [];
-
-      // Replace all games with new data (since we're increasing page size, not page number)
-      setAllGames(newGames);
-
-      // Check if there are more games to load
-      if (newGames.length < pageSize) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
-    }
-  }, [gameResponse, pageSize]);
-
-  // Cancel API request on unmount
-  useEffect(() => {
-    return () => {
-      if (gameSource) {
-        gameSource.cancel("Component unmounted");
-      }
-    };
-  }, [gameSource]);
-
-  // Enhanced infinite scroll with proper debouncing
-  useEffect(() => {
-    const handleScroll = () => {
-      // Clear existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-
-      // Set a new timeout to debounce scroll events
-      scrollTimeoutRef.current = setTimeout(() => {
-        const scrollPosition = window.innerHeight + window.scrollY;
-        const documentHeight = document.documentElement.scrollHeight;
-        const threshold = 200;
-
-        if (
-          scrollPosition >= documentHeight - threshold &&
-          !loadingRef.current &&
-          hasMoreRef.current &&
-          activeTab === "all"
-        ) {
-          setPageSize((prev) => prev + pageSizeIncrement);
-        }
-      }, 250); // Increased debounce time to prevent excessive requests
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    };
-  }, [activeTab]);
-
-const handleToggleFavorite = useCallback(
-  async (gameId) => {
-    if (!gameId) return;
-
-    // Prevent stacking re-requests on the Favorites tab
-    if (activeTab === "favorites" && favMutating) return;
-
-    // Update state + storage in one place
-    let updatedIds= [];
-    setFavorites((prev) => {
-      const exists = prev.includes(gameId);
-      const next = exists
-        ? prev.filter((id) => id !== gameId)
-        : [...prev, gameId];
-      try {
-        StorageManager.setFavorites(next);
-      } catch {}
-      updatedIds = next;
-      // keep the mirror list in sync for UI (badge + includes checks)
-      setFavoriteIds(next);
-      return next;
-    });
-
-    // If on Favorites tab, re-fetch the entire list so the grid reflects changes
-    if (activeTab === "favorites") {
-      try {
-        setFavMutating(true);
-        // read after write, ensuring the persisted value is used
-        const ids = StorageManager.getFavorites() || updatedIds || [];
-        if (!ids.length) {
-          setFavoriteList([]);
-          return;
-        }
-        const url = apiEndPoints.getGamesByIds;
-        const params = { ids: ids.join(",") };
-        const headers = { "Content-Type": "application/json" };
-        await getFavoritesBatch(url, params, headers, true);
-      } finally {
-        setFavMutating(false);
-      }
-    }
-  },
-  [activeTab, favMutating, getFavoritesBatch]
-);
-
-
-  // Handle game click - navigate to game page
   const handleGameClick = useCallback(
     (game) => {
       if (!game) return;
-      const slug = game?.title.toLowerCase().replace(/\s+/g, "-");
+      const slug = String(game?.title || "").toLowerCase().replace(/\s+/g, "-");
       navigate(`/${slug}`);
     },
     [navigate]
   );
 
-  // Handle tab change with reset for infinite scroll
   const handleTabChange = useCallback((tab) => {
     setActiveTab(tab);
-
-    // Reset scroll position when switching tabs
-    if (tab === "favorites") {
+    if (tab === "all") {
+      // reset paging like the tutorial resets pageNumber
+      setPageNumber(1);
+      // also disconnect observer so we don’t accidentally trigger loads mid-transition
+      if (observer.current) observer.current.disconnect();
+    } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, []);
 
-  // Sync favorites with localStorage on mount
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "favorites") {
-        const newFavorites = JSON.parse(e.newValue || "[]");
-        setFavorites(newFavorites);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
   const displayedGames =
-    activeTab === "favorites"
-      ? favoriteList
-      : activeTab === "top-games"
-      ? topGames
-      : allGames;
-  // Loading state for initial load
+    activeTab === "favorites" ? favoriteList :
+    activeTab === "top-games" ? topGames :
+    allGames;
+
+  // Initial UX (optional): show a spinner if “all” is empty and loading
+  const loadingAll = activeTab === "all" && loading && pageNumber === 1;
+  const loadingTop = activeTab === "top-games" && loadingTopGames && !topLoaded;
+  const loadingFavoritesGames = activeTab === "favorites" && loadingFavorites;
+
+  const initialLoading = loadingAll || loadingTop || loadingFavoritesGames;
+
   if (initialLoading) {
     return (
-      <div
-        className="container py-4 d-flex justify-content-center align-items-center"
-        style={{ minHeight: "50vh" }}
-      >
+      <div className="container" style={{ overflowY: "auto" }}>
+        <Tabs
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+          favoriteIds={favoriteIds}
+        />
         <div className="text-center">
-          <div
+          <divj
             className="spinner-border text-primary mb-3"
             role="status"
             style={{ width: "3rem", height: "3rem" }}
           >
             <span className="visually-hidden">Loading...</span>
-          </div>
-          <p style={{ color: "#ccc" }}>Loading amazing games...</p>
+          </divj>
+          <p style={{ color: "#ccc" }}>Loading {loadingAll ? "amazing" : loadingTop ? "top" : "favorite"} games...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
-  if (error && allGames.length === 0) {
+  if (error && activeTab === "all" && displayedGames.length === 0) {
     return (
       <div className="container py-4 text-center" style={{ minHeight: "50vh" }}>
+        
         <div className="d-flex flex-column justify-content-center align-items-center h-100">
           <h3 style={{ color: "#999" }}>Oops! Something went wrong</h3>
-          <p style={{ color: "#666" }}>
-            Unable to load games. Please try again later.
-          </p>
+          <p style={{ color: "#666" }}>Unable to load games. Please try again later.</p>
           <button
             className="btn btn-primary rounded-pill px-4 mt-3"
-            onClick={() => {
-              setPageSize(5);
-              setHasMore(true);
-              fetchGames(5, true);
-            }}
+            onClick={() => setPageNumber(1)}
           >
             Retry
           </button>
@@ -352,182 +206,32 @@ const handleToggleFavorite = useCallback(
     );
   }
 
-  // TODO:we can use framer-motion to animate the cards on hover and on load
   return (
     <div className="container" style={{ overflowY: "auto" }}>
-      {/* Navigation Tabs */}
-      <div className="mb-4 mt-2">
-        <ul className="nav nav-pills justify-content-center">
-          <li className="nav-item me-2">
-            <button
-              className={`nav-link px-4 py-2 mt-2 mt-md-0 rounded-pill fw-semibold transition-all ${
-                activeTab === "all" ? "active" : ""
-              }`}
-              style={{
-                backgroundColor: "transparent",
-                color:
-                  activeTab === "all"
-                    ? "#e7e8e6"
-                    : document.body.getAttribute("data-theme") === "light"
-                    ? "#000000ff"
-                    : "#e7e8e6",
-                border: `2px solid ${
-                  activeTab === "all"
-                    ? CONSTANTS.COLORS.greenMainColor
-                    : CONSTANTS.COLORS.yellowMainColor
-                }`,
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-              onClick={() => handleTabChange("all")}
-            >
-              <span
-                style={{
-                  color:
-                    activeTab === "all"
-                      ? CONSTANTS.COLORS.greenMainColor
-                      : document.body.getAttribute("data-theme") === "light"
-                      ? "#000000ff"
-                      : "#e7e8e6",
-                }}
-              >
-                All Games
-              </span>
-            </button>
-          </li>
-          <li className="nav-item me-2">
-            <button
-              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold transition-all ${
-                activeTab === "favorites" ? "active" : ""
-              }`}
-              style={{
-                backgroundColor: "transparent",
-                color:
-                  activeTab === "favorites"
-                    ? "#e7e8e6"
-                    : document.body.getAttribute("data-theme") === "light"
-                    ? "#000000ff"
-                    : "#e7e8e6",
-                border: `2px solid ${
-                  activeTab === "favorites"
-                    ? CONSTANTS.COLORS.greenMainColor
-                    : CONSTANTS.COLORS.yellowMainColor
-                }`,
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-              onClick={() => handleTabChange("favorites")}
-            >
-              <Heart
-                size={16}
-                className="me-2"
-                fill={
-                  activeTab === "favorites"
-                    ? document.body.getAttribute("data-theme") === "light"
-                      ? CONSTANTS.COLORS.greenMainColor
-                      : CONSTANTS.COLORS.greenMainColor
-                    : "none"
-                }
-                color={
-                  activeTab === "favorites"
-                    ? document.body.getAttribute("data-theme") === "light"
-                      ? CONSTANTS.COLORS.greenMainColor
-                      : CONSTANTS.COLORS.greenMainColor
-                    : document.body.getAttribute("data-theme") === "light"
-                    ? "#000000ff"
-                    : "#f4f3f3ff"
-                }
-              />
-              <span
-                style={{
-                  color:
-                    activeTab === "favorites"
-                      ? CONSTANTS.COLORS.greenMainColor
-                      : document.body.getAttribute("data-theme") === "light"
-                      ? "#000000ff"
-                      : "#e7e8e6",
-                }}
-              >
-                Favorites ({favoriteIds.length}){" "}
-              </span>
-            </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold transition-all ${
-                activeTab === "top-games" ? "active" : ""
-              }`}
-              style={{
-                backgroundColor: "transparent",
-                color:
-                  activeTab === "top-games"
-                    ? "#e7e8e6"
-                    : document.body.getAttribute("data-theme") === "light"
-                    ? "#000000ff"
-                    : "#e7e8e6",
-                border: `2px solid ${
-                  activeTab === "top-games"
-                    ? CONSTANTS.COLORS.greenMainColor
-                    : CONSTANTS.COLORS.yellowMainColor
-                }`,
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-              onClick={() => handleTabChange("top-games")}
-            >
-              <span
-                style={{
-                  color:
-                    activeTab === "top-games"
-                      ? CONSTANTS.COLORS.greenMainColor
-                      : document.body.getAttribute("data-theme") === "light"
-                      ? "#000000ff"
-                      : "#e7e8e6",
-                }}
-              >
-                Top Games
-              </span>
-              {/* TODO make sure to modify this to take the length of the top games */}
-            </button>
-          </li>
-        </ul>
+      {/* Tabs */}
+      <Tabs activeTab={activeTab} handleTabChange={handleTabChange} favoriteIds={favoriteIds} />
+
+      {/* Grid */}
+      <div className="row mt-md-4 m-auto" style={{ overflowX: "hidden" }}>
+        {displayedGames.map((game, idx) => {
+          const isLast =
+            idx === displayedGames.length - 1 && activeTab === "all";
+          return (
+            <GameCard
+              key={game.id}
+              game={game}
+              onGameClick={handleGameClick}
+              onToggleFavorite={handleToggleFavorite}
+              isFavorited={favoriteIds.includes(game.id)}
+              isLast={isLast}
+              lastGameRef={lastGameRef}
+            />
+          );
+        })}
       </div>
 
-      {/* Games Grid */}
-      <div
-        className="row mt-md-4 m-auto"
-        style={{
-          overflowX: "hidden",
-        }}
-      >
-        {displayedGames.map((game) => (
-          <GameCard
-            key={game.id}
-            game={game}
-            onGameClick={handleGameClick}
-            onToggleFavorite={handleToggleFavorite}
-            isFavorited={favoriteIds.includes(game.id)}
-          />
-        ))}
-      </div>
-
-      {/* Loading Indicator */}
-      {loading && !initialLoading && (
+      {/* Loading / status */}
+      {loading && activeTab === "all" && (
         <div className="text-center py-4">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading more games...</span>
@@ -538,7 +242,6 @@ const handleToggleFavorite = useCallback(
         </div>
       )}
 
-      {/* No More Games */}
       {!hasMore && !loading && activeTab === "all" && allGames.length > 0 && (
         <div className="text-center py-4">
           <div className="text-muted">
@@ -552,23 +255,18 @@ const handleToggleFavorite = useCallback(
         </div>
       )}
 
-      {/* Empty All Games State */}
-      {activeTab === "all" &&
-        allGames.length === 0 &&
-        !loading &&
-        !initialLoading && (
-          <div className="text-center py-5">
-            <div className="mb-4">
-              <div className="display-1">🎮</div>
-            </div>
-            <h5 style={{ color: "#999" }}>No games available</h5>
-            <p style={{ color: "#666" }}>
-              No games found. Please check back later.
-            </p>
+      {activeTab === "all" && displayedGames.length === 0 && !loading && (
+        <div className="text-center py-5">
+          <div className="mb-4">
+            <div className="display-1">🎮</div>
           </div>
-        )}
+          <h5 style={{ color: "#999" }}>No games available</h5>
+          <p style={{ color: "#666" }}>
+            No games found. Please check back later.
+          </p>
+        </div>
+      )}
 
-      {/* Empty Favorites State */}
       {activeTab === "favorites" && favoriteIds.length === 0 && (
         <div className="text-center py-5">
           <Heart size={64} color="#666" className="mb-3" />
@@ -590,3 +288,86 @@ const handleToggleFavorite = useCallback(
 };
 
 export default HomePage;
+
+function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
+   return       <div className="mb-4 mt-2">
+        <ul className="nav nav-pills justify-content-center">
+          <li className="nav-item me-2">
+            <button
+              className={`nav-link px-4 py-2 mt-2 mt-md-0 rounded-pill fw-semibold ${activeTab === "all" ? "active" : ""}`}
+              style={{
+                backgroundColor: "transparent",
+                color: activeTab === "all"
+                  ? "#e7e8e6"
+                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
+                border: `2px solid ${activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onClick={() => handleTabChange("all")}
+            >
+              <span style={{ color: activeTab === "all"
+                ? CONSTANTS.COLORS.greenMainColor
+                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
+                All Games
+              </span>
+            </button>
+          </li>
+
+          <li className="nav-item me-2">
+            <button
+              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${activeTab === "favorites" ? "active" : ""}`}
+              style={{
+                backgroundColor: "transparent",
+                color: activeTab === "favorites"
+                  ? "#e7e8e6"
+                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
+                border: `2px solid ${activeTab === "favorites" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onClick={() => handleTabChange("favorites")}
+            >
+              <Heart
+                size={16}
+                className="me-2"
+                fill={activeTab === "favorites" ? CONSTANTS.COLORS.greenMainColor : "none"}
+                color={activeTab === "favorites"
+                  ? CONSTANTS.COLORS.greenMainColor
+                  : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#f4f3f3ff")}
+              />
+              <span style={{ color: activeTab === "favorites"
+                ? CONSTANTS.COLORS.greenMainColor
+                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
+                Favorites ({favoriteIds.length})
+              </span>
+            </button>
+          </li>
+
+          <li className="nav-item">
+            <button
+              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${activeTab === "top-games" ? "active" : ""}`}
+              style={{
+                backgroundColor: "transparent",
+                color: activeTab === "top-games"
+                  ? "#e7e8e6"
+                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
+                border: `2px solid ${activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onClick={() => handleTabChange("top-games")}
+            >
+              <span style={{ color: activeTab === "top-games"
+                ? CONSTANTS.COLORS.greenMainColor
+                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
+                Top Games
+              </span>
+            </button>
+          </li>
+        </ul>
+      </div>
+}
