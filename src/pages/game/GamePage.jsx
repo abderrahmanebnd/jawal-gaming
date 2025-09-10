@@ -282,19 +282,41 @@ const GamePage = () => {
         {/* AdSense Banner */}
         <AdBanner />
 
-        {/* Game Info */}
-        <div className="text-center mb-4 mt-5">
-          <h1
-            className="display-5 fw-bold mb-2"
+        {/* Game Info - Compact Design */}
+        <div className="d-flex flex-column align-items-center mb-4 mt-4">
+          <h2
+            className="fw-bold mb-1"
             style={{
-              color: isDark ? "#e7e8e6" : "#000000ff",
+              fontSize: "2rem",
+              color: isDark ? "#e7e8e6" : "#222",
+              letterSpacing: "0.02em",
+              lineHeight: 1.2,
+              textAlign: "center",
+              maxWidth: "90vw",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
+            title={game?.title}
           >
             {game?.title}
-          </h1>
+          </h2>
+          <p
+            className="mb-0 text-secondary"
+            style={{
+              fontSize: "1rem",
+              color: isDark ? "#adb5bd" : "#555",
+              maxWidth: "80vw",
+              textAlign: "center",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              // whiteSpace: "nowrap",
+            }}
+            title={game?.description}
+          >
+            {game?.description}
+          </p>
         </div>
-
-        {/* Game Player */}
         <div className="mb-5">
           <GamePlayer
             game={game}

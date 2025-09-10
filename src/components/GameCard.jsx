@@ -9,7 +9,9 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
 
   return (
     <div className="mb-3 pt-2 col-4 col-md-3 col-xl-2"
-                  ref={isLast ? lastGameRef : undefined}>
+    ref={isLast ? lastGameRef : undefined}
+    title={game.title || 'Click to play'}
+    >
       <div 
         className="game-card  mx-md-2 mx-1 position-relative overflow-hidden shadow-0"
    
