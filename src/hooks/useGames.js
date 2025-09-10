@@ -49,8 +49,6 @@ export default function useGames(pageNumber, pageSize = DEFAULT_PAGE_SIZE) {
           pag?.totalPages ?? (apiTotal > 0 ? Math.ceil(apiTotal / pageSize) : 1)
         );
 
-        console.log({ rows, apiTotal, pag,payload });
-        // Append de-duped
         setGames((prev) => {
           const seen = new Set(prev.map((g) => String(g?.id)));
           const merged = [...prev];

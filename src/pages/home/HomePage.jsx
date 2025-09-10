@@ -175,13 +175,13 @@ const HomePage = () => {
           favoriteIds={favoriteIds}
         />
         <div className="text-center">
-          <divj
+          <div
             className="spinner-border text-primary mb-3"
             role="status"
             style={{ width: "3rem", height: "3rem" }}
           >
             <span className="visually-hidden">Loading...</span>
-          </divj>
+          </div>
           <p style={{ color: "#ccc" }}>Loading {loadingAll ? "amazing" : loadingTop ? "top" : "favorite"} games...</p>
         </div>
       </div>
