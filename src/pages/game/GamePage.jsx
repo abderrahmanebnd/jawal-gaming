@@ -32,6 +32,7 @@ const GamePage = () => {
     data: gameResponse,
     source: gameSource,
     error: gamesError,
+    loading,
   } = useApi();
 
   const {
