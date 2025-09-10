@@ -17,7 +17,10 @@ export default defineConfig({
   },
   server: {
     port: 8080,
-    open: true
+    open: true,
+    proxy:{
+      '/api': 'http://localhost:3000'
+    }
   },
   build: {
     outDir: 'dist',
