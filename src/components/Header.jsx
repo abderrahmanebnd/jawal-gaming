@@ -4,9 +4,10 @@ import logo from "/logo.png";
 import lightModeLogo from "/Logo-LightMode.png";
 import ColorToggle from "../shared/ColorToggle";
 import menuIcon from "/light-mode-menu.png";
+import { Link } from "react-router-dom";
 
-const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
-  <header
+const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
+  return <header
     className="sticky-top header shadow-sm"
     style={{
       backgroundColor:
@@ -22,9 +23,9 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
   >
     <nav className="navbar  p-0 py-1 navbar-expand-lg navbar-dark">
       <div className="container">
-        <a
+        <Link
           className="navbar-brand fw-bold fs-3"
-          href="/"
+          to="/"
           style={{
             color:
               document.body.getAttribute("data-theme") === "light"
@@ -41,7 +42,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
             }
             alt="Jawal Games"
           />
-        </a>
+        </Link>
 
         <button
           className="navbar-toggler border-1 p-0 "
@@ -66,9 +67,9 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
           <ul className="navbar-nav ms-auto">
             {navLinks.map((link) => (
               <li key={link.id} className="nav-item">
-                <a
+                <Link
                   className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none"
-                  href={link.url}
+                  to={link.url}
                   style={{
                     color:
                       document.body.getAttribute("data-theme") === "light"
@@ -86,7 +87,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
                   }
                 >
                   {link.title}
-                </a>
+                </Link>
               </li>
             ))}
             <li className="nav-item">
@@ -102,6 +103,6 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => (
       </div>
     </nav>
   </header>
-);
+};
 
 export default Header;

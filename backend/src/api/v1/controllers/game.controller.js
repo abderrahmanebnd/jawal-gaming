@@ -238,15 +238,30 @@ exports.getTopGames = async (req, res) => {
 };
 
 // GET /api/games/by-ids?ids=1,2,3&offset=0&limit=20
+/**
+ * Fetch a set of games by an ordered, sanitized list of ids.
+ * Keeps the same order via ORDER BY FIELD.
+ * @param {number[]} idsWindow - sanitized ids (length 1..100)
+ * @returns {Array} rows
+ */
 exports.getByIdsPaged = async (req, res) => {
   try {
     const idsParam = (req.query.ids || "").toString().trim();
     if (!idsParam) {
-      return commonResponse(res, 400, null, "ids query param is required", "v1-game-server-012");
+      return commonResponse(
+        res,
+        400,
+        null,
+        "ids query param is required",
+        "v1-game-server-012"
+      );
     }
 
-    // sanitize: keep only integers, de-duplicate, keep original order
-    const raw = idsParam.split(",").map(s => s.trim()).filter(Boolean);
+    // sanitize ids, de-duplicate, keep order
+    const raw = idsParam
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const seen = new Set();
     const ids = [];
     for (const s of raw) {
@@ -256,30 +271,48 @@ exports.getByIdsPaged = async (req, res) => {
         ids.push(n);
       }
     }
-    if (ids.length === 0) {
-      return commonResponse(res, 400, null, "ids must contain positive integers", "v1-game-server-013");
-    }
- console.log('Sanitized ids:', ids);
-    // paging
-    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
-    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit, 10) || 20)); // cap at 100
-
-    // slice the requested window of ids for efficiency
-    const windowIds = ids.slice(offset, offset + limit);
-
-    if (windowIds.length === 0) {
-      return commonResponse(res, 200, { data: [], total: ids.length, offset, limit });
+    if (!ids.length) {
+      return commonResponse(
+        res,
+        400,
+        null,
+        "ids must contain positive integers",
+        "v1-game-server-013"
+      );
     }
 
-    // fetch ordered window
+    // Optional paging; if missing, fetch all
+    const hasOffset = typeof req.query.offset !== "undefined";
+    const hasLimit = typeof req.query.limit !== "undefined";
+    const offset = hasOffset
+      ? Math.max(0, parseInt(req.query.offset, 10) || 0)
+      : 0;
+    const limit = hasLimit
+      ? Math.max(1, Math.min(1000, parseInt(req.query.limit, 10) || ids.length))
+      : ids.length;
+
+    const windowIds =
+      hasOffset || hasLimit ? ids.slice(offset, offset + limit) : ids;
+
+    if (!windowIds.length) {
+      return commonResponse(res, 200, {
+        data: [],
+        total: ids.length,
+        offset,
+        limit,
+        hasMore: false,
+      });
+    }
+
     const rows = await getGamesByIdsPaged(windowIds);
 
     return commonResponse(res, 200, {
       data: rows,
-      total: ids.length, // total favorites on client
+      total: ids.length,
       offset,
       limit,
-      hasMore: offset + windowIds.length < ids.length
+      hasMore:
+        hasOffset || hasLimit ? offset + windowIds.length < ids.length : false,
     });
   } catch (error) {
     return commonResponse(res, 500, null, error?.message, "v1-game-server-014");

@@ -7,6 +7,7 @@ import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
 import { StorageManager } from "../../shared/storage";
 
+const TOP_GAMES_NUMBER = 24; // Fixed number of top games to fetch
 const HomePage = () => {
   const navigate = useNavigate();
 
@@ -24,6 +25,10 @@ const HomePage = () => {
   const [topLoaded, setTopLoaded] = useState(false);
   const pageSizeIncrement = 20;
 
+  const [favMutating, setFavMutating] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState(StorageManager.getFavorites());
+  const [favoriteList, setFavoriteList] = useState([]);
+
   // API hook
   const {
     get: getGames,
@@ -38,7 +43,13 @@ const HomePage = () => {
     data: topGamesResponse,
     source: topGamesSource,
     error: topError,
-    loading: topLoading, // if your hook doesn’t expose this, you can ignore it
+    loading: topLoading,
+  } = useApi();
+
+  const {
+    get: getFavoritesBatch,
+    data: favoritesResponse,
+    source: favoritesSource,
   } = useApi();
 
   // Refs for infinite scroll optimization
@@ -47,33 +58,63 @@ const HomePage = () => {
   const scrollTimeoutRef = useRef(null);
   const lastPageSizeRef = useRef(5);
 
-
-useEffect(() => {
-  if (activeTab === "top-games" && !topLoaded) {
-    const url = apiEndPoints.topGames; // e.g., "/api/games/top"
-    const params = { n: 24 }; // fixed to 24
-    const headers = { "Content-Type": "application/json" };
-    getTopGames(url, params, headers, true);
-  }
-}, [activeTab, topLoaded, getTopGames]);
-
-// Handle top games response
-useEffect(() => {
-  if (topGamesResponse?.status === 200) {
-    const rows = topGamesResponse?.data?.data || [];
-    setTopGames(rows);
-    setTopLoaded(true);
-  }
-}, [topGamesResponse]);
-
-// Cleanup cancel token for top-games request
-useEffect(() => {
-  return () => {
-    if (topGamesSource) {
-      topGamesSource.cancel("Component unmounted (top games)");
+  useEffect(() => {
+    if (activeTab !== "favorites") return;
+    const ids = StorageManager.getFavorites() || [];
+    if (!ids.length) {
+      setFavoriteList([]);
+      return;
     }
-  };
-}, [topGamesSource]);
+    const url = apiEndPoints.getGamesByIds; // e.g., "/api/games/by-ids"
+    const params = { ids: ids.join(",") }; // no offset/limit => fetch all
+    const headers = { "Content-Type": "application/json" };
+    getFavoritesBatch(url, params, headers, true);
+  }, [activeTab, getFavoritesBatch]);
+
+  useEffect(() => {
+    if (activeTab === "top-games" && !topLoaded) {
+      const url = apiEndPoints.topGames;
+      const params = { n: TOP_GAMES_NUMBER }; // fixed to 24
+      const headers = { "Content-Type": "application/json" };
+      getTopGames(url, params, headers, true);
+    }
+  }, [activeTab, topLoaded, getTopGames]);
+
+  useEffect(() => {
+    if (favoritesResponse?.status === 200) {
+      const rows = favoritesResponse?.data?.data || [];
+      // De-dup and sort to match favorites ID order
+      const ids = StorageManager.getFavorites() || [];
+      const byId = new Map();
+      for (const g of rows)
+        if (g && g.id != null && !byId.has(g.id)) byId.set(g.id, g);
+      const ordered = ids.map((id) => byId.get(id)).filter(Boolean);
+      setFavoriteList(ordered);
+    }
+  }, [favoritesResponse]);
+  useEffect(() => {
+    return () => {
+      favoritesSource?.cancel?.("Component unmounted (favorites)");
+    };
+  }, [favoritesSource]);
+
+  // Handle top games response
+  useEffect(() => {
+    if (topGamesResponse?.status === 200) {
+      const rows = topGamesResponse?.data?.data || [];
+      setTopGames(rows);
+      setTopLoaded(true);
+    }
+  }, [topGamesResponse]);
+
+  // Cleanup cancel token for top-games request
+  useEffect(() => {
+    return () => {
+      if (topGamesSource) {
+        topGamesSource.cancel("Component unmounted (top games)");
+      }
+    };
+  }, [topGamesSource]);
 
   // Sync refs with state
   useEffect(() => {
@@ -181,25 +222,51 @@ useEffect(() => {
     };
   }, [activeTab]);
 
-  // Handle favorite toggle with proper localStorage sync
-  const handleToggleFavorite = useCallback((gameId) => {
+const handleToggleFavorite = useCallback(
+  async (gameId) => {
     if (!gameId) return;
 
-    setFavorites((prevFavorites) => {
-      const updatedFavorites = prevFavorites.includes(gameId)
-        ? prevFavorites.filter((id) => id !== gameId)
-        : [...prevFavorites, gameId];
+    // Prevent stacking re-requests on the Favorites tab
+    if (activeTab === "favorites" && favMutating) return;
 
-      // Update localStorage immediately
+    // Update state + storage in one place
+    let updatedIds= [];
+    setFavorites((prev) => {
+      const exists = prev.includes(gameId);
+      const next = exists
+        ? prev.filter((id) => id !== gameId)
+        : [...prev, gameId];
       try {
-        StorageManager.setFavorites(updatedFavorites);
-      } catch (error) {
-        console.error("Error saving favorites to localStorage:", error);
-      }
-
-      return updatedFavorites;
+        StorageManager.setFavorites(next);
+      } catch {}
+      updatedIds = next;
+      // keep the mirror list in sync for UI (badge + includes checks)
+      setFavoriteIds(next);
+      return next;
     });
-  }, []);
+
+    // If on Favorites tab, re-fetch the entire list so the grid reflects changes
+    if (activeTab === "favorites") {
+      try {
+        setFavMutating(true);
+        // read after write, ensuring the persisted value is used
+        const ids = StorageManager.getFavorites() || updatedIds || [];
+        if (!ids.length) {
+          setFavoriteList([]);
+          return;
+        }
+        const url = apiEndPoints.getGamesByIds;
+        const params = { ids: ids.join(",") };
+        const headers = { "Content-Type": "application/json" };
+        await getFavoritesBatch(url, params, headers, true);
+      } finally {
+        setFavMutating(false);
+      }
+    }
+  },
+  [activeTab, favMutating, getFavoritesBatch]
+);
+
 
   // Handle game click - navigate to game page
   const handleGameClick = useCallback(
@@ -221,18 +288,6 @@ useEffect(() => {
     }
   }, []);
 
-  // Get favorite games with proper filtering
-  const favoriteGames = allGames.filter(
-    (game) => game && game.id && favorites.includes(game.id)
-  );
-
-  // Get displayed games based on active tab
-const displayedGames =
-  activeTab === "favorites"
-    ? favoriteGames
-    : activeTab === "top-games"
-    ? topGames
-    : allGames;
   // Sync favorites with localStorage on mount
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -246,6 +301,12 @@ const displayedGames =
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  const displayedGames =
+    activeTab === "favorites"
+      ? favoriteList
+      : activeTab === "top-games"
+      ? topGames
+      : allGames;
   // Loading state for initial load
   if (initialLoading) {
     return (
@@ -397,7 +458,7 @@ const displayedGames =
                       : "#e7e8e6",
                 }}
               >
-                Favorites ({favoriteGames.length}){" "}
+                Favorites ({favoriteIds.length}){" "}
               </span>
             </button>
           </li>
@@ -460,7 +521,7 @@ const displayedGames =
             game={game}
             onGameClick={handleGameClick}
             onToggleFavorite={handleToggleFavorite}
-            isFavorited={favorites.includes(game.id)}
+            isFavorited={favoriteIds.includes(game.id)}
           />
         ))}
       </div>
@@ -508,7 +569,7 @@ const displayedGames =
         )}
 
       {/* Empty Favorites State */}
-      {activeTab === "favorites" && favoriteGames.length === 0 && (
+      {activeTab === "favorites" && favoriteIds.length === 0 && (
         <div className="text-center py-5">
           <Heart size={64} color="#666" className="mb-3" />
           <h5 style={{ color: "#999" }}>No favorites yet</h5>
@@ -529,5 +590,3 @@ const displayedGames =
 };
 
 export default HomePage;
-
-// TODO: make sure that the buttons shape , as he want it , and the links in the footer and in the navigation bar
