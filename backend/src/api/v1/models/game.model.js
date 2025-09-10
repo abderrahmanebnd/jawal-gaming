@@ -304,4 +304,28 @@ async function getTopLikedGames(limit = 10) {
   }
 }
 
-module.exports = { addGames, getGames, getByIds,getByTitle, gameCount, deleteGames, getGamesWithQuery, getTopLikedGames };
+/**
+ * Fetch a set of games by an ordered, sanitized list of ids.
+ * Keeps the same order via ORDER BY FIELD.
+ * @param {number[]} idsWindow - sanitized ids (length 1..100)
+ * @returns {Array} rows
+ */
+async function getGamesByIdsPaged(idsWindow) {
+  const pool = getPool();
+  if (!Array.isArray(idsWindow) || idsWindow.length === 0) return [];
+
+  // Build IN and FIELD lists from numbers only (already sanitized in controller)
+  const idList = idsWindow.join(",");
+  const query = `
+    SELECT id, title, description, url, thumbnail, status, createDate, updatedDate, liked, viewed
+    FROM GAMES
+    WHERE status = 'ACTIVE' AND id IN (${idList})
+    ORDER BY FIELD(id, ${idList})
+  `;
+
+  const [rows] = await pool.query(query);
+  return rows;
+}
+
+
+module.exports = { addGames, getGames, getByIds,getByTitle, gameCount, deleteGames, getGamesWithQuery, getTopLikedGames, getGamesByIdsPaged };

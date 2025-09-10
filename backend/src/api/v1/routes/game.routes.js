@@ -25,6 +25,10 @@ module.exports = function (app) {
     controller.getTopGames
   );
 
+  app.get(`/api/${apiVersion}/game/by-ids`,
+    [commonMiddleware.requestErrorHandler],
+    controller.getByIdsPaged);
+
   //get game by id route
   app.get(
     `/api/${apiVersion}/game/id-game`,

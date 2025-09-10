@@ -7,6 +7,7 @@ const {
   gameCount,
   deleteGames,
   getTopLikedGames,
+  getGamesByIdsPaged,
 } = require("../models/game.model");
 const fs = require("fs");
 const path = require("path");
@@ -233,5 +234,54 @@ exports.getTopGames = async (req, res) => {
     return commonResponse(res, 200, { data: rows, count: rows.length });
   } catch (error) {
     return commonResponse(res, 500, null, error?.message, "v1-game-server-011");
+  }
+};
+
+// GET /api/games/by-ids?ids=1,2,3&offset=0&limit=20
+exports.getByIdsPaged = async (req, res) => {
+  try {
+    const idsParam = (req.query.ids || "").toString().trim();
+    if (!idsParam) {
+      return commonResponse(res, 400, null, "ids query param is required", "v1-game-server-012");
+    }
+
+    // sanitize: keep only integers, de-duplicate, keep original order
+    const raw = idsParam.split(",").map(s => s.trim()).filter(Boolean);
+    const seen = new Set();
+    const ids = [];
+    for (const s of raw) {
+      const n = parseInt(s, 10);
+      if (!Number.isNaN(n) && n > 0 && !seen.has(n)) {
+        seen.add(n);
+        ids.push(n);
+      }
+    }
+    if (ids.length === 0) {
+      return commonResponse(res, 400, null, "ids must contain positive integers", "v1-game-server-013");
+    }
+ console.log('Sanitized ids:', ids);
+    // paging
+    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit, 10) || 20)); // cap at 100
+
+    // slice the requested window of ids for efficiency
+    const windowIds = ids.slice(offset, offset + limit);
+
+    if (windowIds.length === 0) {
+      return commonResponse(res, 200, { data: [], total: ids.length, offset, limit });
+    }
+
+    // fetch ordered window
+    const rows = await getGamesByIdsPaged(windowIds);
+
+    return commonResponse(res, 200, {
+      data: rows,
+      total: ids.length, // total favorites on client
+      offset,
+      limit,
+      hasMore: offset + windowIds.length < ids.length
+    });
+  } catch (error) {
+    return commonResponse(res, 500, null, error?.message, "v1-game-server-014");
   }
 };

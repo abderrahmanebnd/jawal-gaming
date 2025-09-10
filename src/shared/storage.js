@@ -1,5 +1,5 @@
 // /utility/storage.js
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   FAVORITES: 'jawalgames_favorites',
   GAMES: 'jawalgames_games',
   NAV_LINKS: 'jawalgames_nav_links',

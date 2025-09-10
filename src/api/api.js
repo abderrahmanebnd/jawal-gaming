@@ -16,7 +16,7 @@ export const apiEndPoints = {
   byIdGame: `${BASE_URL}/api/v1/game/id-game`,
   deleteGame: `${BASE_URL}/api/v1/game/delete-game`,
   topGames: `${BASE_URL}/api/v1/game/top`,
-
+  getGamesByIdsPaged: `${BASE_URL}/api/v1/game/by-ids`,
 
   //Nav Management
   addNav: `${BASE_URL}/api/v1/nav/add-nav`,
