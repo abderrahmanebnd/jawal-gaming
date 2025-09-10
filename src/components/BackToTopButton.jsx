@@ -5,15 +5,20 @@ const BackToTopButton = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const onScroll = () => {
       setVisible(window.scrollY > 100);
     };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const handleClick = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
   };
 
   if (!visible) return null;
@@ -38,7 +43,7 @@ const BackToTopButton = () => {
         border: "none",
         cursor: "pointer",
         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        transition: "all 0.3s ease", // Smooth hover effect
+        transition: "all 0.3s ease",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = "#b6e642";
@@ -49,7 +54,16 @@ const BackToTopButton = () => {
         e.currentTarget.style.transform = "scale(1)";
       }}
     >
-      <img src="/ScrollUp-icon.png" alt="Up" style={{ width: "48px", height: "auto",border:"1px solid #5350506e",borderRadius:"100%" }} />
+      <img
+        src="/ScrollUp-icon.png"
+        alt="Up"
+        style={{
+          width: "48px",
+          height: "auto",
+          border: "1px solid #5350506e",
+          borderRadius: "100%",
+        }}
+      />
     </button>
   );
 };
