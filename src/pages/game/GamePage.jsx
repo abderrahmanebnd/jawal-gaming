@@ -219,26 +219,24 @@ const GamePage = () => {
 
   return (
     <div>
-      {game && (
+      {/* {game && (
         <Helmet>
           <title>{`${game.title} - Jawal Games`}</title>
           <meta name="description" content={game.description} />
           <link rel="canonical" href={window.location.href} />
 
-          {/* Open Graph (OG) meta tags for social media previews */}
           <meta property="og:title" content={`${game.title} - Jawal Games`} />
           <meta property="og:description" content={game.description} />
           <meta property="og:image" content={game.thumbnail} />
           <meta property="og:url" content={window.location.href} />
           <meta property="og:type" content="game" />
 
-          {/* Twitter Card meta tags */}
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${game.title} - Jawal Games`} />
           <meta name="twitter:description" content={game.description} />
           <meta name="twitter:image" content={game.thumbnail} />
         </Helmet>
-      )}
+      )} */}
 
       {/* Header with back button */}
       <div className="container py-3">
