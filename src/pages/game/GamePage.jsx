@@ -97,7 +97,7 @@ const GamePage = () => {
     if (!isBrowser) return;
     if (apiEndPoints.viewGame) {
       const url = apiEndPoints.viewGame;
-      const param = { pageNo: 1, pageSize: 40 };
+      const param = { pageNo: 1, pageSize: 50 };
       const headers = { "Content-Type": "application/json" };
       getGames(url, param, headers, true);
     }
@@ -442,7 +442,7 @@ const GamePage = () => {
             {moreGames
               ?.slice()
               .sort(() => Math.random() - 0.5)
-              .slice(0, 12)
+              .slice(0, 18)
               .map((moreGame) => (
                 <GameCard
                   key={moreGame.id}
