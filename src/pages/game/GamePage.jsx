@@ -275,21 +275,6 @@ const GamePage = () => {
           >
             {game?.title}
           </h2>
-          <p
-            className="mb-0 text-secondary"
-            style={{
-              fontSize: "1rem",
-              color: isDark ? "#adb5bd" : "#555",
-              maxWidth: "80vw",
-              textAlign: "center",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              // whiteSpace: "nowrap",
-            }}
-            title={game?.description}
-          >
-            {game?.description}
-          </p>
         </div>
         <div className="mb-5">
           <GamePlayer
@@ -301,7 +286,7 @@ const GamePage = () => {
         </div>
 
         {/* Game Stats - Compact Version */}
-        <div className="mb-5">
+        <div className="mb-4">
           <div className="d-flex justify-content-center">
             <div className="d-flex gap-4 align-items-center">
               {/* Like Button and Count */}
@@ -428,6 +413,21 @@ const GamePage = () => {
           </div>
         </div>
 
+        <p
+          className="mb-0 px-2 mb-5"
+          style={{
+            fontSize: "1.1rem",
+            color: isDark ? "#b4b8bc" : "#555",
+            maxWidth: "100vw",
+            textAlign: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            // whiteSpace: "nowrap",
+          }}
+          title={game?.description}
+        >
+          {game?.description}
+        </p>
         {/* More Games Section */}
         <div className="mb-5 ">
           <h3
