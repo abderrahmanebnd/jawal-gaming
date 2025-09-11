@@ -3,7 +3,6 @@ import { StaticRouter } from "react-router-dom/server";
 import App from "../App";
 import { apiEndPoints } from "../api/api";
 
-// Node-safe fetch
 async function safeFetch(url) {
   try {
     if (!url) return null;
@@ -22,12 +21,12 @@ export async function prerender({ url }) {
   let gameMeta = null;
 
   // 1️⃣ Fetch all games safely
-  let allGames = await safeFetch(apiEndPoints.viewGame);
+  let allGames = await safeFetch(`${apiEndPoints.viewGame}?all=true`);
   if (!Array.isArray(allGames)) allGames = [];
 
   // 2️⃣ If this URL is a game, find its meta
   if (url !== "/") {
-    const slug = url.slice(1); // remove leading slash
+    const slug = url.slice(1); 
   
       const gameData = await safeFetch(
         `${apiEndPoints.byIdGame}?id=${slug}`
@@ -36,7 +35,7 @@ export async function prerender({ url }) {
     
   }
 
-  // 3️⃣ Render your app using StaticRouter (Node-safe)
+  // 3️⃣ Render app using StaticRouter (Node-safe)
   html = ReactDOMServer.renderToString(
     <StaticRouter location={url}>
       <App />
@@ -61,14 +60,13 @@ export async function prerender({ url }) {
        ? `${gameMeta.title} - Jawal Games`
        : "Jawal Games - Play Now!",
      elements: new Set([
-       // Standard description
        {
          type: "meta",
          props: {
            name: "description",
            content:
              gameMeta?.description ||
-             "Jawal Games, your go-to platform for free online games.",
+             "Jawal Games: Play free online games instantly. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser. No download needed. Play now!",
          },
        },
 
@@ -86,7 +84,9 @@ export async function prerender({ url }) {
          type: "meta",
          props: {
            property: "og:description",
-           content: gameMeta?.description || "Play free online games.",
+           content:
+             gameMeta?.description ||
+             "Jawal Games: Play free online games instantly. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser. No download needed. Play now!",
          },
        },
        {
@@ -132,7 +132,9 @@ export async function prerender({ url }) {
          type: "meta",
          props: {
            name: "twitter:description",
-           content: gameMeta?.description || "Play free online games.",
+           content:
+             gameMeta?.description ||
+             "Jawal Games: Play free online games instantly. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser. No download needed. Play now!",
          },
        },
        {
