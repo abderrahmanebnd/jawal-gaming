@@ -322,7 +322,7 @@ const HomePage = () => {
 
 export default HomePage;
 
-function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
+function Tabs({ activeTab, handleTabChange, favoriteIds }) {
   const isLightTheme =
     typeof window !== "undefined"
       ? document.body.getAttribute("data-theme") === "light"
@@ -330,14 +330,17 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
 
   return (
     <div className="mb-4 mt-2">
-      <ul className="nav nav-pills justify-content-center">
-        <li className="nav-item me-2">
+      <ul className="nav nav-pills justify-content-center flex-nowrap">
+        {/* All Games Button */}
+        <li className="nav-item me-1 me-sm-2">
           <button
-            className={`nav-link px-4 py-2 mt-2 mt-md-0 rounded-pill fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 mt-2 mt-sm-0 rounded-pill fw-semibold  ${
               activeTab === "all" ? "active" : ""
             }`}
             style={{
               backgroundColor: "transparent",
+              // display: "flex", alignItems: "center",
+              // justifyContent: "center",
               color:
                 activeTab === "all"
                   ? "#e7e8e6"
@@ -357,7 +360,8 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             onClick={() => handleTabChange("all")}
           >
-            <span
+            <div
+              className="fs-sm-5 tab-text"
               style={{
                 color:
                   activeTab === "all"
@@ -368,13 +372,14 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
               }}
             >
               All Games
-            </span>
+            </div>
           </button>
         </li>
 
-        <li className="nav-item me-2">
+        {/* Favorites Button */}
+        <li className="nav-item me-1 me-sm-2">
           <button
-            className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "favorites" ? "active" : ""
             }`}
             style={{
@@ -398,23 +403,8 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             onClick={() => handleTabChange("favorites")}
           >
-            <Heart
-              size={16}
-              className="me-2"
-              fill={
-                activeTab === "favorites"
-                  ? CONSTANTS.COLORS.greenMainColor
-                  : "none"
-              }
-              color={
-                activeTab === "favorites"
-                  ? CONSTANTS.COLORS.greenMainColor
-                  : isLightTheme
-                  ? "#000000ff"
-                  : "#f4f3f3ff"
-              }
-            />
-            <span
+            <div
+              className="fs-sm-5 tab-text"
               style={{
                 color:
                   activeTab === "favorites"
@@ -424,14 +414,31 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
                     : "#e7e8e6",
               }}
             >
+              <Heart
+                size={14}
+                className="me-1"
+                fill={
+                  activeTab === "favorites"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : "none"
+                }
+                color={
+                  activeTab === "favorites"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : isLightTheme
+                    ? "#000000ff"
+                    : "#f4f3f3ff"
+                }
+              />
               Favorites ({favoriteIds.length})
-            </span>
+            </div>
           </button>
         </li>
 
+        {/* Top Games Button */}
         <li className="nav-item">
           <button
-            className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "top-games" ? "active" : ""
             }`}
             style={{
@@ -455,7 +462,8 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             onClick={() => handleTabChange("top-games")}
           >
-            <span
+            <div
+              className="fs-sm-5 tab-text"
               style={{
                 color:
                   activeTab === "top-games"
@@ -466,7 +474,7 @@ function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
               }}
             >
               Top Games
-            </span>
+            </div>
           </button>
         </li>
       </ul>

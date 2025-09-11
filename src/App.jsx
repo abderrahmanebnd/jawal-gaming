@@ -3,8 +3,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HomePage from "./pages/home/HomePage";
 import GamePage from "./pages/game/GamePage";
-// import AdminLogin from "./pages/login/AdminLogin";
-// import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import AdminLogin from "./pages/login/AdminLogin";
+import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import { CONSTANTS } from "./shared/constants";
 import {
   Routes,
@@ -15,7 +15,7 @@ import {
 } from "react-router-dom";
 import { RoutePaths } from "./routes";
 import "./App.css";
-// import PrivateRoutes from "./auth/PrivateRoutes";
+import PrivateRoutes from "./auth/PrivateRoutes";
 import { apiEndPoints } from "./api/api";
 import useApi from "./hooks/useApi";
 import ScrollToTop from "./components/ScrollToTop";
@@ -151,17 +151,17 @@ const App = () => {
             }
           />
 
-          {/* <Route
+          <Route
             path={RoutePaths.login}
-            // element={<AdminLogin onLogin={handleLogin} />}
-          /> */}
+            element={<AdminLogin onLogin={handleLogin} />}
+          />
 
-          {/* <Route element={<PrivateRoutes />}>
+          <Route element={<PrivateRoutes />}>
             <Route
               path={RoutePaths.adminDashboard}
               element={<AdminDashboard onLogout={handleLogout} />}
             />
-          </Route> */}
+          </Route>
         </Routes>
       </main>
 
