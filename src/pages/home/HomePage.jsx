@@ -9,7 +9,7 @@ import { StorageManager } from "../../shared/storage";
 import useGames from "../../hooks/useGames";
 
 const TOP_GAMES_NUMBER = 24;
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 24;
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -331,11 +331,11 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
 
   return (
     <div className="mb-4 mt-2">
-      <ul className="nav nav-pills justify-content-center flex-nowrap">
+      <ul className="nav nav-pills justify-content-sm-center flex-nowrap">
         {/* All Games Button */}
-        <li className="nav-item me-1 me-sm-2">
+        <li className="nav-item me-1 me-sm-2 flex-fill">
           <button
-            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 mt-2 mt-sm-0 rounded-pill fw-semibold  ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 mt-2 w-100 mt-sm-0 rounded-pill fw-semibold  ${
               activeTab === "all" ? "active" : ""
             }`}
             style={{
@@ -378,9 +378,9 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
         </li>
 
         {/* Favorites Button */}
-        <li className="nav-item me-1 me-sm-2">
+        <li className="nav-item me-1 me-sm-2 flex-fill">
           <button
-            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 rounded-pill mt-2 mt-sm-0 fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 w-100 rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "favorites" ? "active" : ""
             }`}
             style={{
@@ -416,7 +416,7 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
               }}
             >
               <Heart
-                size={17}
+                size={14}
                 className="me-1"
                 fill={
                   activeTab === "favorites"
@@ -437,9 +437,9 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
         </li>
 
         {/* Top Games Button */}
-        <li className="nav-item">
+        <li className="nav-item flex-fill">
           <button
-            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 rounded-pill mt-2 mt-sm-0 fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 w-100 rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "top-games" ? "active" : ""
             }`}
             style={{

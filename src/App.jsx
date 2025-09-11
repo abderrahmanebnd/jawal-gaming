@@ -103,11 +103,11 @@ const App = () => {
   };
 
   // SEO Meta tags (would be handled by React Helmet in production)
-  useEffect(() => {
-    document.title = selectedGame
-      ? `${selectedGame.title} - Jawal Games`
-      : "Jawal Games - Play Now!";
-  }, [selectedGame]);
+  // useEffect(() => {
+  //   document.title = selectedGame
+  //     ? `${selectedGame.title} - Jawal Games`
+  //     : "Jawal Games - Play Now!";
+  // }, [selectedGame]);
 
   return (
     <div
