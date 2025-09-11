@@ -1,21 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ChevronLeft, ThumbsUp, Eye, Heart } from "lucide-react";
 import AdBanner from "../../components/AdBanner";
 import GamePlayer from "../../components/GamePlayer";
 import GameCard from "../../components/GameCard";
 import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
-import { useNavigate, useParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-
 import { StorageManager } from "../../shared/storage";
+
+const isBrowser = typeof window !== "undefined";
 
 const GamePage = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [likedGames, setLikedGames] = useState([]);
   const [game, setGame] = useState(null);
-  const [moreGames, setMoreGames] = useState(null);
+  const [moreGames, setMoreGames] = useState([]);
   const [gameStats, setGameStats] = useState({
     views: 0,
     likes: 0,
@@ -27,35 +28,28 @@ const GamePage = () => {
   const navigate = useNavigate();
 
   // API hooks
-  const {
-    get: getGames,
-    data: gameResponse,
-    source: gameSource,
-    error: gamesError,
-    loading,
-  } = useApi();
-
+  const { get: getGames, data: gameResponse, source: gameSource } = useApi();
   const {
     get: getGameById,
     data: GameByIdResponse,
-    error: GameByIdError,
     source: GameByIdSource,
   } = useApi();
-
   const { get: getGameUpdate, data: GameUpdatedResponse } = useApi();
   const { post: updateViews, data: viewsResponse } = useApi();
   const { post: toggleLike, data: likeResponse } = useApi();
 
-  // Initialize localStorage data
+  // Only access localStorage on the client
   useEffect(() => {
-    try {
-      const savedFavorites = StorageManager.getFavorites();
+    if (!isBrowser) return;
 
+    try {
+      const savedFavorites = StorageManager.getFavorites() || [];
       const savedLikedGames = JSON.parse(
         localStorage.getItem("likedGames") || "[]"
       );
+
       setFavorites(Array.isArray(savedFavorites) ? savedFavorites : []);
-      setLikedGames(savedLikedGames);
+      setLikedGames(Array.isArray(savedLikedGames) ? savedLikedGames : []);
     } catch (error) {
       console.error("Error loading data from localStorage:", error);
       setFavorites([]);
@@ -71,7 +65,7 @@ const GamePage = () => {
       const headers = { "Content-Type": "application/json" };
       getGameById(url, param, headers, true);
     }
-  }, [id, getGameById]); // Fixed dependencies
+  }, [id, getGameById]);
 
   // Handle game data response
   useEffect(() => {
@@ -82,33 +76,32 @@ const GamePage = () => {
       setGameStats({
         views: gameData.viewed || 0,
         likes: gameData.liked || 0,
-        isLiked: likedGames.includes(gameData.id), // Set based on localStorage
+        isLiked: isBrowser ? likedGames.includes(gameData.id) : false,
       });
     }
   }, [GameByIdResponse, likedGames]);
 
   // Update views when game loads
   useEffect(() => {
+    if (!isBrowser) return;
     if (game?.id && apiEndPoints.updateViews) {
       const url = apiEndPoints.updateViews;
       const body = { gameId: game.id };
       const headers = { "Content-Type": "application/json" };
       updateViews(url, body, headers, true);
     }
-  }, [game?.id, updateViews]); // Fixed dependencies
+  }, [game?.id, updateViews]);
 
   // Fetch more games
   useEffect(() => {
+    if (!isBrowser) return;
     if (apiEndPoints.viewGame) {
       const url = apiEndPoints.viewGame;
-      const param = {
-        pageNo: 1,
-        pageSize: 40,
-      };
+      const param = { pageNo: 1, pageSize: 40 };
       const headers = { "Content-Type": "application/json" };
       getGames(url, param, headers, true);
     }
-  }, [getGames]); // Fixed dependencies
+  }, [getGames]);
 
   // Handle more games response
   useEffect(() => {
@@ -119,6 +112,7 @@ const GamePage = () => {
 
   // Refresh game data after like/view updates
   useEffect(() => {
+    if (!isBrowser) return;
     if (
       (likeResponse?.status === 200 || viewsResponse?.status === 200) &&
       id &&
@@ -146,60 +140,44 @@ const GamePage = () => {
   // Cleanup function for API sources
   useEffect(() => {
     return () => {
-      if (GameByIdSource) {
-        GameByIdSource.cancel("Component unmounted");
-      }
-      if (gameSource) {
-        gameSource.cancel("Component unmounted");
-      }
+      GameByIdSource?.cancel("Component unmounted");
+      gameSource?.cancel("Component unmounted");
     };
   }, [GameByIdSource, gameSource]);
 
   // Utility functions
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
-
-  const closeGame = () => {
-    setIsFullscreen(false);
-  };
+  const closeGame = () => setIsFullscreen(false);
 
   const formatNumber = (num) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + "M";
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + "K";
-    }
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
     return num?.toString() || "0";
   };
 
-  // Handle favorite toggle with proper localStorage sync
   const handleToggleFavorite = useCallback((gameId) => {
-    if (!gameId) return;
+    if (!gameId || !isBrowser) return;
     setFavorites((prev) => {
       const isFav = prev.includes(gameId);
       const updated = isFav
         ? prev.filter((id) => id !== gameId)
         : [...prev, gameId];
-      // persist
       StorageManager.setFavorites(updated);
       return updated;
     });
   }, []);
 
-  // derived flag for current game
-  const isCurrentFavorited = !!(game?.id && favorites.includes(game.id));
-
   const handleGameClick = useCallback(
     (gameToNavigate) => {
       if (!gameToNavigate) return;
       const slug = gameToNavigate.title.toLowerCase().replace(/\s+/g, "-");
-      navigate(`/${slug}`); // Fixed: use navigate instead of window.location.href
+      navigate(`/${slug}`);
     },
     [navigate]
   );
 
   const handleLikeToggle = async (gameToLike) => {
-    if (!gameToLike || isLiking) return;
+    if (!gameToLike || !isBrowser || isLiking) return;
 
     const isCurrentlyLiked = likedGames.includes(gameToLike.id);
     const newIsLiked = !isCurrentlyLiked;
@@ -216,22 +194,14 @@ const GamePage = () => {
 
       await toggleLike(url, body, headers, true);
 
-      // Update local state and localStorage on success
       const updatedLikedGames = newIsLiked
         ? [...likedGames, gameToLike.id]
         : likedGames.filter((id) => id !== gameToLike.id);
 
       setLikedGames(updatedLikedGames);
-      setGameStats((prev) => ({
-        ...prev,
-        isLiked: newIsLiked,
-      }));
+      setGameStats((prev) => ({ ...prev, isLiked: newIsLiked }));
 
-      try {
-        localStorage.setItem("likedGames", JSON.stringify(updatedLikedGames));
-      } catch (error) {
-        console.error("Error saving liked games to localStorage:", error);
-      }
+      localStorage.setItem("likedGames", JSON.stringify(updatedLikedGames));
     } catch (error) {
       console.error("Error toggling like:", error);
     } finally {
@@ -239,30 +209,34 @@ const GamePage = () => {
     }
   };
 
-  const isDark = document.body.getAttribute("data-theme") !== "light";
+  const isLightTheme =
+    typeof window !== "undefined"
+      ? document.body.getAttribute("data-theme") === "light"
+      : true; // default to light theme on SSR
+
+  const isDark = isBrowser ? !isLightTheme : false;
+  const isCurrentFavorited = !!(game?.id && favorites.includes(game.id));
 
   return (
     <div>
-      {game && (
+      {/* {game && (
         <Helmet>
           <title>{`${game.title} - Jawal Games`}</title>
           <meta name="description" content={game.description} />
           <link rel="canonical" href={window.location.href} />
 
-          {/* Open Graph (OG) meta tags for social media previews */}
           <meta property="og:title" content={`${game.title} - Jawal Games`} />
           <meta property="og:description" content={game.description} />
           <meta property="og:image" content={game.thumbnail} />
           <meta property="og:url" content={window.location.href} />
           <meta property="og:type" content="game" />
 
-          {/* Twitter Card meta tags */}
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${game.title} - Jawal Games`} />
           <meta name="twitter:description" content={game.description} />
           <meta name="twitter:image" content={game.thumbnail} />
         </Helmet>
-      )}
+      )} */}
 
       {/* Header with back button */}
       <div className="container py-3">
@@ -460,7 +434,6 @@ const GamePage = () => {
             className="mb-4 text-center"
             style={{
               color: isDark ? "#e7e8e6" : "#000000ff",
-
             }}
           >
             More Games

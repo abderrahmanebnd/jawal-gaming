@@ -67,34 +67,44 @@ exports.addGame = async (req, res) => {
  */
 exports.viewGame = async (req, res) => {
   try {
-    // Fix: Handle undefined query parameters properly
-    const pageNo = req.query.pageNo;
-    const pageSize = req.query.pageSize;
-    
-    // Parse with proper defaults and validation
+    const { pageNo, pageSize, all } = req.query;
+
+    console.log("viewGame query params:", req.query);
+    if (all === "true") {
+      console.log("Fetching all games without pagination");
+      // Return all games without pagination
+      const result = await getGames(null,null,all); // fetch all from DB
+      const Count = await gameCount();
+
+      return commonResponse(res, 200, {
+        data: result,
+        total: Count,
+      });
+    }
+
+    // Default paginated response
     let page = parseInt(pageNo) || 1;
     let limit = parseInt(pageSize) || 10;
-    
-    // Ensure valid ranges
     page = Math.max(1, page);
-    limit = Math.max(1, Math.min(100, limit)); 
+    limit = Math.max(1, Math.min(100, limit));
 
     const result = await getGames(page, limit);
     const Count = await gameCount();
 
-    commonResponse(res, 200, { 
-      data: result, 
+    commonResponse(res, 200, {
+      data: result,
       total: Count,
       pagination: {
         currentPage: page,
         pageSize: limit,
-        totalPages: Math.ceil(Count / limit)
-      }
+        totalPages: Math.ceil(Count / limit),
+      },
     });
   } catch (error) {
     commonResponse(res, 500, null, error?.message, "v1-game-server-003");
   }
 };
+
 
 /**
  * This function use to view article

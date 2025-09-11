@@ -16,7 +16,9 @@ const HomePage = () => {
 
   // tabs + favorites
   const [activeTab, setActiveTab] = useState("all");
-  const [favoriteIds, setFavoriteIds] = useState(StorageManager.getFavorites() || []);
+  const [favoriteIds, setFavoriteIds] = useState(
+    StorageManager.getFavorites() || []
+  );
   const [favoriteList, setFavoriteList] = useState([]);
   const [favMutating, setFavMutating] = useState(false);
 
@@ -24,16 +26,30 @@ const HomePage = () => {
   const [pageNumber, setPageNumber] = useState(1);
 
   // Hook for “All” games with infinite scroll
-  const { games: allGames, hasMore, loading, error } = useGames(pageNumber, PAGE_SIZE);
-
+  const {
+    games: allGames,
+    hasMore,
+    loading,
+    error,
+  } = useGames(pageNumber, PAGE_SIZE);
 
   // Top games
   const [topGames, setTopGames] = useState([]);
   const [topLoaded, setTopLoaded] = useState(false);
-  const { get: getTopGames, data: topGamesResponse, source: topGamesSource,loading:loadingTopGames } = useApi();
+  const {
+    get: getTopGames,
+    data: topGamesResponse,
+    source: topGamesSource,
+    loading: loadingTopGames,
+  } = useApi();
 
   // Favorites batch API
-  const { get: getFavoritesBatch, data: favoritesResponse, source: favoritesSource,loading:loadingFavorites } = useApi();
+  const {
+    get: getFavoritesBatch,
+    data: favoritesResponse,
+    source: favoritesSource,
+    loading: loadingFavorites,
+  } = useApi();
 
   // Observe the last card like in the tutorial
   const observer = useRef(null);
@@ -107,8 +123,12 @@ const HomePage = () => {
       let updatedIds = [];
       setFavoriteIds((prev) => {
         const exists = prev.includes(gameId);
-        const next = exists ? prev.filter((id) => id !== gameId) : [...prev, gameId];
-        try { StorageManager.setFavorites(next); } catch {}
+        const next = exists
+          ? prev.filter((id) => id !== gameId)
+          : [...prev, gameId];
+        try {
+          StorageManager.setFavorites(next);
+        } catch {}
         updatedIds = next;
         return next;
       });
@@ -136,7 +156,9 @@ const HomePage = () => {
   const handleGameClick = useCallback(
     (game) => {
       if (!game) return;
-      const slug = String(game?.title || "").toLowerCase().replace(/\s+/g, "-");
+      const slug = String(game?.title || "")
+        .toLowerCase()
+        .replace(/\s+/g, "-");
       navigate(`/${slug}`);
     },
     [navigate]
@@ -155,9 +177,11 @@ const HomePage = () => {
   }, []);
 
   const displayedGames =
-    activeTab === "favorites" ? favoriteList :
-    activeTab === "top-games" ? topGames :
-    allGames;
+    activeTab === "favorites"
+      ? favoriteList
+      : activeTab === "top-games"
+      ? topGames
+      : allGames;
 
   // Initial UX (optional): show a spinner if “all” is empty and loading
   const loadingAll = activeTab === "all" && loading && pageNumber === 1;
@@ -182,7 +206,10 @@ const HomePage = () => {
           >
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p style={{ color: "#ccc" }}>Loading {loadingAll ? "amazing" : loadingTop ? "top" : "favorite"} games...</p>
+          <p style={{ color: "#ccc" }}>
+            Loading {loadingAll ? "amazing" : loadingTop ? "top" : "favorite"}{" "}
+            games...
+          </p>
         </div>
       </div>
     );
@@ -191,10 +218,11 @@ const HomePage = () => {
   if (error && activeTab === "all" && displayedGames.length === 0) {
     return (
       <div className="container py-4 text-center" style={{ minHeight: "50vh" }}>
-        
         <div className="d-flex flex-column justify-content-center align-items-center h-100">
           <h3 style={{ color: "#999" }}>Oops! Something went wrong</h3>
-          <p style={{ color: "#666" }}>Unable to load games. Please try again later.</p>
+          <p style={{ color: "#666" }}>
+            Unable to load games. Please try again later.
+          </p>
           <button
             className="btn btn-primary rounded-pill px-4 mt-3"
             onClick={() => setPageNumber(1)}
@@ -209,7 +237,11 @@ const HomePage = () => {
   return (
     <div className="container" style={{ overflowY: "auto" }}>
       {/* Tabs */}
-      <Tabs activeTab={activeTab} handleTabChange={handleTabChange} favoriteIds={favoriteIds} />
+      <Tabs
+        activeTab={activeTab}
+        handleTabChange={handleTabChange}
+        favoriteIds={favoriteIds}
+      />
 
       {/* Grid */}
       <div className="row mt-md-4 m-auto" style={{ overflowX: "hidden" }}>
@@ -290,84 +322,153 @@ const HomePage = () => {
 export default HomePage;
 
 function Tabs ({ activeTab, handleTabChange, favoriteIds }) {
-   return       <div className="mb-4 mt-2">
-        <ul className="nav nav-pills justify-content-center">
-          <li className="nav-item me-2">
-            <button
-              className={`nav-link px-4 py-2 mt-2 mt-md-0 rounded-pill fw-semibold ${activeTab === "all" ? "active" : ""}`}
-              style={{
-                backgroundColor: "transparent",
-                color: activeTab === "all"
-                  ? "#e7e8e6"
-                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
-                border: `2px solid ${activeTab === "all" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              onClick={() => handleTabChange("all")}
-            >
-              <span style={{ color: activeTab === "all"
-                ? CONSTANTS.COLORS.greenMainColor
-                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
-                All Games
-              </span>
-            </button>
-          </li>
+  const isLightTheme =
+    typeof window !== "undefined"
+      ? document.body.getAttribute("data-theme") === "light"
+      : true; // default to light theme on SSR
 
-          <li className="nav-item me-2">
-            <button
-              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${activeTab === "favorites" ? "active" : ""}`}
-              style={{
-                backgroundColor: "transparent",
-                color: activeTab === "favorites"
+  return (
+    <div className="mb-4 mt-2">
+      <ul className="nav nav-pills justify-content-center">
+        <li className="nav-item me-2">
+          <button
+            className={`nav-link px-4 py-2 mt-2 mt-md-0 rounded-pill fw-semibold ${
+              activeTab === "all" ? "active" : ""
+            }`}
+            style={{
+              backgroundColor: "transparent",
+              color:
+                activeTab === "all"
                   ? "#e7e8e6"
-                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
-                border: `2px solid ${activeTab === "favorites" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              onClick={() => handleTabChange("favorites")}
-            >
-              <Heart
-                size={16}
-                className="me-2"
-                fill={activeTab === "favorites" ? CONSTANTS.COLORS.greenMainColor : "none"}
-                color={activeTab === "favorites"
+                  : isLightTheme
+                  ? "#000000ff"
+                  : "#e7e8e6",
+              border: `2px solid ${
+                activeTab === "all"
                   ? CONSTANTS.COLORS.greenMainColor
-                  : (document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#f4f3f3ff")}
-              />
-              <span style={{ color: activeTab === "favorites"
-                ? CONSTANTS.COLORS.greenMainColor
-                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
-                Favorites ({favoriteIds.length})
-              </span>
-            </button>
-          </li>
-
-          <li className="nav-item">
-            <button
-              className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${activeTab === "top-games" ? "active" : ""}`}
+                  : CONSTANTS.COLORS.yellowMainColor
+              }`,
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onClick={() => handleTabChange("all")}
+          >
+            <span
               style={{
-                backgroundColor: "transparent",
-                color: activeTab === "top-games"
-                  ? "#e7e8e6"
-                  : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6",
-                border: `2px solid ${activeTab === "top-games" ? CONSTANTS.COLORS.greenMainColor : CONSTANTS.COLORS.yellowMainColor}`,
-                transition: "all 0.3s ease",
+                color:
+                  activeTab === "all"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : isLightTheme
+                    ? "#000000ff"
+                    : "#e7e8e6",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              onClick={() => handleTabChange("top-games")}
             >
-              <span style={{ color: activeTab === "top-games"
-                ? CONSTANTS.COLORS.greenMainColor
-                : document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
-                Top Games
-              </span>
-            </button>
-          </li>
-        </ul>
-      </div>
+              All Games
+            </span>
+          </button>
+        </li>
+
+        <li className="nav-item me-2">
+          <button
+            className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${
+              activeTab === "favorites" ? "active" : ""
+            }`}
+            style={{
+              backgroundColor: "transparent",
+              color:
+                activeTab === "favorites"
+                  ? "#e7e8e6"
+                  : isLightTheme
+                  ? "#000000ff"
+                  : "#e7e8e6",
+              border: `2px solid ${
+                activeTab === "favorites"
+                  ? CONSTANTS.COLORS.greenMainColor
+                  : CONSTANTS.COLORS.yellowMainColor
+              }`,
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onClick={() => handleTabChange("favorites")}
+          >
+            <Heart
+              size={16}
+              className="me-2"
+              fill={
+                activeTab === "favorites"
+                  ? CONSTANTS.COLORS.greenMainColor
+                  : "none"
+              }
+              color={
+                activeTab === "favorites"
+                  ? CONSTANTS.COLORS.greenMainColor
+                  : isLightTheme
+                  ? "#000000ff"
+                  : "#f4f3f3ff"
+              }
+            />
+            <span
+              style={{
+                color:
+                  activeTab === "favorites"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : isLightTheme
+                    ? "#000000ff"
+                    : "#e7e8e6",
+              }}
+            >
+              Favorites ({favoriteIds.length})
+            </span>
+          </button>
+        </li>
+
+        <li className="nav-item">
+          <button
+            className={`nav-link px-4 py-2 rounded-pill mt-2 mt-md-0 fw-semibold ${
+              activeTab === "top-games" ? "active" : ""
+            }`}
+            style={{
+              backgroundColor: "transparent",
+              color:
+                activeTab === "top-games"
+                  ? "#e7e8e6"
+                  : isLightTheme
+                  ? "#000000ff"
+                  : "#e7e8e6",
+              border: `2px solid ${
+                activeTab === "top-games"
+                  ? CONSTANTS.COLORS.greenMainColor
+                  : CONSTANTS.COLORS.yellowMainColor
+              }`,
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onClick={() => handleTabChange("top-games")}
+          >
+            <span
+              style={{
+                color:
+                  activeTab === "top-games"
+                    ? CONSTANTS.COLORS.greenMainColor
+                    : isLightTheme
+                    ? "#000000ff"
+                    : "#e7e8e6",
+              }}
+            >
+              Top Games
+            </span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  );
 }

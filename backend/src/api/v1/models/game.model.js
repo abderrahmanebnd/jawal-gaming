@@ -90,43 +90,52 @@ async function gameCount() {
  * FIX: MySQL doesn't allow parameterized LIMIT/OFFSET, so we build the query string
  * @param {number} page - Page number (default: 1)
  * @param {number} limit - Items per page (default: 10)
+ * @param {boolean} all - If true, fetch all games without pagination
  * @returns {Array} Array of game objects
  */
-async function getGames(page = 1, limit = 10) {
+async function getGames(page = 1, limit = 10, all = false) {
   const pool = getPool();
-  
+
   try {
-    // Validate and sanitize parameters
+    // If "all" is true, skip pagination
+    if (all === true || all === "true") {
+      const query = `
+        SELECT id, title, description, url, thumbnail, status, createDate, updatedDate, liked, viewed
+        FROM GAMES
+        WHERE status = ?
+        ORDER BY createDate DESC
+      `;
+      console.log("Executing query without LIMIT/OFFSET");
+      const [rows] = await pool.execute(query, ["ACTIVE"]);
+      return rows;
+    }
+
+    // Otherwise, do normal paginated query
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
-    
-    // Ensure minimum values
+
+    // Ensure safe values
     const validPage = Math.max(1, pageNum);
-    const validLimit = Math.max(1, Math.min(100, limitNum)); // Max 100 items per page
-    
+    const validLimit = Math.max(1, Math.min(100, limitNum)); // Max 100 items
+
     const offset = (validPage - 1) * validLimit;
-    
-    // FIX: Build query with literal LIMIT/OFFSET values instead of parameters
+
     const query = `
       SELECT id, title, description, url, thumbnail, status, createDate, updatedDate, liked, viewed
-      FROM GAMES 
+      FROM GAMES
       WHERE status = ?
       ORDER BY createDate DESC
       LIMIT ${validLimit} OFFSET ${offset}
     `;
-    
-    console.log('Executing query:', query);
-    console.log('With status parameter:', ['ACTIVE']);
-    
-    const [rows] = await pool.execute(query, ['ACTIVE']);
-    
+    console.log("Executing query:", query);
+    const [rows] = await pool.execute(query, ["ACTIVE"]);
+
     return rows;
   } catch (error) {
-    console.error('getGames error details:', error);
+    console.error("getGames error details:", error);
     throw new Error(`Unable to fetch games: ${error.message}`);
   }
 }
-
 
 
 
