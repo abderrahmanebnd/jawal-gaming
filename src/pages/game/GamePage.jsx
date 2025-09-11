@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ChevronLeft, ThumbsUp, Eye, Heart } from "lucide-react";
@@ -175,6 +175,16 @@ const GamePage = () => {
     },
     [navigate]
   );
+
+  
+const displayedMoreGames = useMemo(() => {
+  if (!moreGames) return [];
+  return moreGames
+    .filter((g) => g.id !== game?.id)
+    .slice()
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 18);
+}, [moreGames, game?.id]);
 
   const handleLikeToggle = async (gameToLike) => {
     if (!gameToLike || !isBrowser || isLiking) return;
@@ -439,10 +449,7 @@ const GamePage = () => {
             More Games
           </h3>
           <div className="row m-auto">
-            {moreGames
-              ?.slice()
-              .sort(() => Math.random() - 0.5)
-              .slice(0, 18)
+            {displayedMoreGames
               .map((moreGame) => (
                 <GameCard
                   key={moreGame.id}

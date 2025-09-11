@@ -1,8 +1,8 @@
-import { Heart, Play } from 'lucide-react';
+import { Heart, Play, ThumbsUp } from 'lucide-react';
 import "../styles/responsive.css";
 import { CONSTANTS } from '../shared/constants';
 import { Link } from 'react-router-dom';
-const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,lastGameRef }) => {
+const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,lastGameRef,inTopGames }) => {
   // Handle image loading error
   const handleImageError = (e) => {
     e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiBmaWxsPSIjMzMzIiByeD0iMjQiLz4KPHA+CjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEyOCIgcj0iNDAiIGZpbGw9IiM1NTUiLz4KPHA+Cjx0ZXh0IHg9IjEyOCIgeT0iMTM1IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+R0FNRTU8L3RleHQ+Cjwvc3ZnPgo=';
@@ -58,6 +58,26 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
         >
           <Play size={24} color="#fff" fill="#fff" />
         </div>
+
+        {inTopGames && game.liked !== undefined && (
+<div
+  className="d-flex align-items-center gap-1 position-absolute px-2 py-1 rounded-pill"
+  style={{
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    color: "#fff",
+    fontSize: "0.9rem",
+    userSelect: "none",
+    pointerEvents: "none",
+    bottom: "10px",
+    left: "10px",
+  }}
+  title={`${game.liked} likes`}
+>
+  <ThumbsUp size={16} fill="#fff" />
+  <span>{game.liked || 0}</span>
+</div>
+
+        )}
 
         {/* Favorite Button */}
         <button

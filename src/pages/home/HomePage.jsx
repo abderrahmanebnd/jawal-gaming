@@ -258,6 +258,7 @@ const HomePage = () => {
               isFavorited={favoriteIds.includes(game.id)}
               isLast={isLast}
               lastGameRef={lastGameRef}
+              inTopGames={activeTab === "top-games"}
             />
           );
         })}
