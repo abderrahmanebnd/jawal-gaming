@@ -14,11 +14,7 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
       ref={isLast ? lastGameRef : undefined}
       title={game.title || "Click to play"}
     >
-      <Link
-        to={String(game?.title || "")
-          .toLowerCase()
-          .replace(/\s+/g, "-")}
-      >
+     
         <div
           className="game-card  mx-md-2 mx-1 position-relative overflow-hidden shadow-0"
           onMouseEnter={(e) => {
@@ -29,16 +25,17 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
             e.currentTarget.style.transform = "scale(1)";
             // e.currentTarget.style.borderColor = '#444';
           }}
+          onClick={() => onGameClick(game)}
         >
           {/* Game Image - Full Container */}
           <img
             src={game.thumbnail || game.image}
-            alt={game.title || "Game thumbnail"}
+            alt={game.title || "Game thumbnail"} 
             className="w-100 h-100"
             style={{
               objectFit: "cover",
               borderRadius: "22px",
-              transition: "transform 0.3s ease",
+              transition: "transform 0.3s ease"
             }}
             onError={handleImageError}
             loading="lazy"
@@ -166,7 +163,7 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
             }}
           />
         </div>
-      </Link>
+     
     </div>
   );
 };

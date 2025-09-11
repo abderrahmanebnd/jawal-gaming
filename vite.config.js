@@ -3,18 +3,15 @@ import react from '@vitejs/plugin-react';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 import path from 'path';
 
-
-
-
 export default defineConfig({
   base: "/",
   plugins: [
     react(),
-    vitePrerenderPlugin({
-      renderTarget: "#root",
-      prerenderScript: path.resolve(__dirname, "src/components/prerender.jsx"),
-      additionalPrerenderRoutes: ["/404"], // we’ll add game routes from API dynamically
-    }),
+    // vitePrerenderPlugin({
+    //   renderTarget: "#root",
+    //   prerenderScript: path.resolve(__dirname, "src/components/prerender.jsx"),
+    //   additionalPrerenderRoutes: ["/404"], // we’ll add game routes from API dynamically
+    // }),
   ],
   resolve: {
     alias: {

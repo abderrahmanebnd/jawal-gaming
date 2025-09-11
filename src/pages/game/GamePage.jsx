@@ -219,7 +219,7 @@ const GamePage = () => {
 
   return (
     <div>
-      {/* {game && (
+      {game && (
         <Helmet>
           <title>{`${game.title} - Jawal Games`}</title>
           <meta name="description" content={game.description} />
@@ -236,7 +236,7 @@ const GamePage = () => {
           <meta name="twitter:description" content={game.description} />
           <meta name="twitter:image" content={game.thumbnail} />
         </Helmet>
-      )} */}
+      )}
 
       {/* Header with back button */}
       <div className="container py-3">

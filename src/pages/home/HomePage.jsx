@@ -246,6 +246,7 @@ const HomePage = () => {
       {/* Grid */}
       <div className="row mt-md-4 m-auto" style={{ overflowX: "hidden" }}>
         {displayedGames.map((game, idx) => {
+          console.log("Rendering game:", game);
           const isLast =
             idx === displayedGames.length - 1 && activeTab === "all";
           return (
