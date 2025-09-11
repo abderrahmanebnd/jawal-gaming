@@ -415,7 +415,7 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
               }}
             >
               <Heart
-                size={14}
+                size={17}
                 className="me-1"
                 fill={
                   activeTab === "favorites"

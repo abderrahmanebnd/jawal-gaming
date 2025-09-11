@@ -52,7 +52,7 @@ const GameComponent = () => {
     const url = apiEndPoints.viewGame;
     const param = {
       pageNo: 1,
-      pageSize: 50,
+      pageSize: 150,
     };
     const headers = { "Content-Type": "application/json" };
     getGames(url, param, headers, true);
