@@ -7,6 +7,7 @@ import useApi from "../../hooks/useApi";
 import { apiEndPoints } from "../../api/api";
 import { StorageManager } from "../../shared/storage";
 import useGames from "../../hooks/useGames";
+import { Helmet } from "react-helmet-async";
 
 const TOP_GAMES_NUMBER = 24;
 const PAGE_SIZE = 24;
@@ -235,88 +236,141 @@ const HomePage = () => {
   }
 
   return (
-    <div className="container" style={{ overflowY: "auto" }}>
-      {/* Tabs */}
-      <Tabs
-        activeTab={activeTab}
-        handleTabChange={handleTabChange}
-        favoriteIds={favoriteIds}
-      />
+    <>
+      <Helmet>
+        <title>Jawal Games - Play Now!</title>
+        <meta
+          name="description"
+          content="Jawal Games, your go-to platform for free online games. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser.Play now!"
+          data-rh="true"
+        />
 
-      {/* Grid */}
-      <div className="row mt-md-4 m-auto" style={{ overflowX: "hidden" }}>
-        {displayedGames.map((game, idx) => {
-          const isLast =
-            idx === displayedGames.length - 1 && activeTab === "all";
-          return (
-            <GameCard
-              key={game.id}
-              game={game}
-              onGameClick={handleGameClick}
-              onToggleFavorite={handleToggleFavorite}
-              isFavorited={favoriteIds.includes(game.id)}
-              isLast={isLast}
-              lastGameRef={lastGameRef}
-              inTopGames={activeTab === "top-games"}
-            />
-          );
-        })}
-      </div>
+        <meta
+          property="og:title"
+          content="Jawal Games - Play Now!"
+          data-rh="true"
+        />
+        <meta
+          property="og:description"
+          content="Jawal Games, your go-to platform for free online games. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser.Play now!"
+          data-rh="true"
+        />
+        <meta
+          property="og:image"
+          content="https://jawalgames.net/web-icons/icon-512.png"
+          data-rh="true"
+        />
+        <meta
+          property="og:url"
+          content="https://jawalgames.net"
+          data-rh="true"
+        />
+        <meta property="og:type" content="website" data-rh="true" />
 
-      {/* Loading / status */}
-      {loading && activeTab === "all" && (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading more games...</span>
-          </div>
-          <p className="mt-2" style={{ color: "#999" }}>
-            Loading more games...
-          </p>
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+          data-rh="true"
+        />
+        <meta
+          name="twitter:title"
+          content="Jawal Games - Play Now!"
+          data-rh="true"
+        />
+        <meta
+          name="twitter:description"
+          content="Jawal Games, your go-to platform for free online games. Enjoy top puzzle, brain, and casual hits from the App Store right in your browser.Play now!"
+          data-rh="true"
+        />
+        <meta
+          name="twitter:image"
+          content="https://jawalgames.net/web-icons/icon-512.png"
+          data-rh="true"
+        />
+      </Helmet>
+      <div className="container" style={{ overflowY: "auto" }}>
+        {/* Tabs */}
+        <Tabs
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+          favoriteIds={favoriteIds}
+        />
+
+        {/* Grid */}
+        <div className="row mt-md-4 m-auto" style={{ overflowX: "hidden" }}>
+          {displayedGames.map((game, idx) => {
+            const isLast =
+              idx === displayedGames.length - 1 && activeTab === "all";
+            return (
+              <GameCard
+                key={game.id}
+                game={game}
+                onGameClick={handleGameClick}
+                onToggleFavorite={handleToggleFavorite}
+                isFavorited={favoriteIds.includes(game.id)}
+                isLast={isLast}
+                lastGameRef={lastGameRef}
+                inTopGames={activeTab === "top-games"}
+              />
+            );
+          })}
         </div>
-      )}
 
-      {!hasMore && !loading && activeTab === "all" && allGames.length > 0 && (
-        <div className="text-center py-4">
-          <div className="text-muted">
-            <p style={{ color: "#999" }}>
-              🎮 You've explored all available games!
+        {/* Loading / status */}
+        {loading && activeTab === "all" && (
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading more games...</span>
+            </div>
+            <p className="mt-2" style={{ color: "#999" }}>
+              Loading more games...
             </p>
-            <small style={{ color: "#666" }}>
-              Check back later for new additions
-            </small>
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === "all" && displayedGames.length === 0 && !loading && (
-        <div className="text-center py-5">
-          <div className="mb-4">
-            <div className="display-1">🎮</div>
+        {!hasMore && !loading && activeTab === "all" && allGames.length > 0 && (
+          <div className="text-center py-4">
+            <div className="text-muted">
+              <p style={{ color: "#999" }}>
+                🎮 You've explored all available games!
+              </p>
+              <small style={{ color: "#666" }}>
+                Check back later for new additions
+              </small>
+            </div>
           </div>
-          <h5 style={{ color: "#999" }}>No games available</h5>
-          <p style={{ color: "#666" }}>
-            No games found. Please check back later.
-          </p>
-        </div>
-      )}
+        )}
 
-      {activeTab === "favorites" && favoriteIds.length === 0 && (
-        <div className="text-center py-5">
-          <Heart size={64} color="#666" className="mb-3" />
-          <h5 style={{ color: "#999" }}>No favorites yet</h5>
-          <p style={{ color: "#666" }}>
-            Start exploring games and add some to your favorites by clicking the
-            heart icon!
-          </p>
-          <button
-            className="btn btn-primary rounded-pill px-4 mt-3"
-            onClick={() => handleTabChange("all")}
-          >
-            Browse All Games
-          </button>
-        </div>
-      )}
-    </div>
+        {activeTab === "all" && displayedGames.length === 0 && !loading && (
+          <div className="text-center py-5">
+            <div className="mb-4">
+              <div className="display-1">🎮</div>
+            </div>
+            <h5 style={{ color: "#999" }}>No games available</h5>
+            <p style={{ color: "#666" }}>
+              No games found. Please check back later.
+            </p>
+          </div>
+        )}
+
+        {activeTab === "favorites" && favoriteIds.length === 0 && (
+          <div className="text-center py-5">
+            <Heart size={64} color="#666" className="mb-3" />
+            <h5 style={{ color: "#999" }}>No favorites yet</h5>
+            <p style={{ color: "#666" }}>
+              Start exploring games and add some to your favorites by clicking
+              the heart icon!
+            </p>
+            <button
+              className="btn btn-primary rounded-pill px-4 mt-3"
+              onClick={() => handleTabChange("all")}
+            >
+              Browse All Games
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
