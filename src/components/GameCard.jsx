@@ -61,19 +61,11 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
 
         {inTopGames && game.liked !== undefined && (
 <div
-  className="d-flex align-items-center gap-1 position-absolute px-2 py-1 rounded-pill"
-  style={{
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    color: "#fff",
-    fontSize: "0.9rem",
-    userSelect: "none",
-    pointerEvents: "none",
-    bottom: "10px",
-    left: "10px",
-  }}
+  className="rounded-pill likes-badge"
+  
   title={`${game.liked} likes`}
 >
-  <ThumbsUp size={16} fill="#fff" />
+  <ThumbsUp className='thumbsIcon' fill="#fff" />
   <span>{game.liked || 0}</span>
 </div>
 

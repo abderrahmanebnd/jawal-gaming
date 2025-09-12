@@ -28,23 +28,8 @@ const BackToTopButton = () => {
       type="button"
       onClick={handleClick}
       aria-label="Back to top"
-      className="btn rounded-circle shadow"
-      style={{
-        position: "fixed",
-        right: "20px",
-        bottom: "20px",
-        width: "48px",
-        height: "48px",
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#e2f3e7",
-        border: "none",
-        cursor: "pointer",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        transition: "all 0.3s ease",
-      }}
+      className="rounded-circle shadow btn-to-top"
+    
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = "#b6e642";
         e.currentTarget.style.transform = "scale(1.2)";
@@ -57,12 +42,7 @@ const BackToTopButton = () => {
       <img
         src="/ScrollUp-icon.png"
         alt="Up"
-        style={{
-          width: "48px",
-          height: "auto",
-          border: "1px solid #5350506e",
-          borderRadius: "100%",
-        }}
+        className="img-to-top"
       />
     </button>
   );

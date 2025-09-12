@@ -333,7 +333,7 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
     <div className="mb-4 mt-2">
       <ul className="nav nav-pills justify-content-sm-center flex-nowrap">
         {/* All Games Button */}
-        <li className="nav-item me-1 me-sm-2 flex-fill">
+        <li className="nav-item me-1 me-sm-2 flex-fill flex-sm-grow-0">
           <button
             className={`nav-link px-2 px-sm-4 py-1 py-sm-2 mt-2 w-100 mt-sm-0 rounded-pill fw-semibold  ${
               activeTab === "all" ? "active" : ""
@@ -378,9 +378,9 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
         </li>
 
         {/* Favorites Button */}
-        <li className="nav-item me-1 me-sm-2 flex-fill">
+        <li className="nav-item me-1 me-sm-2 flex-fill flex-sm-grow-0">
           <button
-            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 w-100 rounded-pill mt-2 mt-sm-0 fw-semibold ${
+            className={`nav-link px-2 px-sm-4 py-1 py-sm-2 w-100  rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "favorites" ? "active" : ""
             }`}
             style={{
@@ -437,7 +437,7 @@ function Tabs({ activeTab, handleTabChange, favoriteIds }) {
         </li>
 
         {/* Top Games Button */}
-        <li className="nav-item flex-fill">
+        <li className="nav-item flex-fill flex-sm-grow-0">
           <button
             className={`nav-link px-2 px-sm-4 py-1 py-sm-2 w-100 rounded-pill mt-2 mt-sm-0 fw-semibold ${
               activeTab === "top-games" ? "active" : ""

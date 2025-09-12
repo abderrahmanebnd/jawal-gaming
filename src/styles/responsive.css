@@ -26,13 +26,50 @@ align-items: center;
 justify-content: center; 
 }
 
-@media (max-width: 400px) {
+.likes-badge {
+   background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    color: #fff;
+    font-size: 0.9rem;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    pointer-events: none;
+    bottom: 12px;
+    left: 12px;
+}
+
+.thumbsIcon {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 500px) {
 .favorite-btn {
   width: 20px;
   height: 20px;
   bottom: 10px;
-  right: 10px;
+  right: 8px;
  }
+ .likes-badge {
+  font-size: 0.70rem;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  gap: 3px;
+  bottom: 10px;
+  left: 8px;
+ }
+ .thumbsIcon {
+  width: 10px;
+  height: 10px;
+}
 }
 
 .game-player.fullscreen iframe {
