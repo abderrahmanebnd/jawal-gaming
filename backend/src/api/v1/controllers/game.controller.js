@@ -46,7 +46,7 @@ exports.addGame = async (req, res) => {
         .toFile(uploadPath);
 
       // Build full URL dynamically
-      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+      const baseUrl = process.env.BASE_URL || `https://${req.get("host")}`;
       imageUrl = `${baseUrl}/uploads/${fileName}`;
     }
 
