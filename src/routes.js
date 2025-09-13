@@ -3,6 +3,6 @@ export const RoutePaths = {
   home: "/",
   notFound: "/not-found",
   game: "/:id",
-  login: "/login",
-  adminDashboard: "/admin-dashboard",
+  login: "/edarat-jeddah88",
+  adminDashboard: "/dokhool-aledara623",
 };
