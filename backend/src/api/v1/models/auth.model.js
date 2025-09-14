@@ -1,5 +1,78 @@
 const { getPool } = require("../../../config/db");
 
+
+// Insert new user
+async function createUser(
+  email,
+  hashedPassword,
+  role = "user",
+  status = "ACTIVE"
+) {
+  const pool = getPool();
+  try {
+    // Force admin to always be ACTIVE
+    if (role === "admin") {
+      status = "ACTIVE";
+    }
+
+    const [result] = await pool.execute(
+      `INSERT INTO AUTH (email, password, role, status, createdDate)
+       VALUES (?, ?, ?, ?, NOW())`,
+      [email, hashedPassword, role, status]
+    );
+
+    return {
+      id: result.insertId,
+      email,
+      role,
+      status,
+    };
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      throw new Error("Email already exists");
+    }
+    throw error;
+  }
+}
+
+// Find user by email (optionally enforce only ACTIVE)
+async function findUserByEmail(email, activeOnly = false) {
+    const pool = getPool();
+
+  let query = "SELECT * FROM AUTH WHERE email = ?";
+  const params = [email];
+
+  if (activeOnly) {
+    query += " AND status = 'ACTIVE'";
+  }
+
+  const [rows] = await pool.execute(query, params);
+  return rows[0] || null;
+}
+
+// Find user by id (safe, excludes password)
+async function findUserById(id) {
+    const pool = getPool();
+
+  const [rows] = await pool.execute(
+    "SELECT * FROM AUTH WHERE id = ?",
+    [id]
+  );
+  return rows[0] || null;
+}
+
+exports.updateUserOtp = async (id, otp, otpExpiry) => {
+  const pool = getPool();
+  await pool.execute("UPDATE AUTH SET otp = ?, otpExpiry = ? WHERE id = ?", [
+    otp,
+    otpExpiry,
+    id,
+  ]);
+};
+
+// -----------------------------------------------------
+
+
 /**
  * This model function is used to add/update users in the system
  * @param {number|null} _id - User ID for update, null for insert
@@ -57,29 +130,6 @@ async function auth(_id, email, status, createdDate, password) {
       throw new Error("Email already exists in the system");
     }
     throw new Error(`Unable to save user: ${error.message}`);
-  }
-}
-
-/**
- * This model function is used to get user details by email
- * @param {string} email - User email
- * @returns {Object|null} User object or null if not found
- */
-async function findUserByEmail(email) {
-  const pool = getPool();
-  
-  try {
-    const query = `
-      SELECT id, email, password, status, createdDate, updatedDate
-      FROM AUTH 
-      WHERE email = ? AND status = ?
-    `;
-    
-    const [rows] = await pool.execute(query, [email, 'ACTIVE']);
-    
-    return rows.length > 0 ? rows[0] : null;
-  } catch (error) {
-    throw new Error(`Unable to find user: ${error.message}`);
   }
 }
 
@@ -224,4 +274,13 @@ async function findAllUserWithQuery(page = 1, limit = 10) {
   }
 }
 
-module.exports = { auth, findUserByEmail, findAllUser, userCount, deleteUsers, findAllUserWithQuery };
+module.exports = {
+  auth,
+  findAllUser,
+  userCount,
+  deleteUsers,
+  findAllUserWithQuery,
+  createUser,
+  findUserByEmail,
+  findUserById,
+};

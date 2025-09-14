@@ -1,7 +1,7 @@
 // config/db.js
-const mysql = require('mysql2/promise');
-const { enable } = require('../app');
-require('dotenv').config();
+const mysql = require("mysql2/promise");
+const { enable } = require("../app");
+require("dotenv").config();
 
 const dbConfig = {
   host: process.env.DB_HOST || "127.0.0.1",
@@ -47,22 +47,22 @@ async function executeWithRetry(pool, query, params, maxRetries = 2) {
   }
 }
 
-
-
-
 const createTables = async (connection) => {
   const tables = [
     // AUTH table
     `CREATE TABLE IF NOT EXISTS AUTH (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      email VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      status ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') DEFAULT 'ACTIVE',
-      createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_email (email),
-      INDEX idx_status (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('ADMIN', 'USER') DEFAULT 'USER',
+  status ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') DEFAULT 'ACTIVE',
+  otp VARCHAR(10) NULL,
+  otpExpiry DATETIME NULL,
+  createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_email (email),
+  INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 
     // GAMES table
     `CREATE TABLE IF NOT EXISTS GAMES (
@@ -102,16 +102,16 @@ const createTables = async (connection) => {
       updatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_status (status),
       INDEX idx_title (title)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
   ];
 
   try {
     for (const tableSQL of tables) {
       await connection.execute(tableSQL);
     }
-    console.log('(: All tables created/verified successfully');
+    console.log("(: All tables created/verified successfully");
   } catch (error) {
-    console.error('): Error creating tables:', error);
+    console.error("): Error creating tables:", error);
     throw error;
   }
 };
@@ -120,11 +120,11 @@ async function connectDB() {
   try {
     // Create connection pool
     pool = mysql.createPool(dbConfig);
-    
+
     // Test connection and create tables
     const connection = await pool.getConnection();
-    console.log('(: MySQL connected successfully');
-    
+    console.log("(: MySQL connected successfully");
+
     pool.on("connection", (connection) => {
       console.log(`[DB] New connection ${connection.threadId}`);
     });
@@ -134,19 +134,19 @@ async function connectDB() {
     });
     // Create tables automatically
     await createTables(connection);
-    
+
     connection.release();
-    
+
     return pool;
   } catch (error) {
-    console.error('): Failed to connect to MySQL:', error);
+    console.error("): Failed to connect to MySQL:", error);
     process.exit(1);
   }
 }
 
 function getPool() {
   if (!pool) {
-    throw new Error('Database not initialized. Call connectDB() first.');
+    throw new Error("Database not initialized. Call connectDB() first.");
   }
   return pool;
 }
@@ -154,7 +154,7 @@ function getPool() {
 async function closeDB() {
   if (pool) {
     await pool.end();
-    console.log('(: MySQL connection pool closed');
+    console.log("(: MySQL connection pool closed");
   }
 }
 
