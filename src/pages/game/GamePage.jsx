@@ -62,7 +62,7 @@ const GamePage = () => {
     if (id && apiEndPoints.byIdGame) {
       const url = apiEndPoints.byIdGame;
       const param = { id };
-      const headers = { "Content-Type": "application/json" };
+      const headers = { "Content-Type": "application/json" };     
       getGameById(url, param, headers, true);
     }
   }, [id, getGameById]);
@@ -97,7 +97,7 @@ const GamePage = () => {
     if (!isBrowser) return;
     if (apiEndPoints.viewGame) {
       const url = apiEndPoints.viewGame;
-      const param = { pageNo: 1, pageSize: 50 };
+      const param = { pageNo: 1, pageSize: 19 };
       const headers = { "Content-Type": "application/json" };
       getGames(url, param, headers, true);
     }
@@ -167,14 +167,25 @@ const GamePage = () => {
     });
   }, []);
 
-  const handleGameClick = useCallback(
-    (gameToNavigate) => {
-      if (!gameToNavigate) return;
-      const slug = gameToNavigate.title.toLowerCase().replace(/\s+/g, "-");
-      navigate(`/${slug}`);
-    },
-    [navigate]
-  );
+ const handleGameClick = useCallback(
+   (gameToNavigate) => {
+     if (!gameToNavigate) return;
+
+     // Debounce rapid navigation
+     if (
+       handleGameClick._lastCall &&
+       Date.now() - handleGameClick._lastCall < 500
+     ) {
+       return;
+     }
+     handleGameClick._lastCall = Date.now();
+
+     const slug = gameToNavigate.title.toLowerCase().replace(/\s+/g, "-");
+     navigate(`/${slug}`);
+   },
+   [navigate]
+ );
+
 
   
 const displayedMoreGames = useMemo(() => {

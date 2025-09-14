@@ -68,10 +68,7 @@ exports.addGame = async (req, res) => {
 exports.viewGame = async (req, res) => {
   try {
     const { pageNo, pageSize, all } = req.query;
-
-    console.log("viewGame query params:", req.query);
     if (all === "true") {
-      console.log("Fetching all games without pagination");
       // Return all games without pagination
       const result = await getGames(null,null,all); // fetch all from DB
       const Count = await gameCount();
@@ -101,6 +98,7 @@ exports.viewGame = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("viewGame ERROR::", error);
     commonResponse(res, 500, null, error?.message, "v1-game-server-003");
   }
 };
@@ -128,11 +126,9 @@ exports.getById = async (req, res) => {
 
     // Convert slug back to normal title
     title = title.replace(/-/g, " ");
-    console.log("title::", title);
 
     // Fetch game by title
     const result = await getByTitle(title);
-    console.log("result::", result);
     if (!result) {
       return commonResponse(
         res,
@@ -186,6 +182,7 @@ exports.deleteGame = async (req, res) => {
       );
     }
   } catch (error) {
+    console.log("deleteGame ERROR::", error);
     // Handle specific error cases
     if (error.message.includes("No matching game found")) {
       return commonResponse(

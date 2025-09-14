@@ -24,6 +24,7 @@ exports.updateViews = async (req, res) => {
     });
 
   } catch (error) {
+    console.log("updateViews ERROR::", error);
     return commonResponse(res, 500, null, error?.message, "v1-game-server-005");
   }
 };

@@ -1,4 +1,4 @@
-const { getPool } = require("../../../config/db");
+const { getPool, executeWithRetry } = require("../../../config/db");
 
 
 
@@ -21,11 +21,11 @@ async function addLikeToGame(gameId, action) {
       SET liked = GREATEST(liked + ?, 0), updatedDate = NOW() 
       WHERE id = ?
     `;
-    await pool.execute(updateQuery, [change, gameId]);
+    await executeWithRetry(pool,updateQuery, [change, gameId]);
 
     // Get updated like count
     const selectQuery = `SELECT liked FROM GAMES WHERE id = ?`;
-    const [rows] = await pool.execute(selectQuery, [gameId]);
+    const [rows] = await executeWithRetry(pool,selectQuery, [gameId]);
 
     return rows.length ? rows[0].liked : 0;
   } catch (error) {
@@ -49,11 +49,11 @@ async function incrementViews(gameId) {
       SET viewed = viewed + 1, updatedDate = NOW()
       WHERE id = ?
     `;
-    await pool.execute(updateQuery, [gameId]);
+    await executeWithRetry(pool,updateQuery, [gameId]);
 
     // Get updated view count
     const selectQuery = `SELECT viewed FROM GAMES WHERE id = ?`;
-    const [rows] = await pool.execute(selectQuery, [gameId]);
+    const [rows] = await executeWithRetry(pool,selectQuery, [gameId]);
 
     if (!rows.length) {
       throw new Error(`Game with ID ${gameId} not found`);

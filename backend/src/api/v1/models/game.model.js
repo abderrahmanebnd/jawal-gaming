@@ -1,4 +1,4 @@
-const { getPool } = require("../../../config/db");
+const { getPool, executeWithRetry } = require("../../../config/db");
 
 /**
  * This function adds or updates game items
@@ -30,6 +30,7 @@ async function addGames(_id, title, description, url, thumbnail) {
       const [updateResult] = await connection.execute(updateQuery, [title, description, url, thumbnail, _id]);
       
       if (updateResult.affectedRows === 0) {
+
         throw new Error("No game found with the given ID");
       }
       
@@ -77,7 +78,7 @@ async function gameCount() {
   
   try {
     const query = `SELECT COUNT(*) as count FROM GAMES WHERE status = ?`;
-    const [rows] = await pool.execute(query, ['ACTIVE']);
+    const [rows] = await  executeWithRetry(pool,query, ['ACTIVE']);
     
     return rows[0].count;
   } catch (error) {
@@ -106,7 +107,7 @@ async function getGames(page = 1, limit = 10, all = false) {
         ORDER BY createDate DESC
       `;
       console.log("Executing query without LIMIT/OFFSET");
-      const [rows] = await pool.execute(query, ["ACTIVE"]);
+      const [rows] = await executeWithRetry(pool,query, ["ACTIVE"]);
       return rows;
     }
 
@@ -128,7 +129,7 @@ async function getGames(page = 1, limit = 10, all = false) {
       LIMIT ${validLimit} OFFSET ${offset}
     `;
     console.log("Executing query:", query);
-    const [rows] = await pool.execute(query, ["ACTIVE"]);
+    const [rows] = await executeWithRetry(pool,query, ["ACTIVE"]);
 
     return rows;
   } catch (error) {
@@ -163,7 +164,7 @@ async function getByTitle(title) {
     
     console.log('Searching for game with title:', gameTitle);
     
-    const [rows] = await pool.execute(query, [gameTitle, 'ACTIVE']);
+    const [rows] = await executeWithRetry(pool,query, [gameTitle, 'ACTIVE']);
     
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
@@ -199,7 +200,7 @@ async function getByIds(id) {
       WHERE id = ?
     `;
     
-    const [rows] = await pool.execute(query, [gameId]);
+    const [rows] = await executeWithRetry(pool,query, [gameId]);
     
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
@@ -224,7 +225,7 @@ async function deleteGames(id) {
     const gameId = parseInt(id);
     
     const query = `DELETE FROM GAMES WHERE id = ?`;
-    const [result] = await pool.execute(query, [gameId]);
+    const [result] = await executeWithRetry(pool,query, [gameId]);
     
     if (result.affectedRows === 1) {
       return { 

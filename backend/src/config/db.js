@@ -1,22 +1,54 @@
 // config/db.js
 const mysql = require('mysql2/promise');
+const { enable } = require('../app');
 require('dotenv').config();
 
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || "127.0.0.1",
   port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'JAWALDB',
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "JAWALDB",
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 12,
   queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  maxIdle: 8, // Keep 8 idle connections max
+
+  // acquireTimeout: 60000,
+  connectTimeout: 60000,
   // reconnect: true
 };
 
 let pool;
+
+const RETRIABLE_CODES = [
+  "ECONNREFUSED",
+  "PROTOCOL_CONNECTION_LOST",
+  "ECONNRESET",
+  "ETIMEDOUT",
+];
+
+async function executeWithRetry(pool, query, params, maxRetries = 2) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await pool.execute(query, params);
+    } catch (error) {
+      console.log(`Query attempt ${i + 1}/${maxRetries} failed: ${error.code}`);
+
+      if (!RETRIABLE_CODES.includes(error.code) || i === maxRetries - 1) {
+        throw error;
+      }
+
+      // Wait before retry, with exponential backoff
+      await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, i)));
+    }
+  }
+}
+
+
+
 
 const createTables = async (connection) => {
   const tables = [
@@ -93,6 +125,13 @@ async function connectDB() {
     const connection = await pool.getConnection();
     console.log('(: MySQL connected successfully');
     
+    pool.on("connection", (connection) => {
+      console.log(`[DB] New connection ${connection.threadId}`);
+    });
+
+    pool.on("error", (err) => {
+      console.error("[DB] Pool error:", err.code, err.message);
+    });
     // Create tables automatically
     await createTables(connection);
     
@@ -119,4 +158,4 @@ async function closeDB() {
   }
 }
 
-module.exports = { connectDB, getPool, closeDB }
+module.exports = { connectDB, getPool, closeDB, executeWithRetry };
