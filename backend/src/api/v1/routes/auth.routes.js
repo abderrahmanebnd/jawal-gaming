@@ -51,7 +51,7 @@ module.exports = function (app) {
     controller.logout
   );
 
-  app.post(
+  app.get(
     `/api/${apiVersion}/auth/me`,
     [commonMiddleware.requestErrorHandler],
     controller.getMe

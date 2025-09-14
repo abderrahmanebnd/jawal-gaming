@@ -20,11 +20,6 @@ export const useLogin = () => {
       navigate(
          "/verify-otp"
          //TODO:create verify otp page and route
-      //   data
-      //     ? data.role === "ADMIN"
-      //       ? RoutePaths.adminDashboard
-      //       : RoutePaths.userDashboard
-      //     : null
       );
     },
     onError: (error) => console.error("Login error:", error)

@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { handleError } from "@/lib/utils";
 import { apiEndPoints } from "../api/api";
 import axios from "axios";
 
@@ -26,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user: user || null,
         loading: isPending,
-        error: error ? handleError(error) : null,
+        error,
         //   setUser: ,
       }}
     >

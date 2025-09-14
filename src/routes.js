@@ -6,5 +6,6 @@ export const RoutePaths = {
   login: "/edarat-jeddah88",
   adminDashboard: "/dokhool-aledara623",
   userDashboard: "/", //for now redirect to home
-  privacyPolicy:"/privacy-policy"
+  privacyPolicy:"/privacy-policy",
+  verifyOtp:"/verify-otp"
 };
