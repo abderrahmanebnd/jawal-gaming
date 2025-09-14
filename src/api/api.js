@@ -5,6 +5,8 @@ export const apiEndPoints = {
   //User Management
   signIn: `${BASE_URL}/api/v1/auth/signIn`,
   signOut: `${BASE_URL}/api/v1/auth/signOut`,
+  getMe: `${BASE_URL}/api/v1/auth/me`,
+  verifyOtp: `${BASE_URL}/api/v1/auth/verify-otp`,
   addUser: `${BASE_URL}/api/v1/auth/user-management/add-user`,
   editUser: `${BASE_URL}/api/v1/auth/user-management/edit-user`,
   getUser: `${BASE_URL}/api/v1/auth/user-management/get-user`,

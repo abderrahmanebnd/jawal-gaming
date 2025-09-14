@@ -8,6 +8,7 @@ const {
   findUserById,
   updateUserOtp,
 } = require("../models/auth.model"); // adjust path
+const { sendEmail } = require("../utils/email");
 
 // Helper: sign JWT
 const signToken = (id) => {
@@ -97,6 +98,11 @@ exports.login = async (req, res) => {
     // TODO: send OTP via email/SMS (for now just log it)
     console.log(`OTP for ${email}: ${otp}`);
 
+    await sendEmail({
+      email: user.email,
+      subject: "Your OTP Code",
+      message: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
+    });
     res.status(200).json({
       status: "success",
       message: "OTP sent, please verify.",
