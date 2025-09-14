@@ -189,6 +189,9 @@ const HomePage = () => {
   const loadingTop = activeTab === "top-games" && loadingTopGames && !topLoaded;
   const loadingFavoritesGames = activeTab === "favorites" && loadingFavorites;
 
+
+  console.log({loadingAll, loadingTop, loadingFavoritesGames});
+
   const initialLoading = loadingAll || loadingTop || loadingFavoritesGames;
 
   if (initialLoading) {

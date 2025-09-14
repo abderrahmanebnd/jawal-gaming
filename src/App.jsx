@@ -21,6 +21,7 @@ import useApi from "./hooks/useApi";
 import ScrollToTop from "./components/ScrollToTop";
 // import ColorToggle from "./shared/ColorToggle";
 import BackToTopButton from "./components/BackToTopButton";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState("/");
@@ -130,12 +131,19 @@ const App = () => {
       {/* Main Content */}
       <main className="flex-grow-1 main-container">
         <Routes location={location} key={location.pathname}>
-                   <Route
+          <Route
             path={RoutePaths.base}
             element={
               <HomePage
                 onToggleFavorite={handleToggleFavorite}
                 onGameClick={handleGameClick}
+              />
+            }
+          />
+          <Route
+            path={RoutePaths.privacyPolicy}
+            element={
+              <PrivacyPolicy
               />
             }
           />

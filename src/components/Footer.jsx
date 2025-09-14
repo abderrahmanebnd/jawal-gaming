@@ -1,6 +1,7 @@
 import { CONSTANTS } from "../shared/constants";
 import appStore from "../assets/app_store.png";
 import googlePlay from "../assets/google_play.png";
+import { Link } from "react-router-dom";
 
 // /components/Footer.jsx
 const Footer = ({ footerLinks }) => {
@@ -56,14 +57,14 @@ const Footer = ({ footerLinks }) => {
           <div className="col-md-6 d-flex justify-content-end">
             <div className="gap-4 justify-content-end d-none d-md-block p-2">
               {footerLinks.map((link) => (
-                <a
+                <Link
                   key={link.id}
-                  href={link.url}
+                  to={link.url}
                   className="text-decoration-none mx-2 footer-link"
                   style={{ color: linkColor }}
                 >
                   {link.title}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -72,14 +73,14 @@ const Footer = ({ footerLinks }) => {
         <div className="row mt-1">
           <div className="d-flex gap-4 justify-content-center d-md-none d-block mb-1">
             {footerLinks.map((link) => (
-              <a
+              <Link
                 key={link.id}
-                href={link.url}
+                to={link.url}
                 className="text-decoration-none footer-link"
                 style={{ color: linkColor }}
               >
                 {link.title}
-              </a>
+              </Link>
             ))}
           </div>
           <div className="col-12 text-center">
