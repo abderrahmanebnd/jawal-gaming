@@ -145,7 +145,7 @@ const App = () => {
             <Route path={RoutePaths.verifyOtp} element={<VerifyOtp />} />
           </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route
               path={RoutePaths.adminDashboard}
               element={<AdminDashboard />}

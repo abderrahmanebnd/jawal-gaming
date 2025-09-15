@@ -50,7 +50,7 @@ module.exports = function (app) {
   );
 
   // SignOut route
-  app.post(
+  app.get(
     `/api/${apiVersion}/auth/signOut`,
     [commonMiddleware.requestErrorHandler],
     controller.logout

@@ -1,6 +1,5 @@
 // config/db.js
 const mysql = require("mysql2/promise");
-const { enable } = require("../app");
 require("dotenv").config();
 
 const dbConfig = {
@@ -13,8 +12,9 @@ const dbConfig = {
   connectionLimit: 12,
   queueLimit: 0,
   enableKeepAlive: true,
+  idleTimeout: 60000,
   keepAliveInitialDelay: 0,
-  maxIdle: 8, // Keep 8 idle connections max
+  maxIdle: 4, // Keep 8 idle connections max
 
   // acquireTimeout: 60000,
   connectTimeout: 60000,
@@ -54,7 +54,7 @@ const createTables = async (connection) => {
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role ENUM('ADMIN', 'USER') DEFAULT 'USER',
+  role ENUM('admin', 'user') DEFAULT 'USER',
   status ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') DEFAULT 'ACTIVE',
   otp VARCHAR(10) NULL,
   otpExpiry DATETIME NULL,

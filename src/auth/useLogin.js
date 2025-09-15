@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiEndPoints } from "../api/api";
+import { RoutePaths } from "../routes";
 
 const loginUser = async (credentials) => {
-  const { data } = axios.post(apiEndPoints.signIn, credentials, {
+  const { data } = await axios.post(apiEndPoints.signIn, credentials, {
     withCredentials: true,
   });
   return data;
@@ -15,12 +16,11 @@ export const useLogin = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["authCheck"]);
-      navigate(
-         "/verify-otp"
-         //TODO:create verify otp page and route
-      );
+       sessionStorage.setItem("email", data.data.email);
+       navigate(RoutePaths.verifyOtp);
+      
     },
     onError: (error) => console.error("Login error:", error)
   });

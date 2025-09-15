@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useVerifyOtp } from "../../auth/useVerifyOtp";
 import { useResendOtp } from "../../auth/useResendOtp";
+import {RoutePaths} from "../../routes.js";
+import { Navigate } from "react-router-dom";
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const { mutate: verifyOtp, isLoading } = useVerifyOtp();
-  const { mutate: resendOtp, isLoading: isResending } = useResendOtp()
+  const { mutate: resendOtp, isLoading: isResending } = useResendOtp();
   const handleChange = (value, index) => {
     if (/^[0-9]?$/.test(value)) {
       const newOtp = [...otp];
@@ -22,12 +24,15 @@ export default function VerifyOtp() {
     e.preventDefault();
     const enteredOtp = otp.join("");
     if (enteredOtp.length === 6) {
-      verifyOtp({ otp: enteredOtp });
+      verifyOtp({ otp: enteredOtp,email:sessionStorage.getItem("email")  })
     } else {
       alert("Please enter the full 6-digit OTP.");
     }
   };
 
+  if (!sessionStorage.getItem("email")) {
+    return <Navigate to={RoutePaths.login} replace />;
+  }
   return (
     <div className="otp-container">
       <div className="otp-box">
@@ -61,7 +66,13 @@ export default function VerifyOtp() {
               type="button"
               className="otp-resend-link"
               disabled={isResending}
-              onClick={() => resendOtp(email)}
+              onClick={() =>
+                resendOtp(sessionStorage.getItem("email"), {
+                  onSuccess: () => {
+                    alert("OTP resent successfully!");
+                  },
+                })
+              }
             >
               {isResending ? "Resending..." : "Resend OTP"}
             </button>

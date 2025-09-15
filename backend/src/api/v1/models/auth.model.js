@@ -5,14 +5,14 @@ const { getPool } = require("../../../config/db");
 async function createUser(
   email,
   hashedPassword,
-  role = "USER",
+  role = "user",
   status = "INACTIVE"
 ) {
   const pool = getPool();
   try {
     // Force admin to always be ACTIVE
     //TODO:we should remove this in production, the users not be able to sign up as admin
-    if (role === "ADMIN") {
+    if (role === "admin") {
       // status = "ACTIVE";
       throw new Error("Cannot sign up as admin");
     }

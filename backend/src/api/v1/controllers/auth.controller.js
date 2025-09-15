@@ -7,31 +7,30 @@ const {
   findUserByEmail,
   findUserById,
   updateUserOtp,
-} = require("../models/auth.model"); // adjust path
+} = require("../models/auth.model"); 
+const config = require("../../../config/config.json");
 const { sendEmail } = require("../utils/email");
 
 // Helper: sign JWT
 const signToken = (id) => {
-  console.log("JWT_SECRET:", process.env.JWT_SECRET);
-  console.log("JWT_EXPIRES_IN:", process.env.JWT_EXPIRES_IN);
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  return jwt.sign({ id }, config.cookieSecretKey, {
+    expiresIn: `14d`,
   });
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  expires: new Date(
+    Date.now() + config.expiresIn * 24 * 60 * 60 * 1000
+  ),
+  path: "/",
+};
 // Helper: create and send JWT in cookie + response
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    expires: new Date(
-      Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    path: "/",
-  };
 
   res.cookie("jwt", token, cookieOptions);
   res.status(statusCode).json({
@@ -44,7 +43,7 @@ const createSendToken = (user, statusCode, res) => {
 // ✅ Signup (no OTP needed)
 exports.signup = async (req, res) => {
   try {
-    const { email, password, role = "USER" } = req.body;
+    const { email, password, role = "user" } = req.body;
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await createUser(email, hashedPassword, role);
@@ -108,6 +107,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "OTP sent, please verify.",
+      data: { email: user.email },
     });
   } catch (error) {
   console.error("login ERROR::", error);
@@ -141,7 +141,7 @@ exports.verifyOtp = async (req, res) => {
     if (user.otp !== otp || new Date(user.otpExpiry) < new Date()) {
       return res.status(400).json({
         status: "fail",
-        message: "Invalid or expired OTP",
+        message: "Invalid or expired OTP,try to resend OTP",
       });
     }
 
@@ -228,7 +228,7 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
 
     const freshUser = await findUserById(decoded.id);
     if (!freshUser) {
@@ -271,13 +271,7 @@ exports.restrictTo = (...roles) => {
 
 // ✅ Logout
 exports.logout = (req, res) => {
-  res.cookie("jwt", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-  });
-
+   res.clearCookie('jwt',cookieOptions);
   res.status(200).json({
     status: "success",
     message: "Logged out successfully",
@@ -294,7 +288,7 @@ exports.getMe = async (req, res) => {
       });
     }
 
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
 
     const user = await findUserById(decoded.id);
 

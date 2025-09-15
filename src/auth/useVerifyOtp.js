@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiEndPoints } from "../api/api";
+import { RoutePaths } from "../routes";
 
 const  verifyOtp= async (credentials) => {
-  const { data } = axios.post(apiEndPoints.verifyOtp, credentials, {
+  const { data } = await axios.post(apiEndPoints.verifyOtp, credentials, {
     withCredentials: true,
   });
   return data;
@@ -15,16 +16,19 @@ export const useVerifyOtp = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: verifyOtp,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["authCheck"]);
       navigate(
           data
-            ? data.role === "ADMIN"
+            ? data.data.user.role === "admin"
               ? RoutePaths.adminDashboard
               : RoutePaths.userDashboard
             : null
       );
     },
-    onError: (error) => console.error("Verify otp error:", error),
+    onError: (error) =>{
+      console.error("Verify otp error:", error),
+      alert(error.response?.data?.message || "Failed to verify OTP")
+    } 
   });
 };

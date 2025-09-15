@@ -5,7 +5,7 @@ import axios from "axios";
 
 async function getMeApi() {
   const response = await axios.get(apiEndPoints.getMe, { withCredentials: true });
-  return response.data.data;
+  return response.data.data.user;
 }
 const AuthContext = createContext(undefined);
 
