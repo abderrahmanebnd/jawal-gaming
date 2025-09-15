@@ -291,7 +291,7 @@ exports.getMe = async (req, res) => {
     const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
 
     const user = await findUserById(decoded.id);
-
+    
     if (!user) {
       return res.status(401).json({
         status: "fail",
