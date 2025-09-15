@@ -17,6 +17,7 @@ export function useLogout() {
     mutationFn: logoutUser,
     onSuccess: (data) => {
       console.log("Logout successful:", data);
+      sessionStorage.removeItem("email");
       navigate(RoutePaths.home); // Redirect to home page after logout
     },
     onError: (error) => console.log(" Logout error:", error),

@@ -18,6 +18,7 @@ export const useVerifyOtp = () => {
     mutationFn: verifyOtp,
     onSuccess: (data) => {
       queryClient.invalidateQueries(["authCheck"]);
+            sessionStorage.removeItem("email");
       navigate(
           data
             ? data.data.user.role === "admin"
