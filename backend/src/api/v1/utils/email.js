@@ -14,7 +14,7 @@ exports.sendEmail = async (options) => {
 
   // 2) Define email options
   const mailOptions = {
-    from: `"Jawal App" <${process.env.EMAIL_USER}>`,
+    from: `"Jawal Games" <${process.env.EMAIL_USER}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,

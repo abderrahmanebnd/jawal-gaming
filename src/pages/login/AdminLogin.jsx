@@ -31,8 +31,7 @@ export default function AdminLogin() {
     if (!credentials.email.trim()) {
       errors.email = "Email is required";
     } else if (
-      !/\S+@\S+\.\S+/.test(credentials.email) &&
-      credentials.email !== "admin"
+      !/\S+@\S+\.\S+/.test(credentials.email)
     ) {
       errors.email = "Please enter a valid email address";
     }

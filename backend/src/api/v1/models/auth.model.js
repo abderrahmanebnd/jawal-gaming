@@ -5,14 +5,16 @@ const { getPool } = require("../../../config/db");
 async function createUser(
   email,
   hashedPassword,
-  role = "user",
-  status = "ACTIVE"
+  role = "USER",
+  status = "INACTIVE"
 ) {
   const pool = getPool();
   try {
     // Force admin to always be ACTIVE
-    if (role === "admin") {
-      status = "ACTIVE";
+    //TODO:we should remove this in production, the users not be able to sign up as admin
+    if (role === "ADMIN") {
+      // status = "ACTIVE";
+      throw new Error("Cannot sign up as admin");
     }
 
     const [result] = await pool.execute(
@@ -61,7 +63,7 @@ async function findUserById(id) {
   return rows[0] || null;
 }
 
-exports.updateUserOtp = async (id, otp, otpExpiry) => {
+const updateUserOtp = async (id, otp, otpExpiry) => {
   const pool = getPool();
   await pool.execute("UPDATE AUTH SET otp = ?, otpExpiry = ? WHERE id = ?", [
     otp,
@@ -283,4 +285,5 @@ module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
+  updateUserOtp
 };

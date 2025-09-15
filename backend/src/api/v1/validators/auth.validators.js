@@ -23,8 +23,8 @@ const signUpInitiateValidator = [
   // Role (optional but must be either ADMIN or USER if provided)
   body("role")
     .optional()
-    .isIn(["ADMIN", "USER"])
-    .withMessage("Role must be either ADMIN or USER."),
+    .isIn(["USER"])
+    .withMessage("Role must be USER."),
 
   // Status (optional but must be one of the allowed values)
   body("status")
@@ -44,8 +44,9 @@ const editSignUpValidator = [
   check("role")
     .notEmpty()
     .withMessage("User role is required.")
-    .isIn(["ADMIN", "USER"])
-    .withMessage("Role must be either ADMIN or USER."),
+    // .isIn(["ADMIN", "USER"])
+    .isIn(["USER"])
+    .withMessage("Role must be USER."),
   check("status")
     .notEmpty()
     .withMessage("Status is required.")

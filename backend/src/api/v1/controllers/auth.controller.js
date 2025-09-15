@@ -12,6 +12,8 @@ const { sendEmail } = require("../utils/email");
 
 // Helper: sign JWT
 const signToken = (id) => {
+  console.log("JWT_SECRET:", process.env.JWT_SECRET);
+  console.log("JWT_EXPIRES_IN:", process.env.JWT_EXPIRES_IN);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -26,7 +28,7 @@ const createSendToken = (user, statusCode, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     path: "/",
   };
@@ -42,7 +44,7 @@ const createSendToken = (user, statusCode, res) => {
 // ✅ Signup (no OTP needed)
 exports.signup = async (req, res) => {
   try {
-    const { email, password, role = "user" } = req.body;
+    const { email, password, role = "USER" } = req.body;
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await createUser(email, hashedPassword, role);
@@ -108,7 +110,7 @@ exports.login = async (req, res) => {
       message: "OTP sent, please verify.",
     });
   } catch (error) {
-    console.error("login ERROR::", error);
+  console.error("login ERROR::", error);
     res.status(500).json({ status: "fail", message: error.message });
   }
 };
