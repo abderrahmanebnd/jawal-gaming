@@ -53,15 +53,24 @@ async function findUserByEmail(email, activeOnly = false) {
 }
 
 // Find user by id (safe, excludes password)
-async function findUserById(id) {
-    const pool = getPool();
+let cachedAdmin = null;
 
-  const [rows] = await pool.execute(
-    "SELECT * FROM AUTH WHERE id = ?",
-    [id]
-  );
-  return rows[0] || null;
+async function findUserById(id) {
+  if (cachedAdmin && cachedAdmin.id === id) {
+    return cachedAdmin;
+  }
+
+  const pool = getPool();
+  const [rows] = await pool.execute("SELECT * FROM AUTH WHERE id = ?", [id]);
+  const user = rows[0] || null;
+
+  if (user && user.role === "admin") {
+    cachedAdmin = user; // ✅ Only cache admins
+  }
+
+  return user;
 }
+
 
 const updateUserOtp = async (id, otp, otpExpiry) => {
   const pool = getPool();
