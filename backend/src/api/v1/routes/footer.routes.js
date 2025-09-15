@@ -1,5 +1,6 @@
 const { commonMiddleware } = require("../middlewares");
 const controller = require("../controllers/footer.controller");
+//TODO: we should add authMiddleware to protect these routes only for admin users
 
 module.exports = function (app) {
   // Current API version in use

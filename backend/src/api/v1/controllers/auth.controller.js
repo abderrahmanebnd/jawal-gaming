@@ -291,7 +291,6 @@ exports.getMe = async (req, res) => {
     const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
 
     const user = await findUserById(decoded.id);
-    //TODO:caching because we just have one user and this is used just for the admin now, we can cache this user details in redis or in memory for faster access  
 
     if (!user) {
       return res.status(401).json({
