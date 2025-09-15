@@ -1,8 +1,9 @@
+"use client";
+
 import { useMutation } from "@tanstack/react-query";
-import { apiEndPoints } from "../api/api";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import axios from "axios";
-import { RoutePaths } from "../routes";
+import { apiEndPoints } from "@/routes";
 
 const logoutUser = async () => {
   const { data } = await axios.get(apiEndPoints.signOut, {
@@ -12,13 +13,14 @@ const logoutUser = async () => {
 };
 
 export function useLogout() {
-  const navigate = useNavigate();
+  const router = useRouter(); 
   return useMutation({
     mutationFn: logoutUser,
     onSuccess: (data) => {
       console.log("Logout successful:", data);
-      navigate(RoutePaths.home); // Redirect to home page after logout
+      sessionStorage.removeItem("email");
+      router.push("/");
     },
-    onError: (error) => console.log(" Logout error:", error),
+    onError: (error) => console.log("Logout error:", error),
   });
 }

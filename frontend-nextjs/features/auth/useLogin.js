@@ -1,8 +1,9 @@
+"use client";
+
+import { apiEndPoints } from "@/routes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { apiEndPoints } from "../api/api";
-import { RoutePaths } from "../routes";
+import { useRouter } from "next/navigation"; 
 
 const loginUser = async (credentials) => {
   const { data } = await axios.post(apiEndPoints.signIn, credentials, {
@@ -13,15 +14,19 @@ const loginUser = async (credentials) => {
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const router = useRouter(); // ✅ replaces useNavigate
+
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["authCheck"]);
-       sessionStorage.setItem("email", data.data.email);
-       navigate(RoutePaths.verifyOtp);
-      
+      queryClient.invalidateQueries({ queryKey: ["authCheck"] });
+
+      // Save email in sessionStorage
+      sessionStorage.setItem("email", data.data.email);
+
+      // ✅ redirect to verifyOtp page
+      router.push(apiEndPoints.verifyOtp);
     },
-    onError: (error) => console.error("Login error:", error)
+    onError: (error) => console.error("Login error:", error),
   });
 };

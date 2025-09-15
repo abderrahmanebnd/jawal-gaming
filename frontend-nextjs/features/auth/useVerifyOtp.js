@@ -1,10 +1,11 @@
+"use client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { apiEndPoints } from "../api/api";
-import { RoutePaths } from "../routes";
+import { useRouter } from "next/navigation";
+import { apiEndPoints, RoutePaths } from "@/routes";
 
-const  verifyOtp= async (credentials) => {
+const verifyOtp = async (credentials) => {
   const { data } = await axios.post(apiEndPoints.verifyOtp, credentials, {
     withCredentials: true,
   });
@@ -13,22 +14,30 @@ const  verifyOtp= async (credentials) => {
 
 export const useVerifyOtp = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const router = useRouter();
+
   return useMutation({
     mutationFn: verifyOtp,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["authCheck"]);
-      navigate(
-          data
-            ? data.data.user.role === "admin"
-              ? RoutePaths.adminDashboard
-              : RoutePaths.userDashboard
-            : null
-      );
+      queryClient.invalidateQueries({ queryKey: ["authCheck"] });
+
+      const role = data?.data?.user?.role?.toLowerCase();
+
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("email");
+      }
+
+      if (role === "admin") {
+        router.push(RoutePaths.adminDashboard);
+      } else if (role === "user") {
+        router.push(RoutePaths.userDashboard);
+      } else {
+        console.warn("Unknown role, staying on page.");
+      }
     },
-    onError: (error) =>{
-      console.error("Verify otp error:", error),
-      alert(error.response?.data?.message || "Failed to verify OTP")
-    } 
+    onError: (error) => {
+      console.error("Verify otp error:", error);
+      alert(error.response?.data?.message || "Failed to verify OTP");
+    },
   });
 };
