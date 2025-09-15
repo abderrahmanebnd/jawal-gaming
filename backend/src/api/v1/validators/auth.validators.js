@@ -2,49 +2,86 @@ const { check, body } = require("express-validator");
 
 // Validator for sign up request
 const signUpInitiateValidator = [
-  // Validation rule for email
-  check("email").notEmpty().withMessage("Email address is required.").isEmail().withMessage("Email address is invalid."),
-  // Validation rule for id
+  // Email
+  check("email")
+    .notEmpty()
+    .withMessage("Email address is required.")
+    .isEmail()
+    .withMessage("Email address is invalid."),
+
+  // _id (optional for updates)
   body("_id").optional(),
-  // Validation rule for password
+
+  // Password (only required if creating new user, not updating)
   body("password")
     .if(body("_id").not().exists())
     .notEmpty()
     .withMessage("Password is required.")
     .isLength({ min: 8 })
-    .withMessage("Password must have at least 8 characters.")
+    .withMessage("Password must have at least 8 characters."),
+
+  // Role (optional but must be either ADMIN or USER if provided)
+  body("role")
+    .optional()
+    .isIn(["user"])
+    .withMessage("Role must be USER."),
+
+  // Status (optional but must be one of the allowed values)
+  body("status")
+    .optional()
+    .isIn(["ACTIVE", "INACTIVE", "SUSPENDED"])
+    .withMessage("Invalid status."),
 ];
+
 // Validator for edit user request
 const editSignUpValidator = [
-  // Validation rule for username
-  check("username").notEmpty().withMessage("username is required."),
-  // Validation rule for email
-  check("email").notEmpty().withMessage("Email address is required.").isEmail().withMessage("Email address is invalid."),
-  // Validation rule for role
-  check("role").notEmpty().withMessage("User role is required."),
-  // Validation rule for status
-  check("status").notEmpty().withMessage("Status is required."),
-  // Validation rule for modify date
-  check("modifyDate").notEmpty().withMessage("Modify date is required.")
+  check("username").notEmpty().withMessage("Username is required."),
+  check("email")
+    .notEmpty()
+    .withMessage("Email address is required.")
+    .isEmail()
+    .withMessage("Email address is invalid."),
+  check("role")
+    .notEmpty()
+    .withMessage("User role is required.")
+// .isIn(["ADMIN", "USER"])
+    .isIn(["user"])
+    .withMessage("Role must be USER."),
+  check("status")
+    .notEmpty()
+    .withMessage("Status is required.")
+    .isIn(["ACTIVE", "INACTIVE", "SUSPENDED"])
+    .withMessage("Invalid status."),
+  check("modifyDate").notEmpty().withMessage("Modify date is required."),
 ];
-// Validator for signIn request
+
+// Validator for sign in request
 const signInValidator = [
-  // Validation rule for email
-  check("email").notEmpty().withMessage("Email address is required.").isEmail().withMessage("Email address is invalid."),
-  // Validation rule for password
-  check("password").notEmpty().withMessage("Password is required.")
+  check("email")
+    .notEmpty()
+    .withMessage("Email address is required.")
+    .isEmail()
+    .withMessage("Email address is invalid."),
+  check("password").notEmpty().withMessage("Password is required."),
 ];
-// Validator for get user detail request
+
+// Validator for get user detail request (pagination)
 const getUserValidator = [
-  // Validation rule for pageNo
-  check("pageNo").notEmpty().withMessage("PageNo is required."),
-  // Validation rule for pageSize
-  check("pageSize").notEmpty().withMessage("PageSize is required.")
+  check("pageNo")
+    .notEmpty()
+    .withMessage("PageNo is required.")
+    .isInt({ min: 1 })
+    .withMessage("PageNo must be a positive integer."),
+  check("pageSize")
+    .notEmpty()
+    .withMessage("PageSize is required.")
+    .isInt({ min: 1, max: 100 })
+    .withMessage("PageSize must be between 1 and 100."),
 ];
-// Validator for delete user detail request
+
+// Validator for delete user request
 const deleteUserValidator = [
-  // Validation rule for id
-  check("id").notEmpty().withMessage("ID is required.")
+  check("id").notEmpty().withMessage("ID is required."),
 ];
 
 const auth = {
@@ -52,7 +89,7 @@ const auth = {
   editSignUpValidator,
   signInValidator,
   getUserValidator,
-  deleteUserValidator
+  deleteUserValidator,
 };
 
 module.exports = auth;

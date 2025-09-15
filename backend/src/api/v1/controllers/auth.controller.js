@@ -1,212 +1,321 @@
+const { promisify } = require("util");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { commonResponse } = require("../common/common");
-const { auth, findUserByEmail, findAllUser, userCount, deleteUsers } = require("../models/auth.model");
-const common = require("../common/common");
+const crypto = require("crypto");
+const {
+  createUser,
+  findUserByEmail,
+  findUserById,
+  updateUserOtp,
+} = require("../models/auth.model"); 
+const config = require("../../../config/config.json");
+const { sendEmail } = require("../utils/email");
 
-/**
- * This function use to add users to the system
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.signUp = async (req, res) => {
+// Helper: sign JWT
+const signToken = (id) => {
+  return jwt.sign({ id }, config.cookieSecretKey, {
+    expiresIn: `14d`,
+  });
+};
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  expires: new Date(
+    Date.now() + config.expiresIn * 24 * 60 * 60 * 1000
+  ),
+  path: "/",
+};
+// Helper: create and send JWT in cookie + response
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user.id);
+
+
+  res.cookie("jwt", token, cookieOptions);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: { user },
+  });
+};
+
+// ✅ Signup (no OTP needed)
+exports.signup = async (req, res) => {
   try {
-    const user = await findUserByEmail(req.body.email);
-    if (user && !req.body._id) {
-      commonResponse(res, 409, null, "User already exist", "v1-auth-server-001");
-      return;
-    }
+    const { email, password, role = "user" } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    let hashedPassword;
-    if (req.body.password) {
-      hashedPassword = await bcrypt.hash(req.body.password, 10);
-    }
+    const newUser = await createUser(email, hashedPassword, role);
 
-    const result = await auth(
-      req.body._id ? req.body._id : undefined,
-      req.body.email,
-      "ACTIVE",
-      new Date(), 
-      hashedPassword ? hashedPassword : undefined
-    );
-    // Generate common response
-    commonResponse(res, 200, result);
+    createSendToken(newUser, 201, res);
   } catch (error) {
-    console.log("signUp ERROR::", error);
-    const err = error?.response?.data ? error?.response?.data : error?.message || "server error";
-    const errStatus = error?.response?.status ? error?.response?.status : 500;
-    commonResponse(res, errStatus, null, err, "v1-auth-server-002");
+    console.error("signup ERROR::", error);
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
-/**
- * This function use to edit users
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.editSignUp = async (req, res) => {
+//
+// ✅ Step 1: Login (send OTP instead of logging in directly)
+//
+exports.login = async (req, res) => {
   try {
-    let hashedPassword;
-    if (req.body.password) {
-      hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide email and password",
+      });
     }
-    
-    // Fix: Match the auth model parameters (5 parameters)
-    const result = await auth(
-      req.body._id,
-      req.body.email,
-      req.body.status || "ACTIVE",
-      req.body.modifyDate || new Date(),
-      hashedPassword ? hashedPassword : undefined
-    );
-    // Generate common response
-    commonResponse(res, 200, result);
+
+    const user = await findUserByEmail(email);
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Incorrect email or password",
+      });
+    }
+
+    // 🔹 Check status
+    if (user.status === "INACTIVE") {
+      return res
+        .status(403)
+        .json({ status: "fail", message: "Your account is inactive." });
+    }
+    if (user.status === "SUSPENDED") {
+      return res
+        .status(403)
+        .json({ status: "fail", message: "Your account has been suspended." });
+    }
+
+    // 🔹 Generate OTP (6 digits)
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+
+    // Save OTP in DB
+    await updateUserOtp(user.id, otp, otpExpiry);
+
+    // TODO: send OTP via email/SMS (for now just log it)
+    console.log(`OTP for ${email}: ${otp}`);
+
+    await sendEmail({
+      email: user.email,
+      subject: "Your OTP Code",
+      message: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "OTP sent, please verify.",
+      data: { email: user.email },
+    });
   } catch (error) {
-    console.log("editSignUp ERROR::", error);
-    const err = error?.response?.data ? error?.response?.data : error?.message || "server error";
-    const errStatus = error?.response?.status ? error?.response?.status : 500;
-    commonResponse(res, errStatus, null, err, "v1-auth-server-003");
+  console.error("login ERROR::", error);
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
-/**
- * This function use to send sign in to system
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.signIn = async (req, res) => {
+//
+// ✅ Step 2: Verify OTP
+//
+exports.verifyOtp = async (req, res) => {
   try {
-    const user = await findUserByEmail(req.body.email);
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide email and OTP",
+      });
+    }
+
+    const user = await findUserByEmail(email);
+    if (!user || !user.otp || !user.otpExpiry) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No OTP found, please login again.",
+      });
+    }
+
+    // Check OTP match & expiry
+    if (user.otp !== otp || new Date(user.otpExpiry) < new Date()) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid or expired OTP,try to resend OTP",
+      });
+    }
+
+    // Clear OTP
+    await updateUserOtp(user.id, null, null);
+
+    delete user.password;
+    delete user.otp;
+    delete user.otpExpiry;
+
+    // Now login user
+    createSendToken(user, 200, res);
+  } catch (error) {
+    console.error("verifyOtp ERROR::", error);
+    res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
+
+//
+//  Resend OTP
+//
+exports.resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide email",
+      });
+    }
+
+    const user = await findUserByEmail(email);
     if (!user) {
-      commonResponse(res, 401, null, "Invalid email or password", "v1-auth-server-004");
-      return;
-    }
-      
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
-    if (!isMatch) {
-      commonResponse(res, 401, null, "Invalid email or password", "v1-auth-server-005");
-      return;
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
     }
 
-    common.setSessionTokenCookie(res, user);
-    commonResponse(res, 200, {
-      isLoggedIn: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-        status: user.status,
-        isAccess: true
-      }
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({
+        status: "fail",
+        message: `Your account is ${user.status}. Access denied.`,
+      });
+    }
+
+    // 🔹 Generate new OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+    await updateUserOtp(user.id, otp, otpExpiry);
+
+    // send email
+    await sendEmail({
+      email: user.email,
+      subject: "Your New OTP Code",
+      message: `Your new OTP code is ${otp}. It is valid for 5 minutes.`,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "New OTP sent successfully",
     });
   } catch (error) {
-    console.log("signIn ERROR::", error);
-    commonResponse(res, 500, null, error?.message || "server error", "v1-auth-server-007");
+    console.error("resendOtp ERROR::", error);
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
+    });
   }
 };
 
-/**
- * This function use to send sign out from the system
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.signOut = async (req, res) => {
+
+// ✅ Protect middleware
+exports.protect = async (req, res, next) => {
   try {
-    res.clearCookie("sessionTokenCookie");
-    //Return success response
-    commonResponse(res, 200, { Message: "Logout" });
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res.status(401).json({
+        status: "fail",
+        message: "You are not logged in!",
+      });
+    }
+
+    const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
+
+    const freshUser = await findUserById(decoded.id);
+    if (!freshUser) {
+      return res.status(401).json({
+        status: "fail",
+        message: "The user belonging to this token does not exist.",
+      });
+    }
+
+    if (freshUser.status !== "ACTIVE") {
+      return res.status(403).json({
+        status: "fail",
+        message: `Your account is ${freshUser.status}. Access denied.`,
+      });
+    }
+
+    req.user = freshUser;
+    next();
   } catch (error) {
-    console.log("signOut ERROR::", error);
-    commonResponse(res, 500, null, error?.message || "server error", "v1-auth-server-008");
+    console.error("protect ERROR::", error);
+    return res.status(401).json({
+      status: "fail",
+      message: "Invalid or expired token",
+    });
   }
 };
 
-/**
- * This function use to get users detail
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.getUser = async (req, res) => {
-  try {
-    // Fix: Handle undefined query parameters properly
-    const pageNo = req.query.pageNo;
-    const pageSize = req.query.pageSize;
-    
-    // Debug logging
-    console.log("Raw auth query params - pageNo:", pageNo, "pageSize:", pageSize);
-    
-    // Parse with proper defaults and validation
-    let page = parseInt(pageNo) || 1;  // Default to page 1
-    let limit = parseInt(pageSize) || 10;  // Default to 10 items
-    
-    // Ensure valid ranges
-    page = Math.max(1, page);  // Minimum page 1
-    limit = Math.max(1, Math.min(100, limit));  // Between 1-100 items
-    
-    console.log("Processed auth params - page:", page, "limit:", limit);
+// ✅ Restrict by role
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to perform this action",
+      });
+    }
+    next();
+  };
+};
 
-    const User = await findAllUser(page, limit);
-    const Count = await userCount();
-    
-    //Return success response
-    commonResponse(res, 200, { 
-      data: User, 
-      total: Count,
-      pagination: {
-        currentPage: page,
-        pageSize: limit,
-        totalPages: Math.ceil(Count / limit)
-      }
+// ✅ Logout
+exports.logout = (req, res) => {
+   res.clearCookie('jwt',cookieOptions);
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully",
+  });
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res.status(401).json({
+        status: "fail",
+        message: "You are not logged in!",
+      });
+    }
+
+    const decoded = await promisify(jwt.verify)(token, config.cookieSecretKey);
+
+    const user = await findUserById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        status: "fail",
+        message: "The user belonging to this token does no longer exist.",
+      });
+    }
+
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({
+        status: "fail",
+        message: `Your account is ${user.status}. Access denied.`,
+      });
+    }
+
+    delete user.password;
+    res.status(200).json({
+      status: "success",
+      data: { user },
     });
   } catch (error) {
-    console.log("getUser ERROR::", error);
-    const err = error?.response?.data ? error?.response?.data : error?.message || "server error";
-    const errStatus = error?.response?.status ? error?.response?.status : 500;
-    commonResponse(res, errStatus, null, err, "v1-auth-server-009");
-  }
-};
-
-/**
- * This function use to delete user detail
- * @param {*} req : HTTP request
- * @param {*} res : HTTP response
- */
-exports.deleteUser = async (req, res) => {
-  try {
-    const id = req.query.id;
-    
-    // Validate ID parameter
-    if (!id || isNaN(parseInt(id))) {
-      return commonResponse(res, 400, null, "Valid ID parameter is required", "v1-auth-server-010");
-    }
-    
-    console.log("Deleting user with ID:", id);
-    
-    // Delete from user model
-    const result = await deleteUsers(id);
-    
-    console.log("Delete user result:", result);
-    
-    // Fix: For MySQL, we check the success property instead of modifiedCount
-    if (result.success) {
-      commonResponse(res, 200, result);
-    } else {
-      commonResponse(res, 404, null, result.message || "No Records to delete", "v1-auth-server-010");
-    }
-  } catch (error) {
-    console.log("deleteUser ERROR::", error);
-    
-    // Handle specific error cases
-    if (error.message.includes("No user found")) {
-      return commonResponse(
-        res,
-        404,
-        null,
-        "User not found",
-        "v1-auth-server-010"
-      );
-    }
-    
-    commonResponse(res, 500, null, error?.message || "server error", "v1-auth-server-011");
+    console.error("getMe ERROR::", error);
+    res.status(500).json({
+      status: "error",
+      message: "Something went wrong while fetching user details",
+    });
   }
 };

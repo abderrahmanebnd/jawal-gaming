@@ -10,7 +10,9 @@ const path = require("path");
 require("dotenv").config();
 
 const corsOptions = {
-  origin: [config.frontend],
+  origin: [config.frontend,
+    "http://localhost:8080",
+  ],
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
   credentials: true,
 };

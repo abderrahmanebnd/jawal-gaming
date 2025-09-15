@@ -22,6 +22,9 @@ import ScrollToTop from "./components/ScrollToTop";
 // import ColorToggle from "./shared/ColorToggle";
 import BackToTopButton from "./components/BackToTopButton";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import VerifyOtp from "./pages/login/VerifyOtp";
+import GuestRoute from "./auth/GuestRoute";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState("/");
@@ -87,22 +90,6 @@ const App = () => {
     setSelectedGame(null);
   };
 
-  const handleAdminAccess = () => {
-    navigate(RoutePaths.login);
-  };
-
-  const handleLogin = (success) => {
-    if (success) {
-      setIsAdmin(true);
-      navigate(RoutePaths.adminDashboard);
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAdmin(false);
-    navigate(RoutePaths.base);
-  };
-
   // SEO Meta tags (would be handled by React Helmet in production)
   // useEffect(() => {
   //   document.title = selectedGame
@@ -140,13 +127,7 @@ const App = () => {
               />
             }
           />
-          <Route
-            path={RoutePaths.privacyPolicy}
-            element={
-              <PrivacyPolicy
-              />
-            }
-          />
+          <Route path={RoutePaths.privacyPolicy} element={<PrivacyPolicy />} />
 
           <Route
             path={RoutePaths.game}
@@ -159,15 +140,15 @@ const App = () => {
             }
           />
 
-          <Route
-            path={RoutePaths.login}
-            element={<AdminLogin onLogin={handleLogin} />}
-          />
+          <Route element={<GuestRoute />}>
+            <Route path={RoutePaths.login} element={<AdminLogin />} />
+            <Route path={RoutePaths.verifyOtp} element={<VerifyOtp />} />
+          </Route>
 
-          <Route element={<PrivateRoutes />}>
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route
               path={RoutePaths.adminDashboard}
-              element={<AdminDashboard onLogout={handleLogout} />}
+              element={<AdminDashboard />}
             />
           </Route>
         </Routes>

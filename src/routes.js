@@ -5,5 +5,7 @@ export const RoutePaths = {
   game: "/:id",
   login: "/edarat-jeddah88",
   adminDashboard: "/dokhool-aledara623",
-  privacyPolicy:"/privacy-policy"
+  userDashboard: "/", //for now redirect to home
+  privacyPolicy:"/privacy-policy",
+  verifyOtp:"/verify-otp"
 };

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useCallback, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RoutePaths } from "../routes";
 import { logout } from "../store/features/authSlice";
@@ -12,10 +11,7 @@ const useApi = () => {
   const [source, setSource] = useState(null);
   const dispatch = useCallback(logout, []);
   const navigate = useNavigate();
-  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  /**
-   * This function is use to get data via the given url
-   */
+  
   const get = useCallback(
     async (url, queryParams = {}, headers, isWithCredentials = false) => {
       if (!url) return;
