@@ -158,6 +158,63 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
+
+//
+//  Resend OTP
+//
+exports.resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide email",
+      });
+    }
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({
+        status: "fail",
+        message: `Your account is ${user.status}. Access denied.`,
+      });
+    }
+
+    // 🔹 Generate new OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+    await updateUserOtp(user.id, otp, otpExpiry);
+
+    // send email
+    await sendEmail({
+      email: user.email,
+      subject: "Your New OTP Code",
+      message: `Your new OTP code is ${otp}. It is valid for 5 minutes.`,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "New OTP sent successfully",
+    });
+  } catch (error) {
+    console.error("resendOtp ERROR::", error);
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};
+
+
 // ✅ Protect middleware
 exports.protect = async (req, res, next) => {
   try {

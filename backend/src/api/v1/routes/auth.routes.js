@@ -43,6 +43,11 @@ module.exports = function (app) {
     [commonMiddleware.requestErrorHandler],
     controller.verifyOtp
   );
+  app.post(
+    `/api/${apiVersion}/auth/resend-otp`,
+    [commonMiddleware.requestErrorHandler],
+    controller.resendOtp
+  );
 
   // SignOut route
   app.post(

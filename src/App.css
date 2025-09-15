@@ -95,6 +95,108 @@ body {
 }
 }
 
+
+.otp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: transparent;
+}
+
+.otp-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  width: 360px;
+  text-align: center;
+}
+
+.otp-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.otp-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.otp-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.otp-input {
+  width: 48px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.otp-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 6px rgba(79,70,229,0.4);
+}
+
+.otp-button {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.otp-button:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.otp-button:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+
+.otp-resend {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 1rem;
+}
+
+.otp-resend-link {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.otp-resend-link:hover {
+  text-decoration: underline;
+}
+
+
 @media (max-width: 768px) {
   .display-4 {
     font-size: 2.5rem;
