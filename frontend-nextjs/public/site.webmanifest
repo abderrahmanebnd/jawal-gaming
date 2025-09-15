@@ -1,0 +1,23 @@
+{
+  "name": "Jawal Games",
+  "short_name": "Jawal",
+  "icons": [
+    { "src": "/web-icons/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
+    { "src": "/web-icons/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/web-icons/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    {
+      "src": "/web-icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000"
+}

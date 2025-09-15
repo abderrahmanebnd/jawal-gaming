@@ -1,0 +1,38 @@
+
+
+  .theme-toggle-button:hover {
+    width: 100px;
+  }
+
+  .theme-toggle-button svg {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+
+  .theme-toggle-button {
+    position: fixed;
+    left: 0;
+    top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #5f5f5f;
+    color: #f5f5f5;
+    border-radius: 0 20px 20px 0;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  .theme-toggle-button:hover svg {
+    transform: rotate(360deg);
+  }
+
+  @media (max-width: 768px) {
+  .theme-toggle-button {
+    top:75px;
+  }
+}
