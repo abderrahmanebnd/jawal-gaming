@@ -1,27 +1,33 @@
 "use client";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { apiEndPoints } from "@/routes";
 
-export function useGame(slug) {
+export function useGameStats(slug) {
   return useQuery({
-    queryKey: ["game", slug],
+    queryKey: ["game-stats", slug],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiEndPoints.byIdGame}/${slug}`, {
+      const { data } = await axios.get(`${apiEndPoints.gameStats}/${slug}`, {
         withCredentials: true,
       });
       return data;
     },
+    refetchInterval: 60000, // Refetch every 30 seconds for fresh stats
+    staleTime: 0, // Always consider stale (fetch fresh data)
   });
 }
 
-export function useLike(gameId) {
-  return useMutation({
-    mutationFn: async () => {
-      const { data } = await axios.post(`${apiEndPoints.toggleLike}/${gameId}`, {
+export function useGameDetails(slug, fallbackData) {
+  return useQuery({
+    queryKey: ["game-details", slug],
+    queryFn: async () => {
+      const { data } = await axios.get(`${apiEndPoints.byIdGame}?id=${slug}`, {
         withCredentials: true,
       });
       return data;
     },
+    initialData: fallbackData,
+    staleTime: Infinity, // Never consider stale (static data)
+    gcTime: Infinity, // Keep in cache forever
   });
 }

@@ -19,7 +19,7 @@ exports.updateViews = async (req, res) => {
     }
     const result = await incrementViews(gameId);
     return commonResponse(res, 200, {
-      views: result.views,
+      views: result.viewed,
       message: 'View count updated successfully'
     });
 
@@ -46,7 +46,7 @@ exports.addLike = async (req, res) => {
     const result = await addLikeToGame(gameId, action);
 
     return commonResponse(res, 200, {
-      likes: result.likes,
+      likes: result.liked,
       message: 'Like added successfully'
     });
 

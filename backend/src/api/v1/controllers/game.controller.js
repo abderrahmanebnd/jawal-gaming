@@ -104,6 +104,48 @@ exports.viewGame = async (req, res) => {
   }
 };
 
+exports.getGameStats = async (req, res) => {
+  try {
+    let title = req.query.id; // This is the slug, like "call-of-duty"
+    // Validate title
+    if (!title || typeof title !== "string") {
+      return commonResponse(
+        res,
+        400,
+        null,
+        "Valid slug parameter is required",
+        "v1-game-server-015"
+      );
+    }
+    // Convert slug back to normal title
+    title = title.replace(/-/g, " ");
+    // Fetch game by title
+    let result = await getByTitle(title);
+    if (!result) {
+      return commonResponse(
+        res,
+        404,
+        null,
+        "Game not found",
+        "v1-game-server-016"
+      );
+    }
+    return commonResponse(res, 200, { data: { viewed: result.viewed || 0, liked: result.liked || 0 } });
+  }
+  catch (error) {
+    console.log("getGameStats ERROR::", error);
+    return commonResponse(
+      res,
+      500,
+      null,
+      error?.message,
+      "v1-game-server-017"
+    );
+  }
+};
+
+
+
 
 /**
  * This function use to view game by ID (slug)
@@ -143,7 +185,7 @@ exports.getById = async (req, res) => {
     await updateViewsModel(result.id); // helper function to +1 views in DB
 
     // Reflect increment in the response (avoid one extra SELECT)
-    result.views = (result.views || 0) + 1;
+    result.viewed = (result.viewed || 0) + 1;
 
     return commonResponse(res, 200, { data: result });
   } catch (error) {

@@ -20,6 +20,11 @@ module.exports = function (app) {
     [commonMiddleware.requestErrorHandler],
     controller.viewGame
   );
+  app.get(
+    `/api/${apiVersion}/game/stats`,
+    [commonMiddleware.requestErrorHandler],
+    controller.getGameStats
+  );
 
   app.get(
     `/api/${apiVersion}/game/top`,

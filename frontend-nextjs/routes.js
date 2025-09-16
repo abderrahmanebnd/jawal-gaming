@@ -10,7 +10,7 @@ export const RoutePaths = {
   verifyOtp:"/verify-otp"
 };
 
-const BASE_URL = process.env.BACKEND_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const apiEndPoints = {
   //User Management
@@ -44,4 +44,5 @@ export const apiEndPoints = {
 
   toggleLike: `${BASE_URL}/api/v1/game/add-like`,
   updateViews: `${BASE_URL}/api/v1/game/updateViews`,
+  gameStats: `${BASE_URL}/api/v1/game/stats`,
 };
