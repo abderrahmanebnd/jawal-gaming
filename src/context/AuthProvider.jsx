@@ -18,6 +18,14 @@ export const AuthProvider = ({ children }) => {
     queryKey: ["authCheck"],
     queryFn: getMeApi,
     retry: 1,
+    // ✅ stop unnecessary refetching
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+
+    // ✅ keep the user cached in memory
+    staleTime: 1000 * 60 * 10, // 10 minutes (adjust as needed)
+    cacheTime: 1000 * 60 * 30, // keep cache for 30 minutes
   });
 
   return (
@@ -30,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </AuthContext.Provider>  
   );
 };
 
