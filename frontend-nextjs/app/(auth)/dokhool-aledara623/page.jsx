@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Gamepad2, ClipboardList, Link, LogOut, User, Shield, AlertTriangle, X } from "lucide-react";
 import { useLogout } from "@/features/auth/useLogout";
+import { useRouter } from "next/navigation";
 import { CONSTANTS } from "@/shared/constants";
 import GameComponent from "@/features/dashboard/components/GameComponent";
 import NavComponent from "@/features/dashboard/components/NavComponent";

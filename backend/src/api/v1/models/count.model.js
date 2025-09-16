@@ -65,5 +65,12 @@ async function incrementViews(gameId) {
   }
 }
 
+async function updateViewsModel(gameId) {
+  const pool = getPool();
+  await pool.execute(
+    "UPDATE GAMES SET viewed = viewed + 1,updatedDate = NOW() WHERE id = ?",
+    [gameId]
+  );
+}
 
-module.exports = { addLikeToGame, incrementViews };
+module.exports = { addLikeToGame, incrementViews, updateViewsModel };

@@ -12,6 +12,7 @@ const {
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
+const { updateViewsModel } = require("../models/count.model");
 
 // const { thumbnailImage, imageHandler, metaCrawlerImage } = require("./common.controller");
 
@@ -105,7 +106,7 @@ exports.viewGame = async (req, res) => {
 
 
 /**
- * This function use to view article
+ * This function use to view game by ID (slug)
  * @param {*} req : HTTP request
  * @param {*} res : HTTP response
  */
@@ -128,7 +129,7 @@ exports.getById = async (req, res) => {
     title = title.replace(/-/g, " ");
 
     // Fetch game by title
-    const result = await getByTitle(title);
+    let result = await getByTitle(title);
     if (!result) {
       return commonResponse(
         res,
@@ -139,10 +140,15 @@ exports.getById = async (req, res) => {
       );
     }
 
-    commonResponse(res, 200, { data: result });
+    await updateViewsModel(result.id); // helper function to +1 views in DB
+
+    // Reflect increment in the response (avoid one extra SELECT)
+    result.views = (result.views || 0) + 1;
+
+    return commonResponse(res, 200, { data: result });
   } catch (error) {
     console.log("getById ERROR::", error);
-    commonResponse(
+    return commonResponse(
       res,
       500,
       null,
