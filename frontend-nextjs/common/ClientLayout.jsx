@@ -1,5 +1,6 @@
 // components/ClientLayout.jsx
 "use client";
+
 import { useState, useEffect } from "react";
 import { CONSTANTS } from "@/shared/constants";
 import Header from "./Header";
@@ -8,15 +9,28 @@ import ScrollToTop from "./ScrollToTop";
 import BackToTopButton from "./BackToTopButton";
 
 export default function ClientLayout({ children, navLinks, footerLinks }) {
-  const [theme, setTheme] = useState(false);
+  const [theme, setTheme] = useState(true); // false = light, true = dark
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Theme detection
+
+  // Initialize theme from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setTheme(savedTheme === "dark");
-      document.body.setAttribute("data-theme", savedTheme);
+    setMounted(true);
+
+    try {
+      const savedTheme = localStorage.getItem("theme");
+
+      // Default to light theme if nothing saved
+      const isDark = savedTheme === "dark";
+
+      setTheme(isDark);
+      document.body.setAttribute("data-theme", isDark ? "dark" : "light");
+    } catch (error) {
+      console.error("Error loading theme:", error);
+      // Fallback to light theme
+      setTheme(false);
+      document.body.setAttribute("data-theme", "light");
     }
   }, []);
 
@@ -31,25 +45,30 @@ export default function ClientLayout({ children, navLinks, footerLinks }) {
     <div
       className="min-vh-100 d-flex flex-column"
       style={{
-        backgroundColor: theme
-          ? CONSTANTS.COLORS.background
-          : CONSTANTS.COLORS.lightBackground,
-        color: theme ? CONSTANTS.COLORS.text : CONSTANTS.COLORS.darkText,
+        backgroundColor: mounted
+          ? theme
+            ? CONSTANTS.COLORS.background
+            : CONSTANTS.COLORS.lightBackground
+          : CONSTANTS.COLORS.background, 
+        color: mounted
+          ? theme
+            ? CONSTANTS.COLORS.text
+            : CONSTANTS.COLORS.darkText
+          : CONSTANTS.COLORS.text, // Default during SSR
+        transition: "background-color 0.3s ease, color 0.3s ease", // Smooth theme transition
       }}
     >
-      {/* Header with theme toggle */}
       <Header
         navLinks={navLinks}
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         isMenuOpen={isMenuOpen}
         theme={theme}
-        setTheme={handleThemeToggle}
+        onThemeToggle={handleThemeToggle} // ✅ Fix: Use handleThemeToggle instead of setTheme
+        mounted={mounted} // ✅ Pass mounted state to Header
       />
 
-      {/* Main Content */}
       <main className="flex-grow-1 main-container">{children}</main>
 
-      {/* Footer */}
       <Footer footerLinks={footerLinks} />
 
       <ScrollToTop />

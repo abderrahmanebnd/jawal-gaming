@@ -28,7 +28,7 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [likedGames, setLikedGames] = useState([]);
   const [isLiking, setIsLiking] = useState(false);
-const [shuffledGames, setShuffledGames] = useState([]);
+  const [shuffledGames, setShuffledGames] = useState([]);
 
   const router = useRouter();
 
@@ -55,24 +55,23 @@ const [shuffledGames, setShuffledGames] = useState([]);
     }
   }, []);
 
-
   // Memoized more games with current game excluded
-useEffect(() => {
-  if (!moreGames) return;
+  useEffect(() => {
+    if (!moreGames) return;
 
-  const filtered = moreGames
-    .filter((g) => g.id !== game?.id)
-    .slice()
-    .sort(() => Math.random() - 0.5) // Only on client
-    .slice(0, 18);
+    const filtered = moreGames
+      .filter((g) => g.id !== game?.id)
+      .slice()
+      .sort(() => Math.random() - 0.5) // Only on client
+      .slice(0, 18);
 
-  setShuffledGames(filtered);
-}, [moreGames, game?.id]);
+    setShuffledGames(filtered);
+  }, [moreGames, game?.id]);
 
-// Use shuffledGames instead of displayedMoreGames in JSX
-const displayedMoreGames = shuffledGames.length
-  ? shuffledGames
-  : moreGames?.filter((g) => g.id !== game?.id).slice(0, 18) || [];
+  // Use shuffledGames instead of displayedMoreGames in JSX
+  const displayedMoreGames = shuffledGames.length
+    ? shuffledGames
+    : moreGames?.filter((g) => g.id !== game?.id).slice(0, 18) || [];
 
   // Utility functions
   const formatNumber = (num) => {
@@ -107,9 +106,8 @@ const displayedMoreGames = shuffledGames.length
 
   const handleLikeToggle = useCallback(
     async (gameToLike) => {
-      console.log({gameToLike})
+      console.log({ gameToLike });
       if (!gameToLike || isLiking) return;
-
 
       const isCurrentlyLiked = likedGames.includes(gameToLike.id);
       const newIsLiked = !isCurrentlyLiked;
@@ -172,12 +170,12 @@ const displayedMoreGames = shuffledGames.length
       {/* Header with back button */}
       <div className="container py-3">
         <button
-          style={{ color: isDark ? "" : "#000000ff" }}
-          className="btn btn-outline-light rounded-pill mb-3"
+          style={{ color: isDark ? "#fefefe" : "#000000ff" }}
+          className={`flex items-center border border-${isDark?"[#fefefe]" :"#000000"} py-1 px-3 justify-center rounded-pill mb-3`}
           onClick={() => router.back()}
         >
           <ChevronLeft size={20} className="me-2" />
-          Back
+          <span>Back</span>
         </button>
       </div>
 

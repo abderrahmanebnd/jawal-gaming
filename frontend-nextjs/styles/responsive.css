@@ -12,36 +12,36 @@
 }
 
 .favorite-btn {
-position: absolute;
-bottom: 12px;
-right: 12px;
-width: 30px;
-height: 30px;
-border: none;
-backdrop-filter: blur(10px);
-transition: all 0.3s ease;
-z-index: 10;
-display: flex;
-align-items: center;
-justify-content: center; 
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .likes-badge {
-   background-color: rgba(0, 0, 0, 0.6);
-    position: absolute;
-    color: #fff;
-    font-size: 0.9rem;
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-    pointer-events: none;
-    bottom: 12px;
-    left: 12px;
+  background-color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  color: #fff;
+  font-size: 0.9rem;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+  pointer-events: none;
+  bottom: 12px;
+  left: 12px;
 }
 
 .thumbsIcon {
@@ -50,26 +50,26 @@ justify-content: center;
 }
 
 @media (max-width: 500px) {
-.favorite-btn {
-  width: 20px;
-  height: 20px;
-  bottom: 10px;
-  right: 8px;
- }
- .likes-badge {
-  font-size: 0.70rem;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-top: 1px;
-  padding-bottom: 1px;
-  gap: 3px;
-  bottom: 10px;
-  left: 8px;
- }
- .thumbsIcon {
-  width: 10px;
-  height: 10px;
-}
+  .favorite-btn {
+    width: 20px;
+    height: 20px;
+    bottom: 10px;
+    right: 8px;
+  }
+  .likes-badge {
+    font-size: 0.7rem;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    gap: 3px;
+    bottom: 10px;
+    left: 8px;
+  }
+  .thumbsIcon {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .game-player.fullscreen iframe {
@@ -78,10 +78,9 @@ justify-content: center;
   border: none;
 }
 
-
 .game-card {
-  width: 100%;           
-  aspect-ratio: 1/1;          
+  width: 100%;
+  aspect-ratio: 1/1;
   background-color: #2a2a2a45;
   cursor: pointer;
   transform: scale(1);
@@ -91,32 +90,39 @@ justify-content: center;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.game-card:hover { border-color: #b6e642; }
+.game-card:hover {
+  border-color: #b6e642;
+}
 
 @media (max-width: 400px) {
-  .game-card {border-radius: 26px;  
- }
+  .game-card {
+    border-radius: 26px;
+  }
 }
 @media (min-width: 576px) {
-  .game-card { 
-    height: 160px;  
- }
+  .game-card {
+    height: 160px;
+  }
 }
 
 @media (min-width: 768px) {
-  .game-card { height: 170px; }
+  .game-card {
+    height: 170px;
+  }
 }
 
 @media (min-width: 992px) {
-  .game-card { height: 180px; }
+  .game-card {
+    height: 180px;
+  }
 }
 
 @media (min-width: 1200px) {
-  .game-card { 
+  .game-card {
     height: 170px;
-    border-radius: 36px; }
+    border-radius: 36px;
+  }
 }
-
 
 /* Mobile First Responsive Design */
 
@@ -125,20 +131,20 @@ justify-content: center;
   .display-4 {
     font-size: 2rem;
   }
-  
+
   .lead {
     font-size: 1rem;
   }
-  
+
   .navbar-brand {
     font-size: 1.5rem;
   }
-  
+
   .container {
     padding-left: 15px;
     padding-right: 15px;
   }
-  
+
   .btn-floating {
     bottom: 20px;
     right: 20px;
@@ -154,17 +160,12 @@ justify-content: center;
   }
 }
 
-
-
-
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991.98px) {
-
-  
   .navbar-nav {
     flex-direction: row;
   }
-  
+
   .navbar-nav .nav-item {
     margin-left: 0.5rem;
   }
@@ -175,10 +176,10 @@ justify-content: center;
   .game-card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .game-card:hover {
     transform: scale(1.08) translateY(-8px);
-    }
+  }
 }
 
 /* Extra large devices (large desktops, 1200px and up) */
@@ -193,12 +194,12 @@ justify-content: center;
   .game-player iframe {
     min-height: 300px;
   }
-  
+
   .game-player-controls {
     bottom: 10px;
     right: 10px;
   }
-  
+
   .game-player-controls .btn {
     padding: 8px;
   }
@@ -209,11 +210,11 @@ justify-content: center;
   .admin-dashboard .nav-pills {
     flex-direction: column;
   }
-  
+
   .admin-dashboard .nav-pills .nav-item {
     margin-bottom: 0.5rem;
   }
-  
+
   .admin-dashboard .card-body {
     padding: 1.5rem;
   }

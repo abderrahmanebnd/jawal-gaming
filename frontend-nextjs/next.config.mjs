@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["jawalgames.net"], // 👈 Add your external domain here
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "jawalgames.net",
+        port: "",
+        pathname: "/uploads/**",
+      },
+    ],
   },
 };
 

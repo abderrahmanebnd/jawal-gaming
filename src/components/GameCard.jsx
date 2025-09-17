@@ -1,11 +1,20 @@
-import { Heart, Play, ThumbsUp } from 'lucide-react';
+import { Heart, Play, ThumbsUp } from "lucide-react";
 import "../styles/responsive.css";
-import { CONSTANTS } from '../shared/constants';
-import { Link } from 'react-router-dom';
-const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,lastGameRef,inTopGames }) => {
+import { CONSTANTS } from "../shared/constants";
+import { Link } from "react-router-dom";
+const GameCard = ({
+  game,
+  isFavorited,
+  onToggleFavorite,
+  onGameClick,
+  isLast,
+  lastGameRef,
+  inTopGames,
+}) => {
   // Handle image loading error
   const handleImageError = (e) => {
-    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiBmaWxsPSIjMzMzIiByeD0iMjQiLz4KPHA+CjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEyOCIgcj0iNDAiIGZpbGw9IiM1NTUiLz4KPHA+Cjx0ZXh0IHg9IjEyOCIgeT0iMTM1IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+R0FNRTU8L3RleHQ+Cjwvc3ZnPgo=';
+    e.target.src =
+      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiBmaWxsPSIjMzMzIiByeD0iMjQiLz4KPHA+CjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEyOCIgcj0iNDAiIGZpbGw9IiM1NTUiLz4KPHA+Cjx0ZXh0IHg9IjEyOCIgeT0iMTM1IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+R0FNRTU8L3RleHQ+Cjwvc3ZnPgo=";
   };
 
   return (
@@ -60,15 +69,13 @@ const GameCard = ({ game, isFavorited, onToggleFavorite, onGameClick,isLast,last
         </div>
 
         {inTopGames && game.liked !== undefined && (
-<div
-  className="rounded-pill likes-badge"
-  
-  title={`${game.liked} likes`}
->
-  <ThumbsUp className='thumbsIcon' fill="#fff" />
-  <span>{game.liked || 0}</span>
-</div>
-
+          <div
+            className="rounded-pill likes-badge"
+            title={`${game.liked} likes`}
+          >
+            <ThumbsUp className="thumbsIcon" fill="#fff" />
+            <span>{game.liked || 0}</span>
+          </div>
         )}
 
         {/* Favorite Button */}

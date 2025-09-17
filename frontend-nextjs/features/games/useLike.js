@@ -46,11 +46,6 @@ export function useLike(slug) {
       return { previousStats };
     },
 
-    //TODO
-//     navigation menu  
-// favorites icon 
-// play icon 
-// light dark mode 
 
     onSuccess: (response) => {
       // Update cache with actual server response (no additional request)

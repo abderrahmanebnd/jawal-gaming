@@ -40,8 +40,8 @@ export default function useGames(pageNumber, pageSize = DEFAULT_PAGE_SIZE) {
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes cache
-    refetchOnWindowFocus: false,
+    gcTime: 5 * 60 * 1000, // 10 minutes cache
+    refetchOnWindowFocus: false
   });
 
   // Transform data to match your original hook's format

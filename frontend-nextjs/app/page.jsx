@@ -153,38 +153,61 @@ const HomePage = () => {
   );
 
   // Event handlers
-  const handleToggleFavorite = useCallback(
-    async (gameId) => {
-      if (!gameId) return;
-      if (activeTab === "favorites" && favMutating) return;
+const handleToggleFavorite = useCallback(
+  async (gameId) => {
+    if (!gameId) return;
+    if (activeTab === "favorites" && favMutating) return;
 
-      let updatedIds = [];
-      setFavoriteIds((prev) => {
-        const exists = prev.includes(gameId);
-        const next = exists
-          ? prev.filter((id) => id !== gameId)
-          : [...prev, gameId];
-        try {
-          StorageManager.setFavorites(next);
-        } catch {}
-        updatedIds = next;
-        return next;
-      });
+    setFavMutating(true);
+
+    try {
+      // Calculate new IDs synchronously
+      const currentIds = StorageManager.getFavorites() || [];
+      const exists = currentIds.includes(gameId);
+      const updatedIds = exists
+        ? currentIds.filter((id) => id !== gameId)
+        : [...currentIds, gameId];
+
+      // Update localStorage immediately
+      StorageManager.setFavorites(updatedIds);
+
+      // Update local state
+      setFavoriteIds(updatedIds);
 
       if (activeTab === "favorites") {
-        try {
-          setFavMutating(true);
-          // Invalidate and refetch favorites
-          await queryClient.invalidateQueries({
-            queryKey: ["games", "favorites"],
+        if (exists) {
+          // Immediately remove from favoriteList for instant UI feedback
+          setFavoriteList((prev) => prev.filter((game) => game.id !== gameId));
+        }
+
+        // Invalidate ALL favorites queries (not just current one)
+        await queryClient.invalidateQueries({
+          queryKey: ["games", "favorites"],
+          exact: false, // This invalidates all variations
+        });
+
+        // Force refetch with new IDs if there are still favorites
+        if (updatedIds.length > 0) {
+          await queryClient.refetchQueries({
+            queryKey: ["games", "favorites", updatedIds],
+            exact: true,
           });
-        } finally {
-          setFavMutating(false);
+        } else {
+          // No favorites left, clear the list
+          setFavoriteList([]);
         }
       }
-    },
-    [activeTab, favMutating, queryClient]
-  );
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      // Revert on error
+      const revertIds = StorageManager.getFavorites() || [];
+      setFavoriteIds(revertIds);
+    } finally {
+      setFavMutating(false);
+    }
+  },
+  [activeTab, favMutating, queryClient]
+);
 
   const handleGameClick = useCallback(
     (game) => {
@@ -358,7 +381,7 @@ const NavigationTabs = ({ activeTab, onTabChange, favoriteCount, isDark }) => {
       label: `Favorites (${favoriteCount})`,
       icon: (
         <Heart
-          size={14}
+          size={16}
           className="me-1"
           fill={
             activeTab === "favorites" ? CONSTANTS.COLORS.greenMainColor : "none"
@@ -405,7 +428,7 @@ const NavigationTabs = ({ activeTab, onTabChange, favoriteCount, isDark }) => {
               onClick={() => onTabChange(tab.id)}
             >
               <div
-                className="fs-sm-5 tab-text"
+                className="fs-sm-5 tab-text flex items-center justify-center"
                 style={{
                   color:
                     activeTab === tab.id
@@ -505,7 +528,7 @@ const StatusMessages = ({
   if (activeTab === "favorites" && favoriteIds.length === 0) {
     return (
       <div className="text-center py-5">
-        <Heart size={64} color="#666" className="mb-3" />
+        <Heart size={64} color="#666" className="mb-3 mx-auto" />
         <h5 style={{ color: "#999" }}>No favorites yet</h5>
         <p style={{ color: "#666" }}>
           Start exploring games and add some to your favorites by clicking the
