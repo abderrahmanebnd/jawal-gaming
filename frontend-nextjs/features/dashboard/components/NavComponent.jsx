@@ -1,8 +1,9 @@
+"use client"
 import React, { useEffect, useState } from "react";
 import { Edit3, Trash2, Save, Plus, Menu, AlertTriangle, X, ExternalLink, Navigation } from "lucide-react";
-import { CONSTANTS } from "../../../shared/constants";
-import useApi from "../../../hooks/useApi";
-import { apiEndPoints } from "../../../api/api";
+import { CONSTANTS } from "@/shared/constants";
+import useApi from "@/hooks/useApi";
+import { apiEndPoints } from "@/routes";
 
 const NavComponent = () => {
   const [navLinks, setNvLinks] = useState([]);

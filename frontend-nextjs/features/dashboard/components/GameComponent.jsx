@@ -1,8 +1,10 @@
+"use client"
 import { useEffect, useState, useRef } from "react";
 import { Edit3, Trash2, Save, Upload, X, Image as ImageIcon, Plus, GamepadIcon, AlertTriangle } from "lucide-react";
-import { CONSTANTS } from "../../../shared/constants";
-import useApi from "../../../hooks/useApi";
-import { apiEndPoints } from "../../../api/api";
+import { CONSTANTS } from "@/shared/constants";
+import useApi from "@/hooks/useApi";
+import { apiEndPoints } from "@/routes";
+import Image from "next/image";
 
 const GameComponent = () => {
   const [editingGame, setEditingGame] = useState(null);
@@ -381,7 +383,7 @@ const handleGameSubmit = async () => {
                     }}
                   >
                     <div className="position-relative">
-                      <img
+                      <Image
                         src={game.thumbnail || '/placeholder-game.jpg'}
                         alt={game.title}
                         className="card-img-top rounded-0 pt-1"

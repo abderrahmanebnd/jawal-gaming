@@ -1,4 +1,5 @@
 // components/BackToTopButton.jsx
+"use client"
 import { useEffect, useState } from "react";
 
 const BackToTopButton = () => {

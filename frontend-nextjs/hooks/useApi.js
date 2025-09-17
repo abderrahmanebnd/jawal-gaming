@@ -1,17 +1,19 @@
+"use client";
+
 import axios from "axios";
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { RoutePaths } from "../routes";
-import { logout } from "../store/features/authSlice";
+import { useRouter } from "next/navigation"; // ← Next.js routing
+import { RoutePaths } from "@/routes";
+// Remove React Router imports
 
 const useApi = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [source, setSource] = useState(null);
-  const dispatch = useCallback(logout, []);
-  const navigate = useNavigate();
-  
+
+  const router = useRouter(); // ← Next.js router
+
   const get = useCallback(
     async (url, queryParams = {}, headers, isWithCredentials = false) => {
       if (!url) return;
@@ -19,21 +21,19 @@ const useApi = () => {
       setLoading(true);
       setError(null);
       const cancelTokenSource = axios.CancelToken.source();
-      // Store the cancel token for potential cleanup
       setSource(cancelTokenSource);
+
       try {
         const response = await axios.get(url, {
           headers,
           params: queryParams,
           withCredentials: isWithCredentials,
           cancelToken: cancelTokenSource?.token,
-          // 30 seconds
           timeout: 30 * 1000,
         });
         setData(response.data);
         setError(null);
       } catch (err) {
-        // If the error is from request cancellation
         if (axios.isCancel(err)) {
           console.error("Request canceled: ", err.message);
         } else {
@@ -41,21 +41,20 @@ const useApi = () => {
             if (!navigator.onLine) {
               setError("No internet connection. Please check your network.");
             } else {
-              // Check for unauthorized requests
-              if (err?.response?.status === 401) {
-                dispatch(logout);
+              // Handle auth errors
+              if (
+                err?.response?.status === 401 ||
+                err?.response?.status === 403
+              ) {
+                
+                router.push(RoutePaths.home); // ← Next.js navigation
                 return;
               }
-              const error = err?.response?.data?.error
-                ? err?.response?.data?.error
-                : "An error occurred. Please try again.";
 
+              const error =
+                err?.response?.data?.error ||
+                "An error occurred. Please try again.";
               setError(error);
-              if (err?.response?.status === 403) {
-                dispatch(logout());
-                navigate(RoutePaths.signIn);
-                return;
-              }
             }
           }
           setData(null);
@@ -64,12 +63,9 @@ const useApi = () => {
         setLoading(false);
       }
     },
-    [dispatch]
+    [router]
   );
 
-  /**
-   * This function is use to post data via the given url
-   */
   const post = useCallback(
     async (url, request, headers, isWithCredentials = false) => {
       if (!url) return;
@@ -78,6 +74,7 @@ const useApi = () => {
       setError(null);
       const cancelTokenSource = axios.CancelToken.source();
       setSource(cancelTokenSource);
+
       try {
         const response = await axios.post(url, request, {
           headers,
@@ -88,43 +85,27 @@ const useApi = () => {
         setData(response.data);
         setError(null);
       } catch (err) {
-        // If the error is from request cancellation
         if (axios.isCancel(err)) {
           console.error("Request canceled: ", err.message);
         } else {
           if (err && err instanceof Error) {
-            // Check if the error is due to no internet connection
             if (!navigator.onLine) {
               setError("No internet connection. Please check your network.");
-            }  else {
-              if (err?.response?.status === 401) {
-                const error = err?.response?.data?.error
-                  ? err?.response?.data?.error
-                  : "An error occurred. Please try again.";
-
-                dispatch(logout());
-                setError(error);
-                return;
-              } else if (err?.response?.status === 403) {
-                const error = err?.response?.data?.data.errors[0].msg
-                  ? err?.response?.data?.data.errors[0].msg
-                  : "An error occurred. Please try again.";
-                dispatch(logout());
-                navigate(RoutePaths.signIn);
-                setError(error);
+            } else {
+              // Handle auth errors
+              if (
+                err?.response?.status === 401 ||
+                err?.response?.status === 403
+              ) {
+                router.push(RoutePaths.home);
                 return;
               }
 
-              const error1 =
-                err?.response?.data?.data?.errors[0].msg &&
-                err?.response?.data?.data?.errors[0].msg;
-
-              const error2 = err?.response?.data?.error
-                ? err?.response?.data?.error
-                : "An error occurred. Please try again.";
-
-              const error = error1 ? error1 : error2;
-
+              // Simplified error handling
+              const error =
+                err?.response?.data?.error ||
+                err?.response?.data?.data?.errors?.[0]?.msg ||
+                "An error occurred. Please try again.";
               setError(error);
             }
           }
@@ -133,12 +114,9 @@ const useApi = () => {
         setLoading(false);
       }
     },
-    [dispatch]
+    [router]
   );
 
-  /**
-   * This function is use to delete data via the given url
-   */
   const deleteApi = useCallback(
     async (url, queryParams = {}, headers, isWithCredentials = false) => {
       if (!url) return;
@@ -146,46 +124,39 @@ const useApi = () => {
       setLoading(true);
       setError(null);
       const cancelTokenSource = axios.CancelToken.source();
-      // Store the cancel token for potential cleanup
       setSource(cancelTokenSource);
+
       try {
         const response = await axios.delete(url, {
           headers,
           params: queryParams,
           withCredentials: isWithCredentials,
           cancelToken: cancelTokenSource?.token,
-          // 30 seconds
           timeout: 30 * 1000,
         });
         setData(response.data);
         setError(null);
       } catch (err) {
-        // If the error is from request cancellation
         if (axios.isCancel(err)) {
           console.error("Request canceled: ", err.message);
         } else {
           if (err && err instanceof Error) {
-            // Check if the error is due to no internet connection
             if (!navigator.onLine) {
               setError("No internet connection. Please check your network.");
-            }  else {
-              // Check for unauthorized requests
-              if (err?.response?.status === 401) {
-                dispatch(logout());
-                navigate(Rout.signIn);
+            } else {
+              // Handle auth errors
+              if (
+                err?.response?.status === 401 ||
+                err?.response?.status === 403
+              ) {
+                router.push(RoutePaths.home);
                 return;
               }
 
-              const error = err?.response?.data?.error
-                ? err?.response?.data?.error
-                : "An error occurred. Please try again.";
+              const error =
+                err?.response?.data?.error ||
+                "An error occurred. Please try again.";
               setError(error);
-
-              if (err?.response?.status === 403) {
-                dispatch(logout());
-                navigate(RoutePaths.signIn);
-                return;
-              }
             }
           }
           setData(null);
@@ -194,7 +165,7 @@ const useApi = () => {
         setLoading(false);
       }
     },
-    [dispatch, navigate]
+    [router]
   );
 
   return { data, loading, error, get, post, source, deleteApi };

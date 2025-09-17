@@ -1,98 +1,198 @@
+// components/Header.jsx (Enhanced)
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
 import { Menu, X } from "lucide-react";
-import { CONSTANTS } from "../shared/constants";
-import logo from "/logo.png";
-import lightModeLogo from "/Logo-LightMode.png";
-import ColorToggle from "../shared/ColorToggle";
-import menuIcon from "/light-mode-menu.png";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { CONSTANTS } from "@/shared/constants";
+import ColorToggle from "@/shared/ColorToggle";
 
 const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
-  // Determine current theme safely
-  const isLightTheme =
-    typeof window !== "undefined"
-      ? document.body.getAttribute("data-theme") === "light"
-      : true; // default to light during SSR
+  const [isLightTheme, setIsLightTheme] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+
+  // Close menu when clicking outside
+  const handleOutsideClick = useCallback(
+    (e) => {
+      if (isMenuOpen && !e.target.closest(".navbar")) {
+        onMenuToggle();
+      }
+    },
+    [isMenuOpen, onMenuToggle]
+  );
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.addEventListener("click", handleOutsideClick);
+      document.body.style.overflow = "hidden"; // Prevent scroll on mobile
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen, handleOutsideClick]);
+
+  // Auto-close menu on route change
+  useEffect(() => {
+    if (isMenuOpen) {
+      onMenuToggle();
+    }
+  }, [pathname]);
+
+  // Theme detection
+  useEffect(() => {
+    setMounted(true);
+
+    const detectTheme = () => {
+      setIsLightTheme(document.body.getAttribute("data-theme") === "light");
+    };
+
+    detectTheme();
+
+    const observer = new MutationObserver(detectTheme);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  if (!mounted) {
+    return <HeaderSkeleton />;
+  }
 
   const bgColor = isLightTheme ? "#e7e8e6" : "#333131";
   const borderColor = isLightTheme ? "#e7e8e6" : "#272727ff";
   const textColor = isLightTheme ? "#333131" : "#ffffffff";
   const hoverColor = isLightTheme ? "#f3f3f3ff" : "#333131";
-  const currentLogo = isLightTheme ? lightModeLogo : logo;
 
   return (
-    <header
-      className="sticky-top header shadow-sm"
-      style={{
-        backgroundColor: bgColor,
-        borderBottom: `2px solid ${borderColor}`,
-      }}
-    >
-      <nav className="navbar p-0 py-1 navbar-expand-lg navbar-dark">
-        <div className="container">
-          <Link
-            className="navbar-brand fw-bold fs-3"
-            to="/"
-            style={{ color: textColor }}
-          >
-            <img width={100} src={currentLogo} alt="Jawal Games" />
-          </Link>
+    <>
+      <header
+        className="sticky-top header shadow-sm"
+        style={{
+          backgroundColor: bgColor,
+          borderBottom: `2px solid ${borderColor}`,
+          zIndex: 1030,
+        }}
+      >
+        <nav className="navbar p-0 py-1 navbar-expand-lg">
+          <div className="container">
+            <Link href="/" className="navbar-brand fw-bold fs-3">
+              <Image
+                src={isLightTheme ? "/Logo-LightMode.png" : "/logo.png"}
+                alt="Jawal Games"
+                width={100}
+                height={40}
+                priority={true}
+                style={{ width: "100px", height: "auto" }}
+              />
+            </Link>
 
-          <button
-            className="navbar-toggler border-1 p-0"
-            type="button"
-            onClick={onMenuToggle}
-            style={{ boxShadow: "none" }}
-          >
-            {isLightTheme ? (
-              isMenuOpen ? (
-                <X size={34} color="#b2de43" />
+            <button
+              className="navbar-toggler border-0 p-1"
+              type="button"
+              onClick={onMenuToggle}
+              aria-label="Toggle navigation"
+              aria-expanded={isMenuOpen}
+              style={{ boxShadow: "none" }}
+            >
+              {isMenuOpen ? (
+                <X size={30} color="#b2de43" />
+              ) : isLightTheme ? (
+                <Image
+                  src="/light-mode-menu.png"
+                  width={30}
+                  height={30}
+                  alt="Menu"
+                />
               ) : (
-                <img src={menuIcon} width={34} height={34} alt="Menu" />
-              )
-            ) : isMenuOpen ? (
-              <X size={34} color="#b2de43" />
-            ) : (
-              <Menu size={34} color="#b2de43" />
-            )}
-          </button>
+                <Menu size={30} color="#b2de43" />
+              )}
+            </button>
 
-          <div
-            className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`}
-          >
-            <ul className="navbar-nav ms-auto">
-              {navLinks.map((link) => (
-                <li key={link.id} className="nav-item">
-                  <Link
-                    className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none"
-                    to={link.url}
-                    style={{ color: textColor }}
-                    onMouseEnter={(e) => {
-                      if (typeof window !== "undefined")
-                        e.target.style.backgroundColor = hoverColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (typeof window !== "undefined")
-                        e.target.style.backgroundColor = "transparent";
-                    }}
-                  >
-                    {link.title}
-                  </Link>
+            <div
+              className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`}
+            >
+              <ul className="navbar-nav ms-auto">
+                {navLinks?.map((link) => (
+                  <li key={link.id} className="nav-item">
+                    <Link
+                      href={link.url}
+                      className={`nav-link px-3 py-2 mx-1 rounded transition-all ${
+                        pathname === link.url ? "active" : ""
+                      }`}
+                      style={{
+                        color: textColor,
+                        backgroundColor:
+                          pathname === link.url ? hoverColor : "transparent",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.target.style.backgroundColor = hoverColor)
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.backgroundColor =
+                          pathname === link.url ? hoverColor : "transparent")
+                      }
+                    >
+                      {link.title}
+                    </Link>
+                  </li>
+                ))}
+                <li className="nav-item">
+                  <div className="nav-link px-3 py-2 mx-1">
+                    <ColorToggle setTheme={setTheme} />
+                  </div>
                 </li>
-              ))}
-              <li className="nav-item">
-                <div
-                  className="nav-link px-3 py-2 mx-1"
-                  style={{ cursor: "default" }}
-                >
-                  <ColorToggle setTheme={setTheme} />
-                </div>
-              </li>
-            </ul>
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
-    </header>
+        </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className="position-fixed w-100 h-100 d-lg-none"
+          style={{
+            top: 0,
+            left: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1025,
+          }}
+          onClick={onMenuToggle}
+        />
+      )}
+    </>
   );
 };
+
+// Loading skeleton
+const HeaderSkeleton = () => (
+  <header
+    className="sticky-top header shadow-sm"
+    style={{ backgroundColor: "#e7e8e6" }}
+  >
+    <nav className="navbar p-0 py-1">
+      <div className="container">
+        <div
+          className="placeholder"
+          style={{ width: "100px", height: "40px" }}
+        />
+        <div
+          className="placeholder"
+          style={{ width: "34px", height: "34px" }}
+        />
+      </div>
+    </nav>
+  </header>
+);
 
 export default Header;

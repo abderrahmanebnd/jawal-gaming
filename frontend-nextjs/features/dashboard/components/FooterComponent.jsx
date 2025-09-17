@@ -1,8 +1,9 @@
+"use client"
 import { useEffect, useState } from "react";
 import { Edit3, Trash2, Save, Plus, Link as LinkIcon, AlertTriangle, X, ExternalLink } from "lucide-react";
-import { CONSTANTS } from "../../../shared/constants";
-import useApi from "../../../hooks/useApi";
-import { apiEndPoints } from "../../../api/api";
+import { CONSTANTS } from "@/shared/constants";
+import useApi from "@/hooks/useApi";
+import { apiEndPoints } from "@/routes";
 
 const FooterComponent = () => {
   const [editingFooterLink, setEditingFooterLink] = useState(null);

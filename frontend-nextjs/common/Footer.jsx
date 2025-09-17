@@ -1,14 +1,78 @@
-import { CONSTANTS } from "../shared/constants";
-import appStore from "../assets/app_store.png";
-import googlePlay from "../assets/google_play.png";
-import { Link } from "react-router-dom";
+// components/Footer.jsx
+"use client";
 
-// /components/Footer.jsx
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { CONSTANTS } from "@/shared/constants";
+import appStore from "@/assets/app_store.png";
+import googlePlay from "@/assets/google_play.png";
+
 const Footer = ({ footerLinks }) => {
-  const isLightTheme =
-    typeof window !== "undefined"
-      ? document.body.getAttribute("data-theme") === "light"
-      : true; // default to light theme on SSR
+  const [isLightTheme, setIsLightTheme] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Handle theme detection safely
+  useEffect(() => {
+    setMounted(true);
+
+    const detectTheme = () => {
+      setIsLightTheme(document.body.getAttribute("data-theme") === "light");
+    };
+
+    detectTheme();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(detectTheme);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <footer
+        className="mt-auto footers py-4"
+        style={{ backgroundColor: "#e7e8e6" }}
+      >
+        <div className="container">
+          <div className="row align-items-center">
+            <div className="col-md-6 mb-3 mb-md-0">
+              <div className="d-flex gap-3 justify-content-center justify-content-md-start">
+                <div
+                  style={{
+                    height: "40px",
+                    width: "120px",
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "4px",
+                  }}
+                />
+                <div
+                  style={{
+                    height: "40px",
+                    width: "120px",
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "4px",
+                  }}
+                />
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="text-center">
+                <small style={{ color: "#999" }}>
+                  © 2025 Jawal Games. All rights reserved.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   const bgColor = isLightTheme ? "#e7e8e6" : "#333131";
   const borderColor = isLightTheme ? "#d4d3d3ff" : "#202020ff";
@@ -24,6 +88,7 @@ const Footer = ({ footerLinks }) => {
     >
       <div className="container">
         <div className="row align-items-center">
+          {/* App Store Links */}
           <div className="col-md-6 mb-3 mb-md-0">
             <div className="d-flex gap-3 justify-content-center justify-content-md-start">
               <a
@@ -31,11 +96,15 @@ const Footer = ({ footerLinks }) => {
                 className="text-decoration-none"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Download from App Store"
               >
-                <img
+                <Image
                   src={appStore}
-                  alt="App Store"
-                  style={{ height: "40px" }}
+                  alt="Download on App Store"
+                  height={40}
+                  width={120}
+                  style={{ height: "40px", width: "auto" }}
+                  priority={false}
                 />
               </a>
               <a
@@ -43,46 +112,53 @@ const Footer = ({ footerLinks }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-decoration-none"
+                aria-label="Download from Google Play"
               >
-                <img
+                <Image
                   src={googlePlay}
-                  alt="Google Play"
-                  style={{ height: "40px" }}
+                  alt="Get it on Google Play"
+                  height={40}
+                  width={120}
+                  style={{ height: "40px", width: "auto" }}
+                  priority={false}
                 />
               </a>
             </div>
           </div>
 
-          {/* links */}
+          {/* Desktop Footer Links */}
           <div className="col-md-6 d-flex justify-content-end">
-            <div className="gap-4 justify-content-end d-none d-md-block p-2">
-              {footerLinks.map((link) => (
+            <nav className="gap-4 justify-content-end d-none d-md-block p-2">
+              {footerLinks?.map((link) => (
                 <Link
                   key={link.id}
-                  to={link.url}
+                  href={link.url}
                   className="text-decoration-none mx-2 footer-link"
                   style={{ color: linkColor }}
                 >
                   {link.title}
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
         </div>
 
         <div className="row mt-1">
-          <div className="d-flex gap-4 justify-content-center d-md-none d-block mb-1">
-            {footerLinks.map((link) => (
+          {/* Mobile Footer Links */}
+          <nav className="d-flex gap-4 justify-content-center d-md-none d-block mb-1">
+            {footerLinks?.map((link) => (
               <Link
                 key={link.id}
-                to={link.url}
+                href={link.url}
                 className="text-decoration-none footer-link"
                 style={{ color: linkColor }}
               >
                 {link.title}
               </Link>
             ))}
-          </div>
+          </nav>
+
+          {/* Copyright */}
           <div className="col-12 text-center">
             <small style={{ color: "#999" }}>
               © 2025 Jawal Games. All rights reserved.
