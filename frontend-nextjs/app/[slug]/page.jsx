@@ -2,6 +2,7 @@ import GamePageClient from "@/features/games/GamePageClient";
 import { Suspense } from "next";
 import { notFound } from "next/navigation";
 
+
 // Fetch static game details (cached forever - no views/likes)
 async function fetchGameDetails(slug) {
   const res = await fetch(`${process.env.API_BASE_URL}/game/id-game?id=${slug}`,{
@@ -33,6 +34,7 @@ async function fetchGameStats(slug) {
 
 // Fetch more games (cached daily)
 async function fetchMoreGames() {
+ 
   const res = await fetch(`${process.env.API_BASE_URL}/game/view-game?pageSize=50`, {
     next: {
       revalidate: 86400, // ← 24 hours
@@ -51,9 +53,8 @@ export async function generateStaticParams() {
       `${process.env.API_BASE_URL}/game/top?top=100`
     );
     const games = await popularGames.json();
-
     return (
-      games.data?.map((game) => ({
+      games.data.data?.map((game) => ({
         slug: game.title.replace(/\s+/g, "-").toLowerCase(),
       })) || []
     );
@@ -67,7 +68,8 @@ export const dynamicParams = true;
 
 // SEO metadata (static data only)
 export async function generateMetadata({ params }) {
-  const gameData = await fetchGameDetails(params.slug);
+  const slug = (await params).slug
+  const gameData = await fetchGameDetails(slug);
 
   if (!gameData?.data) {
     return {
@@ -76,9 +78,8 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const game = gameData.data;
-  const gameUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/${params.slug}`;
-
+  const game = gameData.data.data;
+  const gameUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/${slug}`;
   return {
     title: `${game.title} - Jawal Games`,
     description: game.description,
@@ -108,29 +109,29 @@ export async function generateMetadata({ params }) {
 
 // Main server component
 export default async function GamePage({ params }) {
+  const slug = (await params).slug
   const [gameDetailsData, gameStatsData, moreGamesData] = await Promise.all([
-    fetchGameDetails(params.slug), // Static forever
-    fetchGameStats(params.slug), // Never cached
+    fetchGameDetails(slug), // Static forever
+    fetchGameStats(slug), // Never cached
     fetchMoreGames(), // Daily cache
-  ]);
+  ])
 
   if (!gameDetailsData?.data) {
     notFound();
   }
 
-  const gameDetails = gameDetailsData.data;
-  const gameStats = gameStatsData.data || { views: 0, likes: 0 };
-  const moreGames = moreGamesData?.data || [];
-
+  const gameDetails = gameDetailsData.data.data;
+  const gameStats = gameStatsData.data.data || { views: 0, likes: 0 };
+  const moreGames = moreGamesData?.data.data || [];
   return (
-    <Suspense fallback={<GamePageSkeleton />}>
+    // <Suspense fallback={<GamePageSkeleton />}>
       <GamePageClient
         gameDetails={gameDetails}
         initialGameStats={gameStats}
         moreGames={moreGames}
-        slug={params.slug}
+        slug={slug}
       />
-    </Suspense>
+    // </Suspense>
   );
 }
 

@@ -5,8 +5,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CONSTANTS } from "@/shared/constants";
-import appStore from "@/assets/app_store.png";
-import googlePlay from "@/assets/google_play.png";
 
 const Footer = ({ footerLinks }) => {
   const [isLightTheme, setIsLightTheme] = useState(true);
@@ -99,7 +97,7 @@ const Footer = ({ footerLinks }) => {
                 aria-label="Download from App Store"
               >
                 <Image
-                  src={appStore}
+                  src="/web-icons/app_store.png"
                   alt="Download on App Store"
                   height={40}
                   width={120}
@@ -115,7 +113,7 @@ const Footer = ({ footerLinks }) => {
                 aria-label="Download from Google Play"
               >
                 <Image
-                  src={googlePlay}
+                  src="/web-icons/google_play.png"
                   alt="Get it on Google Play"
                   height={40}
                   width={120}

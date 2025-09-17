@@ -43,7 +43,7 @@ export default function ClientLayout({ children, navLinks, footerLinks }) {
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         isMenuOpen={isMenuOpen}
         theme={theme}
-        onThemeToggle={handleThemeToggle}
+        setTheme={handleThemeToggle}
       />
 
       {/* Main Content */}

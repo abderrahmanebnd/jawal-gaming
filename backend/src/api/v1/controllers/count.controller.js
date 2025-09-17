@@ -35,18 +35,21 @@ exports.updateViews = async (req, res) => {
  * @param {*} res 
  */
 exports.addLike = async (req, res) => {
+
   try {
     const { gameId,action } = req.body;
 
-        
+    console.log({gameId})
+    console.log("-----------LIKE----------")
     if (!gameId) {
       return commonResponse(res, 400, null, "Game ID is required", "v1-game-server-006");
     }
 
-    const result = await addLikeToGame(gameId, action);
+    const result = await addLikeToGame(gameId, action);  
 
+    console.log({result})
     return commonResponse(res, 200, {
-      likes: result.liked,
+      likes: result,
       message: 'Like added successfully'
     });
 

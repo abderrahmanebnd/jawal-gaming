@@ -3,26 +3,32 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ThumbsUp, Eye, Heart } from "lucide-react";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 import { useGameDetails, useGameStats } from "./useGame";
 import { useFavorites } from "./useFavorites";
 import { useLike } from "./useLike";
 import { apiEndPoints } from "@/routes";
 
 // Dynamic imports for performance
-const AdBanner = dynamic(() => import("@/common/AdBanner"), {
-  ssr: false,
-});
-const GamePlayer = dynamic(() => import("@/common/GamePlayer"), {
-  ssr: false,
-});
-const GameCard = dynamic(() => import("@/common/GameCard"));
+// const AdBanner = dynamic(() => import("@/common/AdBanner"), {
+//   ssr: false,
+// });
+// const GamePlayer = dynamic(() => import("@/common/GamePlayer"), {
+//   ssr: false,
+// });
+// const GameCard = dynamic(() => import("@/common/GameCard"),{
+//   ssr:false
+// });
 
+import AdBanner from "@/common/AdBanner";
+import GamePlayer from "@/common/GamePlayer";
+import GameCard from "@/common/GameCard";
 
 const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [likedGames, setLikedGames] = useState([]);
   const [isLiking, setIsLiking] = useState(false);
+const [shuffledGames, setShuffledGames] = useState([]);
 
   const router = useRouter();
 
@@ -31,12 +37,10 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
 
   // Use dynamic game stats (always fresh)
   const { data: gameStatsData, isLoading: statsLoading } = useGameStats(slug);
-
   const { mutate: likeMutation } = useLike(slug);
   const { favorites, toggleFavorite } = useFavorites();
-
   const game = gameDetailsData?.data || gameDetails;
-  const gameStats = gameStatsData?.data || initialGameStats;
+  const gameStats = gameStatsData || initialGameStats;
 
   // Load liked games from localStorage
   useEffect(() => {
@@ -51,26 +55,24 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (game?.id) {
-      fetch(apiEndPoints.updateViews, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ gameId: game.id }),
-      }).catch(console.error);
-    }
-  }, [game?.id]);
 
   // Memoized more games with current game excluded
-  const displayedMoreGames = useMemo(() => {
-    if (!moreGames) return [];
-    return moreGames
-      .filter((g) => g.id !== game?.id)
-      .slice()
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 18);
-  }, [moreGames, game?.id]);
+useEffect(() => {
+  if (!moreGames) return;
+
+  const filtered = moreGames
+    .filter((g) => g.id !== game?.id)
+    .slice()
+    .sort(() => Math.random() - 0.5) // Only on client
+    .slice(0, 18);
+
+  setShuffledGames(filtered);
+}, [moreGames, game?.id]);
+
+// Use shuffledGames instead of displayedMoreGames in JSX
+const displayedMoreGames = shuffledGames.length
+  ? shuffledGames
+  : moreGames?.filter((g) => g.id !== game?.id).slice(0, 18) || [];
 
   // Utility functions
   const formatNumber = (num) => {
@@ -105,7 +107,9 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
 
   const handleLikeToggle = useCallback(
     async (gameToLike) => {
+      console.log({gameToLike})
       if (!gameToLike || isLiking) return;
+
 
       const isCurrentlyLiked = likedGames.includes(gameToLike.id);
       const newIsLiked = !isCurrentlyLiked;
@@ -253,7 +257,7 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
                   />
                 )}
                 <span className="fw-semibold">
-                  {formatNumber(gameStats.likes || 0)}
+                  {formatNumber(gameStats.likes)}
                 </span>
               </button>
 
@@ -268,7 +272,7 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
               >
                 <Eye size={16} />
                 <span className="fw-semibold">
-                  {statsLoading ? "..." : formatNumber(gameStats.views || 0)}
+                  {statsLoading ? "..." : formatNumber(gameStats.views)}
                 </span>
               </button>
 
@@ -320,7 +324,7 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
         </div>
 
         <p
-          className="mb-0 px-2 mb-5"
+          className="px-2 mb-5"
           style={{
             fontSize: "1.1rem",
             color: isDark ? "#b4b8bc" : "#555",

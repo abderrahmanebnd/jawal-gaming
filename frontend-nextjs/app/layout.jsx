@@ -2,8 +2,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import "../styles/App.css";
 import QueryProvider from "@/providers/QueryProvider";
-import ClientLayout from "@/components/ClientLayout";
 import { apiEndPoints } from "@/routes";
+import ClientLayout from "@/common/ClientLayout";
 
 async function getNavLinks() {
   try {
@@ -59,7 +59,6 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
           <ClientLayout navLinks={navLinks} footerLinks={footerLinks}>

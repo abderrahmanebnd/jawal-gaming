@@ -7,10 +7,10 @@ export function useGameStats(slug) {
   return useQuery({
     queryKey: ["game-stats", slug],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiEndPoints.gameStats}/${slug}`, {
+      const { data } = await axios.get(`${apiEndPoints.gameStats}?id=${slug}`, {
         withCredentials: true,
       });
-      return data;
+      return data.data.data;
     },
     refetchInterval: 60000, // Refetch every 30 seconds for fresh stats
     staleTime: 0, // Always consider stale (fetch fresh data)

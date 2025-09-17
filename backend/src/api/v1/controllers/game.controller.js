@@ -106,9 +106,9 @@ exports.viewGame = async (req, res) => {
 
 exports.getGameStats = async (req, res) => {
   try {
-    let title = req.query.id; // This is the slug, like "call-of-duty"
-    // Validate title
-    if (!title || typeof title !== "string") {
+    let slug = req.query.id; // This is the slug, like "call-of-duty"
+    // Validate slug
+    if (!slug || typeof slug !== "string") {
       return commonResponse(
         res,
         400,
@@ -118,19 +118,22 @@ exports.getGameStats = async (req, res) => {
       );
     }
     // Convert slug back to normal title
-    title = title.replace(/-/g, " ");
+    const title = slug.replace(/-/g, " ");
     // Fetch game by title
-    let result = await getByTitle(title);
-    if (!result) {
-      return commonResponse(
-        res,
-        404,
-        null,
-        "Game not found",
-        "v1-game-server-016"
-      );
-    }
-    return commonResponse(res, 200, { data: { viewed: result.viewed || 0, liked: result.liked || 0 } });
+    // let result = await getByTitle(title);
+    // if (!result) {
+    //   return commonResponse(
+    //     res,
+    //     404,
+    //     null,
+    //     "Game not found",
+    //     "v1-game-server-016"
+    //   );
+    // }
+    const result = await updateViewsModel(title); // helper function to +1 views in DB
+    return commonResponse(res, 200, {
+      data: { views: result.viewed || 0, likes: result.liked || 0 },
+    });
   }
   catch (error) {
     console.log("getGameStats ERROR::", error);
@@ -182,10 +185,10 @@ exports.getById = async (req, res) => {
       );
     }
 
-    await updateViewsModel(result.id); // helper function to +1 views in DB
+    // await updateViewsModel(result.id); // helper function to +1 views in DB
 
-    // Reflect increment in the response (avoid one extra SELECT)
-    result.viewed = (result.viewed || 0) + 1;
+    // // Reflect increment in the response (avoid one extra SELECT)
+    // // result.viewed = (result.viewed || 0) + 1;
 
     return commonResponse(res, 200, { data: result });
   } catch (error) {

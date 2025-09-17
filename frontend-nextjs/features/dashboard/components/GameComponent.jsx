@@ -388,10 +388,11 @@ const handleGameSubmit = async () => {
                         alt={game.title}
                         className="card-img-top rounded-0 pt-1"
                         style={{ 
-                          height: "180px", 
-                          objectFit: "cover",
+                      
                           transition: "transform 0.3s ease"
                         }}
+                        height="180px"
+                        objectFit="cover"
                         onError={(e) => {
                           e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDIwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjNDk1MDU3Ii8+CjxwYXRoIGQ9Ik04MCA3MEgxMjBWMTEwSDgwVjcwWiIgZmlsbD0iIzZjNzU3ZCIvPgo8L3N2Zz4K';
                         }}

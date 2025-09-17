@@ -1,30 +1,14 @@
+// shared/ColorToggle.jsx
+"use client";
+
 import { useEffect, useState } from "react";
 
-function ColorToggle({ setTheme }) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(1024); // default for SSR
-
-  const isBrowser = typeof window !== "undefined";
+function ColorToggle({ theme, onThemeToggle }) {
+  const [windowWidth, setWindowWidth] = useState(1024);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isBrowser) return;
-
-    setIsClient(true);
-
-    // Get stored theme from localStorage
-    let storedTheme = localStorage.getItem("theme");
-
-    // Default to dark theme if nothing stored
-    if (storedTheme === null) {
-      localStorage.setItem("theme", "true");
-      storedTheme = "true";
-    }
-
-    const isDark = storedTheme === "true";
-    setIsDarkMode(isDark);
-    setTheme(isDark);
-    document.body.setAttribute("data-theme", isDark ? "dark" : "light");
+    setMounted(true);
 
     // Track window width for responsive styling
     const updateWidth = () => setWindowWidth(window.innerWidth);
@@ -34,28 +18,20 @@ function ColorToggle({ setTheme }) {
     return () => {
       window.removeEventListener("resize", updateWidth);
     };
-  }, [isBrowser, setTheme]);
+  }, []);
+
+  if (!mounted) return null;
 
   const toggleTheme = () => {
-    if (!isBrowser) return;
-
-    const newDarkMode = !isDarkMode;
-    const newTheme = newDarkMode ? "dark" : "light";
-
-    setIsDarkMode(newDarkMode);
-    setTheme(newDarkMode);
-    localStorage.setItem("theme", newDarkMode.toString());
-    document.body.setAttribute("data-theme", newTheme);
+    onThemeToggle(!theme);
   };
-
-  if (!isClient) return null;
 
   const buttonStyle = {
     padding: "8px 16px",
     borderRadius: "6px",
-    border: `1px solid ${isDarkMode ? "#555555" : "#dddddd"}`,
-    backgroundColor: isDarkMode ? "#444444" : "#e7e8e6",
-    color: isDarkMode ? "#e7e8e6" : "#333333",
+    border: `1px solid ${theme ? "#555555" : "#dddddd"}`,
+    backgroundColor: theme ? "#444444" : "#e7e8e6",
+    color: theme ? "#e7e8e6" : "#333333",
     fontSize: "14px",
     fontWeight: "500",
     cursor: "pointer",
@@ -69,8 +45,8 @@ function ColorToggle({ setTheme }) {
   };
 
   const hoverStyle = {
-    backgroundColor: isDarkMode ? "#555555" : "#f5f5f5",
-    borderColor: isDarkMode ? "#666666" : "#cccccc",
+    backgroundColor: theme ? "#555555" : "#f5f5f5",
+    borderColor: theme ? "#666666" : "#cccccc",
   };
 
   return (
@@ -79,8 +55,9 @@ function ColorToggle({ setTheme }) {
       style={buttonStyle}
       onMouseEnter={(e) => Object.assign(e.target.style, hoverStyle)}
       onMouseLeave={(e) => Object.assign(e.target.style, buttonStyle)}
+      aria-label={`Switch to ${theme ? "light" : "dark"} mode`}
     >
-      {isDarkMode ? "Light" : "Dark"}
+      {theme ? "☀️ Light" : "🌙 Dark"}
     </button>
   );
 }

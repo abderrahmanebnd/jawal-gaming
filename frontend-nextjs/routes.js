@@ -14,35 +14,35 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const apiEndPoints = {
   //User Management
-  signIn: `${BASE_URL}/api/v1/auth/signIn`,
-  signOut: `${BASE_URL}/api/v1/auth/signOut`,
-  getMe: `${BASE_URL}/api/v1/auth/me`,
-  verifyOtp: `${BASE_URL}/api/v1/auth/verify-otp`,
-  resendOtp: `${BASE_URL}/api/v1/auth/resend-otp`,
-  addUser: `${BASE_URL}/api/v1/auth/user-management/add-user`,
-  editUser: `${BASE_URL}/api/v1/auth/user-management/edit-user`,
-  getUser: `${BASE_URL}/api/v1/auth/user-management/get-user`,
-  deleteUser: `${BASE_URL}/api/v1/auth/user-management/delete-user`,
+  signIn: `${BASE_URL}/auth/signIn`,
+  signOut: `${BASE_URL}/auth/signOut`,
+  getMe: `${BASE_URL}/auth/me`,
+  verifyOtp: `${BASE_URL}/auth/verify-otp`,
+  resendOtp: `${BASE_URL}/auth/resend-otp`,
+  addUser: `${BASE_URL}/auth/user-management/add-user`,
+  editUser: `${BASE_URL}/auth/user-management/edit-user`,
+  getUser: `${BASE_URL}/auth/user-management/get-user`,
+  deleteUser: `${BASE_URL}/auth/user-management/delete-user`,
 
   //Game Management
-  addGame: `${BASE_URL}/api/v1/game/add-game`,
-  viewGame: `${BASE_URL}/api/v1/game/view-game`,
-  byIdGame: `${BASE_URL}/api/v1/game/id-game`,
-  deleteGame: `${BASE_URL}/api/v1/game/delete-game`,
-  topGames: `${BASE_URL}/api/v1/game/top`,
-  getGamesByIds: `${BASE_URL}/api/v1/game/by-ids`,
+  addGame: `${BASE_URL}/game/add-game`,
+  viewGame: `${BASE_URL}/game/view-game`,
+  byIdGame: `${BASE_URL}/game/id-game`,
+  deleteGame: `${BASE_URL}/game/delete-game`,
+  topGames: `${BASE_URL}/game/top`,
+  getGamesByIds: `${BASE_URL}/game/by-ids`,
 
   //Nav Management
-  addNav: `${BASE_URL}/api/v1/nav/add-nav`,
-  viewNav: `${BASE_URL}/api/v1/nav/view-nav`,
-  deleteNav: `${BASE_URL}/api/v1/nav/delete-nav`,
+  addNav: `${BASE_URL}/nav/add-nav`,
+  viewNav: `${BASE_URL}/nav/view-nav`,
+  deleteNav: `${BASE_URL}/nav/delete-nav`,
 
   //Footer Management
-  addFooter: `${BASE_URL}/api/v1/footer/add-footer`,
-  viewFooter: `${BASE_URL}/api/v1/footer/view-footer`,
-  deleteFooter: `${BASE_URL}/api/v1/footer/delete-footer`,
+  addFooter: `${BASE_URL}/footer/add-footer`,
+  viewFooter: `${BASE_URL}/footer/view-footer`,
+  deleteFooter: `${BASE_URL}/footer/delete-footer`,
 
-  toggleLike: `${BASE_URL}/api/v1/game/add-like`,
-  updateViews: `${BASE_URL}/api/v1/game/updateViews`,
-  gameStats: `${BASE_URL}/api/v1/game/stats`,
+  toggleLike: `${BASE_URL}/game/add-like`,
+  updateViews: `${BASE_URL}/game/updateViews`,
+  gameStats: `${BASE_URL}/game/stats`,
 };

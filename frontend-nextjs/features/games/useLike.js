@@ -1,3 +1,4 @@
+// useLike.js
 "use client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,16 +11,12 @@ export function useLike(slug) {
     mutationFn: async ({ gameId, action }) => {
       const { data } = await axios.post(
         `${apiEndPoints.toggleLike}`,
-        {
-          gameId,
-          action,
-        },
-        {
-          withCredentials: true,
-        }
+        { gameId, action },
+        { withCredentials: true }
       );
       return data;
     },
+
     onMutate: async ({ action }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["game-stats", slug] });
@@ -27,29 +24,58 @@ export function useLike(slug) {
       // Snapshot previous value
       const previousStats = queryClient.getQueryData(["game-stats", slug]);
 
-      // Optimistically update
+      // Optimistically update the cache with new like count
+      queryClient.setQueryData(["game-stats", slug], (old) => {
+        if (!old?.data?.data) return old;
+
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            data: {
+              ...old.data.data,
+              likes:
+                action === "like"
+                  ? (old.data.data.likes || 0) + 1
+                  : Math.max((old.data.data.likes || 0) - 1, 0),
+            },
+          },
+        };
+      });
+
+      return { previousStats };
+    },
+
+    //TODO
+//     navigation menu  
+// favorites icon 
+// play icon 
+// light dark mode 
+
+    onSuccess: (response) => {
+      // Update cache with actual server response (no additional request)
       queryClient.setQueryData(["game-stats", slug], (old) => ({
         ...old,
         data: {
           ...old.data,
-          likes:
-            action === "like"
-              ? (old.data.likes || 0) + 1
-              : Math.max((old.data.likes || 0) - 1, 0),
+          data: {
+            ...old.data.data,
+            likes: response.likes, // Use server response
+          },
         },
       }));
-
-      return { previousStats };
     },
+
     onError: (err, variables, context) => {
       // Rollback on error
       if (context?.previousStats) {
         queryClient.setQueryData(["game-stats", slug], context.previousStats);
       }
     },
-    onSettled: () => {
-      // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["game-stats", slug] });
-    },
+
+    // Remove onSettled - we don't want to refetch!
+    // onSettled: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["game-stats", slug] });
+    // },
   });
 }

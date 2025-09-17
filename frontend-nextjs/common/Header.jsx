@@ -1,4 +1,4 @@
-// components/Header.jsx (Enhanced)
+// components/Header.jsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -9,10 +9,19 @@ import { usePathname } from "next/navigation";
 import { CONSTANTS } from "@/shared/constants";
 import ColorToggle from "@/shared/ColorToggle";
 
-const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
-  const [isLightTheme, setIsLightTheme] = useState(true);
+const Header = ({
+  navLinks,
+  onMenuToggle,
+  isMenuOpen,
+  theme,
+  onThemeToggle,
+}) => {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close menu when clicking outside
   const handleOutsideClick = useCallback(
@@ -27,7 +36,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
   useEffect(() => {
     if (isMenuOpen) {
       document.addEventListener("click", handleOutsideClick);
-      document.body.style.overflow = "hidden"; // Prevent scroll on mobile
+      document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
@@ -45,28 +54,12 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
     }
   }, [pathname]);
 
-  // Theme detection
-  useEffect(() => {
-    setMounted(true);
-
-    const detectTheme = () => {
-      setIsLightTheme(document.body.getAttribute("data-theme") === "light");
-    };
-
-    detectTheme();
-
-    const observer = new MutationObserver(detectTheme);
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   if (!mounted) {
     return <HeaderSkeleton />;
   }
+
+  // Use theme prop directly instead of detecting from DOM
+  const isLightTheme = !theme; // theme is boolean: false=light, true=dark
 
   const bgColor = isLightTheme ? "#e7e8e6" : "#333131";
   const borderColor = isLightTheme ? "#e7e8e6" : "#272727ff";
@@ -87,12 +80,13 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
           <div className="container">
             <Link href="/" className="navbar-brand fw-bold fs-3">
               <Image
-                src={isLightTheme ? "/Logo-LightMode.png" : "/logo.png"}
+                src={
+                  isLightTheme ? "/Logo-LightMode.png" : "/web-icons/logo.png"
+                }
                 alt="Jawal Games"
                 width={100}
                 height={40}
                 priority={true}
-                style={{ width: "100px", height: "auto" }}
               />
             </Link>
 
@@ -148,7 +142,7 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
                 ))}
                 <li className="nav-item">
                   <div className="nav-link px-3 py-2 mx-1">
-                    <ColorToggle setTheme={setTheme} />
+                    <ColorToggle theme={theme} onThemeToggle={onThemeToggle} />
                   </div>
                 </li>
               </ul>
@@ -174,7 +168,6 @@ const Header = ({ navLinks, onMenuToggle, isMenuOpen, setTheme }) => {
   );
 };
 
-// Loading skeleton
 const HeaderSkeleton = () => (
   <header
     className="sticky-top header shadow-sm"

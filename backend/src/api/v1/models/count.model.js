@@ -1,7 +1,5 @@
 const { getPool, executeWithRetry } = require("../../../config/db");
 
-
-
 /**
  * This function increments or decrements the like count of a game
  * @param {number} gameId - The ID of the game
@@ -13,7 +11,7 @@ async function addLikeToGame(gameId, action) {
 
   try {
     // Determine increment or decrement
-    const change = action === 'like' ? 1 : -1;
+    const change = action === "like" ? 1 : -1;
 
     // Update liked count
     const updateQuery = `
@@ -21,18 +19,17 @@ async function addLikeToGame(gameId, action) {
       SET liked = GREATEST(liked + ?, 0), updatedDate = NOW() 
       WHERE id = ?
     `;
-    await executeWithRetry(pool,updateQuery, [change, gameId]);
+    await executeWithRetry(pool, updateQuery, [change, gameId]);
 
     // Get updated like count
     const selectQuery = `SELECT liked FROM GAMES WHERE id = ?`;
-    const [rows] = await executeWithRetry(pool,selectQuery, [gameId]);
+    const [rows] = await executeWithRetry(pool, selectQuery, [gameId]);
 
     return rows.length ? rows[0].liked : 0;
   } catch (error) {
     throw new Error(`Unable to update like count: ${error.message}`);
   }
 }
-
 
 /**
  * This function increments the view count of a game by 1
@@ -49,11 +46,11 @@ async function incrementViews(gameId) {
       SET viewed = viewed + 1, updatedDate = NOW()
       WHERE id = ?
     `;
-    await executeWithRetry(pool,updateQuery, [gameId]);
+    await executeWithRetry(pool, updateQuery, [gameId]);
 
     // Get updated view count
     const selectQuery = `SELECT viewed FROM GAMES WHERE id = ?`;
-    const [rows] = await executeWithRetry(pool,selectQuery, [gameId]);
+    const [rows] = await executeWithRetry(pool, selectQuery, [gameId]);
 
     if (!rows.length) {
       throw new Error(`Game with ID ${gameId} not found`);
@@ -65,12 +62,28 @@ async function incrementViews(gameId) {
   }
 }
 
-async function updateViewsModel(gameId) {
+async function updateViewsModel(title) {
   const pool = getPool();
+
+  console.log({ title });
+
+  // Step 1: Update
   await pool.execute(
-    "UPDATE GAMES SET viewed = viewed + 1,updatedDate = NOW() WHERE id = ?",
-    [gameId]
+    `UPDATE GAMES 
+     SET viewed = viewed + 1, updatedDate = NOW() 
+     WHERE title = ?`,
+    [title]
   );
+
+  // Step 2: Get updated values
+  const [rows] = await pool.execute(
+    `SELECT viewed, liked FROM GAMES WHERE title = ?`,
+    [title]
+  );
+
+  console.log(rows[0]);
+  return rows[0];
 }
+
 
 module.exports = { addLikeToGame, incrementViews, updateViewsModel };
