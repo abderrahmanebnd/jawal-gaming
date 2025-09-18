@@ -44,28 +44,24 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
           </Link>
 
           {/* Desktop Nav */}
-          <ul className="d-none d-lg-flex mb-0 ms-auto align-items-center">
+          <ul className="d-none d-lg-flex mb-0 ms-auto align-items-center flex-1 justify-center">
             {navLinks?.map((link) => (
-              <li key={link.id} className="list-unstyled">
+              <li key={link.id} className="list-unstyled mr-auto">
                 <Link
                   className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none"
                   href={link.url}
                   style={{ color: textColor }}
-                  // onMouseEnter={(e) => {
-                  //   if (typeof window !== "undefined")
-                  //     e.target.style.backgroundColor = hoverColor;
-                  // }}
-                  // onMouseLeave={(e) => {
-                  //   if (typeof window !== "undefined")
-                  //     e.target.style.backgroundColor = "transparent";
-                  // }}
+                 
                 >
                   {link.title}
                 </Link>
               </li>
             ))}
-            <li className="list-unstyled px-2">
+            <li className="list-unstyled px-2 w-fit">
+              <div className="ml-auto w-fit">
+          
               <ColorToggle theme={theme} onThemeToggle={onThemeToggle} />
+              </div>
             </li>
           </ul>
 
@@ -109,7 +105,7 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
               </li>
             ))}
 
-            <li className="mt-2 pt-2">
+            <li className="mt-2 pt-2 ml-4">
               <ColorToggle theme={theme} onThemeToggle={onThemeToggle} />
             </li>
           </ul>

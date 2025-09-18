@@ -7,7 +7,6 @@ import { ChevronLeft, ThumbsUp, Eye, Heart } from "lucide-react";
 import { useGameDetails, useGameStats } from "./useGame";
 import { useFavorites } from "./useFavorites";
 import { useLike } from "./useLike";
-import { apiEndPoints } from "@/routes";
 
 // Dynamic imports for performance
 // const AdBanner = dynamic(() => import("@/common/AdBanner"), {
@@ -21,8 +20,8 @@ import { apiEndPoints } from "@/routes";
 // });
 
 import AdBanner from "@/common/AdBanner";
-import GamePlayer from "@/common/GamePlayer";
-import GameCard from "@/common/GameCard";
+import GamePlayer from "@/features/games/GamePlayer";
+import GameCard from "@/features/games/GameCard";
 
 const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -106,7 +105,6 @@ const GamePageClient = ({ gameDetails, initialGameStats, moreGames, slug }) => {
 
   const handleLikeToggle = useCallback(
     async (gameToLike) => {
-      console.log({ gameToLike });
       if (!gameToLike || isLiking) return;
 
       const isCurrentlyLiked = likedGames.includes(gameToLike.id);

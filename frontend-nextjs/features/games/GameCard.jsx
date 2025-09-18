@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, memo } from "react";
 import { Heart, Play, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import "../styles/responsive.css";
+import "@/styles/responsive.css";
 
 // Memoized GameCard for performance
 const GameCard = memo(
