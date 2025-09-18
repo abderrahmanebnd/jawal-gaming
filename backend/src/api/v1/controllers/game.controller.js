@@ -158,7 +158,8 @@ exports.getGameStats = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     let title = req.query.id; // This is the slug, like "call-of-duty"
-
+    
+    console.log({title},"from getById")
     // Validate title
     if (!title || typeof title !== "string") {
       return commonResponse(

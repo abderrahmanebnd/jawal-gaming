@@ -64,9 +64,6 @@ async function incrementViews(gameId) {
 
 async function updateViewsModel(title) {
   const pool = getPool();
-
-  console.log({ title });
-
   // Step 1: Update
   await pool.execute(
     `UPDATE GAMES 
@@ -78,10 +75,9 @@ async function updateViewsModel(title) {
   // Step 2: Get updated values
   const [rows] = await pool.execute(
     `SELECT viewed, liked FROM GAMES WHERE title = ?`,
-    [title]
+    [title]   
   );
 
-  console.log(rows[0]);
   return rows[0];
 }
 

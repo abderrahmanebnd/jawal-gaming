@@ -8,13 +8,11 @@ import ClientLayout from "@/common/ClientLayout";
 async function getNavLinks() {
   try {
     const response = await fetch(
-      `${
-        apiEndPoints.viewNav
-      }?pageNo=1&pageSize=50`,
+      `${apiEndPoints.viewNav}?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 0, // Revalidate once per day (24 hours)
-          tags: ["navigation"], // For manual revalidation
+          revalidate:2*86400, // Revalidate once per 2-day (48 hours)
+          tags: ["navigation"], 
         },
       }
     );
@@ -36,7 +34,7 @@ async function getFooterLinks() {
       }?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 0, // Revalidate once per day
+          revalidate: 2*86400, // Revalidate once per 2-day
           tags: ["footer"], // For manual revalidation
         },
       }

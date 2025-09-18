@@ -8,17 +8,6 @@ import { useGameDetails, useGameStats } from "./useGame";
 import { useFavorites } from "./useFavorites";
 import { useLike } from "./useLike";
 
-// Dynamic imports for performance
-// const AdBanner = dynamic(() => import("@/common/AdBanner"), {
-//   ssr: false,
-// });
-// const GamePlayer = dynamic(() => import("@/common/GamePlayer"), {
-//   ssr: false,
-// });
-// const GameCard = dynamic(() => import("@/common/GameCard"),{
-//   ssr:false
-// });
-
 import AdBanner from "@/common/AdBanner";
 import GamePlayer from "@/features/games/GamePlayer";
 import GameCard from "@/features/games/GameCard";

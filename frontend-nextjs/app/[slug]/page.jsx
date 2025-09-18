@@ -3,7 +3,6 @@ import { Suspense } from "next";
 import { notFound } from "next/navigation";
 
 
-// Fetch static game details (cached forever - no views/likes)
 async function fetchGameDetails(slug) {
   const res = await fetch(`${process.env.API_BASE_URL}/game/id-game?id=${slug}`,{
     credentials:"include",
