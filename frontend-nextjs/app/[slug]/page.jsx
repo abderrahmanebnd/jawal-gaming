@@ -110,9 +110,9 @@ export async function generateMetadata({ params }) {
 export default async function GamePage({ params }) {
   const slug = (await params).slug
   const [gameDetailsData, gameStatsData, moreGamesData] = await Promise.all([
-    fetchGameDetails(slug), // Static forever
-    fetchGameStats(slug), // Never cached
-    fetchMoreGames(), // Daily cache
+    fetchGameDetails(slug),
+    fetchGameStats(slug),
+    fetchMoreGames(),
   ])
 
   if (!gameDetailsData?.data) {
@@ -123,39 +123,11 @@ export default async function GamePage({ params }) {
   const gameStats = gameStatsData.data.data || { views: 0, likes: 0 };
   const moreGames = moreGamesData?.data.data || [];
   return (
-    // <Suspense fallback={<GamePageSkeleton />}>
       <GamePageClient
         gameDetails={gameDetails}
         initialGameStats={gameStats}
         moreGames={moreGames}
         slug={slug}
       />
-    // </Suspense>
-  );
-}
-
-function GamePageSkeleton() {
-  return (
-    <div className="container">
-      <div className="py-3">
-        <div className="btn btn-outline-light rounded-pill mb-3 placeholder-glow">
-          <span className="placeholder col-3"></span>
-        </div>
-      </div>
-      <div className="text-center mb-4">
-        <div className="placeholder-glow">
-          <span
-            className="placeholder col-6 mb-3"
-            style={{ height: "2rem" }}
-          ></span>
-        </div>
-        <div className="placeholder-glow mb-5">
-          <span
-            className="placeholder col-12"
-            style={{ height: "400px" }}
-          ></span>
-        </div>
-      </div>
-    </div>
   );
 }

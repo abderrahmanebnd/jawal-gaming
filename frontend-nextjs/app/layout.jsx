@@ -34,7 +34,7 @@ async function getFooterLinks() {
       }?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 2*86400, // Revalidate once per 2-day
+          revalidate: 10*86400, // Revalidate once per 10-day
           tags: ["footer"], // For manual revalidation
         },
       }
@@ -48,6 +48,31 @@ async function getFooterLinks() {
     return [];
   }
 }
+export const metadata = {
+  // Global metadata 
+
+  // Icons (applies to all pages)
+  icons: {
+    icon: [
+      { url: "/web-icons/favicon.ico", sizes: "any" },
+      { url: "/web-icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/web-icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: {
+      url: "/web-icons/apple-touch-icon.png",
+      sizes: "180x180",
+    },
+  },
+
+  manifest: "/site.webmanifest",
+
+  viewport: "width=device-width, initial-scale=1",
+
+  // verification: {
+  //   google: "your-google-verification-code", //TODO
+  //   yandex: "your-yandex-verification-code", //TODO
+  // },
+};
 export default async function RootLayout({ children }) {
   const [navLinks, footerLinks] = await Promise.all([
     getNavLinks(),
@@ -56,8 +81,29 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-      >
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6178922300827357"
+          crossorigin="anonymous"
+        ></script>
+
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-HPVDD3B6EK"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-HPVDD3B6EK');
+            `,
+          }}
+        />
+      </head>
+      <body>
         <QueryProvider>
           <ClientLayout navLinks={navLinks} footerLinks={footerLinks}>
             {children}
