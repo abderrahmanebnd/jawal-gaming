@@ -12,6 +12,7 @@ const {
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
+const { updateViewsModel } = require("../models/count.model");
 
 // const { thumbnailImage, imageHandler, metaCrawlerImage } = require("./common.controller");
 
@@ -103,16 +104,62 @@ exports.viewGame = async (req, res) => {
   }
 };
 
+exports.getGameStats = async (req, res) => {
+  try {
+    let slug = req.query.id; // This is the slug, like "call-of-duty"
+    // Validate slug
+    if (!slug || typeof slug !== "string") {
+      return commonResponse(
+        res,
+        400,
+        null,
+        "Valid slug parameter is required",
+        "v1-game-server-015"
+      );
+    }
+    // Convert slug back to normal title
+    const title = slug.replace(/-/g, " ");
+    // Fetch game by title
+    // let result = await getByTitle(title);
+    // if (!result) {
+    //   return commonResponse(
+    //     res,
+    //     404,
+    //     null,
+    //     "Game not found",
+    //     "v1-game-server-016"
+    //   );
+    // }
+    const result = await updateViewsModel(title); // helper function to +1 views in DB
+    return commonResponse(res, 200, {
+      data: { views: result.viewed || 0, likes: result.liked || 0 },
+    });
+  }
+  catch (error) {
+    console.log("getGameStats ERROR::", error);
+    return commonResponse(
+      res,
+      500,
+      null,
+      error?.message,
+      "v1-game-server-017"
+    );
+  }
+};
+
+
+
 
 /**
- * This function use to view article
+ * This function use to view game by ID (slug)
  * @param {*} req : HTTP request
  * @param {*} res : HTTP response
  */
 exports.getById = async (req, res) => {
   try {
     let title = req.query.id; // This is the slug, like "call-of-duty"
-
+    
+    console.log({title},"from getById")
     // Validate title
     if (!title || typeof title !== "string") {
       return commonResponse(
@@ -128,7 +175,7 @@ exports.getById = async (req, res) => {
     title = title.replace(/-/g, " ");
 
     // Fetch game by title
-    const result = await getByTitle(title);
+    let result = await getByTitle(title);
     if (!result) {
       return commonResponse(
         res,
@@ -139,10 +186,15 @@ exports.getById = async (req, res) => {
       );
     }
 
-    commonResponse(res, 200, { data: result });
+    // await updateViewsModel(result.id); // helper function to +1 views in DB
+
+    // // Reflect increment in the response (avoid one extra SELECT)
+    // // result.viewed = (result.viewed || 0) + 1;
+
+    return commonResponse(res, 200, { data: result });
   } catch (error) {
     console.log("getById ERROR::", error);
-    commonResponse(
+    return commonResponse(
       res,
       500,
       null,

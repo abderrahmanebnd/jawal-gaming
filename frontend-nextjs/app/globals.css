@@ -1,0 +1,89 @@
+@import "tailwindcss";
+@import 'bootstrap/dist/css/bootstrap.min.css';
+/* /styles/global.css */
+:root {
+  --bg-primary: #333131;
+  --text-primary: #FFF;
+  --bg-secondary: #444;
+  --bg-tertiary: #222;
+  --accent-blue: #007bff;
+  --accent-red: #dc3545;
+  --accent-green: #28a745;
+  --text-muted: #999;
+  --border-color: #555;
+  --yellowMainColor: "#fff035";
+  --greenMainColor: "#b6e642";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.game-card {
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+}
+
+.btn:focus {
+  box-shadow: none !important;
+}
+
+.form-control:focus {
+  background-color: #666 !important;
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none !important;
+}
+
+.nav-pills .nav-link {
+  border-radius: 25px !important;
+}
+
+.sticky-top {
+  backdrop-filter: blur(10px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+

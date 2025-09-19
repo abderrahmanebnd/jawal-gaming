@@ -4,6 +4,8 @@ const authController = require("../controllers/auth.controller");
 
 //TODO: we should add authMiddleware to protect these routes only for admin users
 
+//TODO: we should add authMiddleware to protect these routes only for admin users
+
 module.exports = function (app) {
   // Current API version in use
   const apiVersion = "v1";
@@ -13,6 +15,11 @@ module.exports = function (app) {
     `/api/${apiVersion}/game/view-game`,
     [commonMiddleware.requestErrorHandler],
     controller.viewGame
+  );
+  app.get(
+    `/api/${apiVersion}/game/stats`,
+    [commonMiddleware.requestErrorHandler],
+    controller.getGameStats
   );
 
   app.get(

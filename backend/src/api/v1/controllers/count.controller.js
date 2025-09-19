@@ -19,7 +19,7 @@ exports.updateViews = async (req, res) => {
     }
     const result = await incrementViews(gameId);
     return commonResponse(res, 200, {
-      views: result.views,
+      views: result.viewed,
       message: 'View count updated successfully'
     });
 
@@ -35,18 +35,18 @@ exports.updateViews = async (req, res) => {
  * @param {*} res 
  */
 exports.addLike = async (req, res) => {
+
   try {
     const { gameId,action } = req.body;
 
-        
     if (!gameId) {
       return commonResponse(res, 400, null, "Game ID is required", "v1-game-server-006");
     }
 
-    const result = await addLikeToGame(gameId, action);
+    const result = await addLikeToGame(gameId, action);  
 
     return commonResponse(res, 200, {
-      likes: result.likes,
+      likes: result,
       message: 'Like added successfully'
     });
 

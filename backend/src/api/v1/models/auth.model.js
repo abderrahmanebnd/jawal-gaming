@@ -52,6 +52,8 @@ async function findUserByEmail(email, activeOnly = false) {
   return rows[0] || null;
 }
 
+// Find user by id (safe, excludes password)
+
 let cachedAdmin = null;
 
 async function findUserById(id) {
@@ -66,9 +68,9 @@ async function findUserById(id) {
   if (user && user.role === "admin") {
     cachedAdmin = user; // ✅ Only cache admins
   }
-
   return user;
 }
+
 const updateUserOtp = async (id, otp, otpExpiry) => {
   const pool = getPool();
   await pool.execute("UPDATE AUTH SET otp = ?, otpExpiry = ? WHERE id = ?", [

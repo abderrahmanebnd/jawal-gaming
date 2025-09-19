@@ -1,5 +1,6 @@
 const { commonMiddleware } = require("../middlewares");
 const controller = require("../controllers/count.controller");
+//TODO: we should add authMiddleware to protect these routes only for admin users
 
 //TODO: we should add authMiddleware to protect these routes only for admin users
 

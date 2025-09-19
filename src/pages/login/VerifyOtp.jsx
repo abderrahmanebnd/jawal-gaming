@@ -9,6 +9,7 @@ export default function VerifyOtp() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const { mutate: verifyOtp, isLoading } = useVerifyOtp();
   const { mutate: resendOtp, isLoading: isResending } = useResendOtp();
+  
   const handleChange = (value, index) => {
     if (/^[0-9]?$/.test(value)) {
       const newOtp = [...otp];

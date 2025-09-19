@@ -265,7 +265,7 @@ const displayedMoreGames = useMemo(() => {
           style={{
             color: isDark ? "" : "#000000ff",
           }}
-          className="btn btn-outline-light rounded-pill mb-3"
+          className="flex rounded-pill mb-3 bg-red-200"
           onClick={() => navigate(-1)}
         >
           <ChevronLeft size={20} className="me-2" />
