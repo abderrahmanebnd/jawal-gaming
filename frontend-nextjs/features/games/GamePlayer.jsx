@@ -147,7 +147,7 @@ const GamePlayer = ({ game, isFullscreen, onToggleFullscreen, onClose }) => {
         src={game.url}
         className="w-100 h-100 border-0"
         style={{
-          minHeight: isFullscreen ? "100vh" : "600px",
+          minHeight: isFullscreen ? "100vh" : "400px",
           borderRadius: isFullscreen ? "0" : "12px",
         }}
         title={`Play ${game.title}`}
