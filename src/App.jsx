@@ -39,6 +39,15 @@ const App = () => {
   const [footerLinks, setFooterLinks] = useState([]);
   const [theme, setTheme] = useState(false);
 
+    useEffect(() => {
+      if (typeof gtag !== "undefined") {
+        gtag("config", "G-HPVDD3B6EK", {
+          page_path: location.pathname + location.search,
+          page_location: window.location.href,
+        });
+      }
+    }, [location]);
+    
   useEffect(() => {
     const url = apiEndPoints.viewFooter;
     const navUrl = apiEndPoints.viewNav;
