@@ -1,4 +1,5 @@
-import VerifyOtpClient from "@/auth/VerifyOtpClient";
+import GuestRoute from "@/features/auth/GuestRoute";
+import VerifyOtpClient from "@/features/auth/VerifyOtpClient";
 
 export const metadata = {
   title: "Verify OTP - Jawal Games",

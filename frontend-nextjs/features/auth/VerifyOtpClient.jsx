@@ -9,8 +9,8 @@ import { useResendOtp } from "@/features/auth/useResendOtp";
 export default function VerifyOtp() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [email, setEmail] = useState(null);
-  const { mutate: verifyOtp, isLoading } = useVerifyOtp();
-  const { mutate: resendOtp, isLoading: isResending } = useResendOtp();
+  const { mutate: verifyOtp,isPending:isLoading } = useVerifyOtp();
+  const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const router = useRouter();
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 // components/BackToTopButton.jsx
 "use client"
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const BackToTopButton = () => {
@@ -40,10 +41,12 @@ const BackToTopButton = () => {
         e.currentTarget.style.transform = "scale(1)";
       }}
     >
-      <img
+      <Image
         src="/ScrollUp-icon.png"
         alt="Up"
         className="img-to-top"
+        height={40}
+        width={40}
       />
     </button>
   );

@@ -51,7 +51,6 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
                   className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none"
                   href={link.url}
                   style={{ color: textColor }}
-                 
                 >
                   {link.title}
                 </Link>
@@ -59,8 +58,7 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
             ))}
             <li className="list-unstyled px-2 w-fit">
               <div className="ml-auto w-fit">
-          
-              <ColorToggle theme={theme} onThemeToggle={onThemeToggle} />
+                <ColorToggle theme={theme} onThemeToggle={onThemeToggle} />
               </div>
             </li>
           </ul>
@@ -71,10 +69,21 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
             style={{ boxShadow: "none" }}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? (
-              <X size={30} color="#b2de43" />
+            {isLightTheme ? (
+              isMenuOpen ? (
+                <X size={34} color="#b2de43" />
+              ) : (
+                <Image
+                  src="/light-mode-menu.png"
+                  width={34}
+                  height={34}
+                  alt="Menu"
+                />
+              )
+            ) : isMenuOpen ? (
+              <X size={34} color="#b2de43" />
             ) : (
-              <Menu size={30} color="#b2de43" />
+              <Menu size={34} color="#b2de43" />
             )}
           </button>
         </div>
@@ -98,7 +107,6 @@ const Header = ({ navLinks, theme, onThemeToggle }) => {
                   className="d-block navigation-link px-3 py-2 mx-1 rounded transition-all pt-md-3 text-decoration-none"
                   href={link.url}
                   style={{ color: textColor }}
-                
                 >
                   {link.title}
                 </Link>

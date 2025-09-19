@@ -7,12 +7,29 @@ import Header from "./Header";
 import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
 import BackToTopButton from "./BackToTopButton";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function ClientLayout({ children, navLinks, footerLinks }) {
   const [theme, setTheme] = useState(true); // false = light, true = dark
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Track page views on route changes
+  useEffect(() => {
+    if (typeof gtag !== "undefined") {
+      const url =
+        pathname +
+        (searchParams.toString() ? "?" + searchParams.toString() : "");
+
+      gtag("config", "G-HPVDD3B6EK", {
+        page_path: url,
+        page_location: window.location.href,
+      });
+    }
+  }, [pathname, searchParams]);
 
   // Initialize theme from localStorage
   useEffect(() => {
@@ -49,7 +66,7 @@ export default function ClientLayout({ children, navLinks, footerLinks }) {
           ? theme
             ? CONSTANTS.COLORS.background
             : CONSTANTS.COLORS.lightBackground
-          : CONSTANTS.COLORS.background, 
+          : CONSTANTS.COLORS.background,
         color: mounted
           ? theme
             ? CONSTANTS.COLORS.text

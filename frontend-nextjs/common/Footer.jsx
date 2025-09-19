@@ -85,7 +85,7 @@ const Footer = ({ footerLinks }) => {
       }}
     >
       <div className="container">
-        <div className="row align-items-center">
+        <div className="row align-items-center items-center">
           {/* App Store Links */}
           <div className="col-md-6 mb-3 mb-md-0">
             <div className="d-flex gap-3 justify-content-center justify-content-md-start">
@@ -126,7 +126,7 @@ const Footer = ({ footerLinks }) => {
 
           {/* Desktop Footer Links */}
           <div className="col-md-6 d-flex justify-content-end">
-            <nav className="gap-4 justify-content-end d-none d-md-block p-2">
+            <nav className="gap-4 justify-content-end d-none d-md-block">
               {footerLinks?.map((link) => (
                 <Link
                   key={link.id}

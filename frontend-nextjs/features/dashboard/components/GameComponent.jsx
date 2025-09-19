@@ -303,31 +303,50 @@ const handleGameSubmit = async () => {
       <div className="row mb-4">
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between ">
-
-            <div className="d-flex align-items-center d-none d-md-block">
-              <GamepadIcon size={32} color={CONSTANTS.COLORS.primary} className="me-3" />
+            <div className="hidden md:flex items-center ">
+              <GamepadIcon
+                size={32}
+                color={CONSTANTS.COLORS.primary}
+                className="me-3"
+              />
               <div>
-                <h3 className="mb-0 fw-bold" style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6"  }}>
+                <h3
+                  className="mb-0 fw-bold"
+                  style={{
+                    color:
+                      document.body.getAttribute("data-theme") === "light"
+                        ? "#000000ff"
+                        : "#e7e8e6",
+                  }}
+                >
                   Game Management
                 </h3>
-                <p className="mb-0 " style={{ color: document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6"  }}>Add and manage your game collection</p>
+                <p
+                  className="mb-0 "
+                  style={{
+                    color:
+                      document.body.getAttribute("data-theme") === "light"
+                        ? "#000000ff"
+                        : "#e7e8e6",
+                  }}
+                >
+                  Add and manage your game collection
+                </p>
               </div>
             </div>
-        
+
             <button
               className="btn btn-primary rounded-3 px-4 py-2 fw-semibold "
               onClick={openAddGameModal}
               style={{
-                background: 'linear-gradient(45deg, #007bff, #0056b3)',
-                border: 'none',
-                boxShadow: '0 4px 15px rgba(0,123,255,0.3)'
+                background: "linear-gradient(45deg, #007bff, #0056b3)",
+                border: "none",
+                boxShadow: "0 4px 15px rgba(0,123,255,0.3)",
               }}
             >
-              <Plus size={18} className="me-2" />
+              {/* <Plus size={18} className="me-2" /> */}
               Add New Game
             </button>
-
-
           </div>
         </div>
       </div>
@@ -337,10 +356,28 @@ const handleGameSubmit = async () => {
         <div className="col-12">
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div className="mb-0 mt-md-4">
-              <p className="mb-0 fw-bold" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>
+              <p
+                className="mb-0 fw-bold"
+                style={{
+                  color:
+                    document.body.getAttribute("data-theme") === "light"
+                      ? "#000000ff"
+                      : "#e7e8e6",
+                }}
+              >
                 Your Games ({games.length})
               </p>
-              <p className="mb-0" style={{ color:document.body.getAttribute("data-theme") === "light" ? "#000000ff" : "#e7e8e6" }}>Manage your game collection</p>
+              <p
+                className="mb-0"
+                style={{
+                  color:
+                    document.body.getAttribute("data-theme") === "light"
+                      ? "#000000ff"
+                      : "#e7e8e6",
+                }}
+              >
+                Manage your game collection
+              </p>
             </div>
             {gameLoading && (
               <div className="spinner-border text-primary" role="status">
@@ -353,100 +390,107 @@ const handleGameSubmit = async () => {
             <div className="text-center py-5">
               <GamepadIcon size={64} color="#6c757d" className="mb-3" />
               <h5 className="text-muted">No games yet</h5>
-              <p className="text-muted">Add your first game by clicking the button above</p>
-              <button 
+              <p className="text-muted">
+                Add your first game by clicking the button above
+              </p>
+              <button
                 className="btn btn-primary rounded-3 px-4 py-2 mt-3"
                 onClick={openAddGameModal}
               >
-                <Plus size={16} className="me-2" />
+                {/* <Plus size={16} className="me-2" /> */}
                 Add First Game
               </button>
             </div>
           ) : (
             <div className="row g-4">
               {games?.map((game) => (
-                <div key={game.id || game._id} className="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <div
+                  key={game.id || game._id}
+                  className="col-xl-2 col-lg-3 col-md-4 col-sm-6"
+                >
                   <div
                     className="card border-0 shadow-lg rounded-3 h-100 game-card-admin"
-                    style={{ 
+                    style={{
                       backgroundColor: "#343a40",
                       transition: "all 0.3s ease",
-                      overflow: "hidden"
+                      overflow: "hidden",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-5px)';
-                      e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.3)';
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 15px 35px rgba(0,0,0,0.3)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 20px rgba(0,0,0,0.15)";
                     }}
                   >
                     <div className="position-relative">
-                      <Image
-                        src={game.thumbnail || '/placeholder-game.jpg'}
+                      <img
+                        src={game.thumbnail || "/placeholder-game.jpg"}
                         alt={game.title}
                         className="card-img-top rounded-0 pt-1"
-                        style={{ 
-                      
-                          transition: "transform 0.3s ease"
+                        style={{
+                          height: "180px",
+                          objectFit: "cover",
+                          transition: "transform 0.3s ease",
                         }}
-                        height="180px"
-                        objectFit="cover"
                         onError={(e) => {
-                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDIwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjNDk1MDU3Ii8+CjxwYXRoIGQ9Ik04MCA3MEgxMjBWMTEwSDgwVjcwWiIgZmlsbD0iIzZjNzU3ZCIvPgo8L3N2Zz4K';
+                          e.target.src =
+                            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDIwMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTgwIiBmaWxsPSIjNDk1MDU3Ii8+CjxwYXRoIGQ9Ik04MCA3MEgxMjBWMTEwSDgwVjcwWiIgZmlsbD0iIzZjNzU3ZCIvPgo8L3N2Zz4K";
                         }}
                       />
-                      <div 
+                      <div
                         className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center opacity-0"
                         style={{
-                          background: 'rgba(0,0,0,0.7)',
-                          transition: 'opacity 0.3s ease'
+                          background: "rgba(0,0,0,0.7)",
+                          transition: "opacity 0.3s ease",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.opacity = '1';
+                          e.currentTarget.style.opacity = "1";
                         }}
                       >
                         <ImageIcon size={32} color="#fff" />
                       </div>
                     </div>
-                    
+
                     <div className="card-body p-3 d-flex flex-column">
                       <h6
                         className="card-title fw-bold mb-2"
-                        style={{ 
+                        style={{
                           color: CONSTANTS.COLORS.text,
                           fontSize: "0.95rem",
                           lineHeight: "1.3",
-                          display: '-webkit-box',
+                          display: "-webkit-box",
                           WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
                         }}
                         title={game.title}
                       >
                         {game.title}
                       </h6>
-                      
+
                       <p
                         className="card-text small mb-3 flex-grow-1"
-                        style={{ 
+                        style={{
                           color: "#adb5bd",
                           fontSize: "0.8rem",
                           lineHeight: "1.4",
-                          display: '-webkit-box',
+                          display: "-webkit-box",
                           WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
                         }}
                         title={game.description}
                       >
                         {game.description}
                       </p>
-                      
-                      <div className="d-flex gap-2 mt-auto">
+
+                      <div className="d-flex gap-2 mt-auto mx-auto">
                         <button
-                          className="btn btn-outline-warning btn-sm rounded-pill flex-fill"
+                          className="btn-sm rounded-pill flex flex-row items-center text-amber-400 border-1 px-2 border-amber-400 "
                           onClick={() => openEditGameModal(game)}
                           style={{ fontSize: "0.75rem" }}
                         >
@@ -454,7 +498,7 @@ const handleGameSubmit = async () => {
                           Edit
                         </button>
                         <button
-                          className="btn btn-outline-danger btn-sm rounded-pill flex-fill"
+                          className="btn-sm rounded-pill flex flex-row items-center text-red-400 border-1 px-2 border-red-400"
                           onClick={() => openDeleteModal(game)}
                           style={{ fontSize: "0.75rem" }}
                         >
@@ -473,30 +517,32 @@ const handleGameSubmit = async () => {
 
       {/* Add/Edit Game Modal */}
       {showGameModal && (
-        <div 
+        <div
           className="modal fade show d-block"
-          style={{ backgroundColor:  'rgba(127, 124, 124, 0.77)' }}
+          style={{ backgroundColor: "rgba(127, 124, 124, 0.77)" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeGameModal();
           }}
         >
           <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div 
+            <div
               className="modal-content border-0 shadow-lg"
-              style={{ backgroundColor: '#2c3e50' }}
+              style={{ backgroundColor: "#2c3e50" }}
             >
-              <div 
+              <div
                 className="modal-header border-0 pb-0"
-                style={{ borderBottom: '1px solid #495057' }}
+                style={{ borderBottom: "1px solid #495057" }}
               >
                 <div className="d-flex align-items-center">
-                  <div 
+                  <div
                     className="rounded-circle d-flex align-items-center justify-content-center me-3"
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      backgroundColor: editingGame ? '#ffc107' : CONSTANTS.COLORS.primary,
-                      color: '#fff'
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: editingGame
+                        ? "#ffc107"
+                        : CONSTANTS.COLORS.primary,
+                      color: "#fff",
                     }}
                   >
                     {editingGame ? <Edit3 size={18} /> : <Plus size={18} />}
@@ -506,13 +552,15 @@ const handleGameSubmit = async () => {
                       {editingGame ? "Edit Game" : "Add New Game"}
                     </h5>
                     <p className="mb-0 small text-white">
-                      {editingGame ? "Update game information" : "Fill in the details to add a new game"}
+                      {editingGame
+                        ? "Update game information"
+                        : "Fill in the details to add a new game"}
                     </p>
                   </div>
                 </div>
-                <button 
-                  type="button" 
-                  className="btn-close btn-close-white" 
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
                   onClick={closeGameModal}
                 ></button>
               </div>
@@ -521,91 +569,132 @@ const handleGameSubmit = async () => {
                 <div className="row g-4">
                   {/* Game Title */}
                   <div className="col-md-6">
-                    <label className="form-label text-light fw-semibold">Game Title *</label>
+                    <label className="form-label text-light fw-semibold">
+                      Game Title *
+                    </label>
                     <input
                       type="text"
-                      className={`form-control rounded-3 px-4 py-3 ${formErrors.title ? 'is-invalid' : ''}`}
+                      className={`form-control rounded-3 px-4 py-3 ${
+                        formErrors.title ? "is-invalid" : ""
+                      }`}
                       placeholder="Enter game title"
                       style={{
                         backgroundColor: "#495057",
-                        border: formErrors.title ? "2px solid #dc3545" : "2px solid transparent",
+                        border: formErrors.title
+                          ? "2px solid #dc3545"
+                          : "2px solid transparent",
                         color: "#fff",
-                        fontSize: "0.95rem"
+                        fontSize: "0.95rem",
                       }}
                       value={gameForm.title}
                       onChange={(e) => {
                         setGameForm({ ...gameForm, title: e.target.value });
                         if (formErrors.title) {
-                          setFormErrors(prev => ({ ...prev, title: null }));
+                          setFormErrors((prev) => ({ ...prev, title: null }));
                         }
                       }}
                     />
-                    {formErrors.title && <div className="invalid-feedback d-block">{formErrors.title}</div>}
+                    {formErrors.title && (
+                      <div className="invalid-feedback d-block">
+                        {formErrors.title}
+                      </div>
+                    )}
                   </div>
 
                   {/* Game URL */}
                   <div className="col-md-6">
-                    <label className="form-label text-light fw-semibold">Game URL *</label>
+                    <label className="form-label text-light fw-semibold">
+                      Game URL *
+                    </label>
                     <input
                       type="url"
-                      className={`form-control rounded-3 px-4 py-3 ${formErrors.url ? 'is-invalid' : ''}`}
+                      className={`form-control rounded-3 px-4 py-3 ${
+                        formErrors.url ? "is-invalid" : ""
+                      }`}
                       placeholder="https://example.com/game"
                       style={{
                         backgroundColor: "#495057",
-                        border: formErrors.url ? "2px solid #dc3545" : "2px solid transparent",
+                        border: formErrors.url
+                          ? "2px solid #dc3545"
+                          : "2px solid transparent",
                         color: "#fff",
-                        fontSize: "0.95rem"
+                        fontSize: "0.95rem",
                       }}
                       value={gameForm.url}
                       onChange={(e) => {
                         setGameForm({ ...gameForm, url: e.target.value });
                         if (formErrors.url) {
-                          setFormErrors(prev => ({ ...prev, url: null }));
+                          setFormErrors((prev) => ({ ...prev, url: null }));
                         }
                       }}
                     />
-                    {formErrors.url && <div className="invalid-feedback d-block">{formErrors.url}</div>}
+                    {formErrors.url && (
+                      <div className="invalid-feedback d-block">
+                        {formErrors.url}
+                      </div>
+                    )}
                   </div>
 
                   {/* Game Description */}
                   <div className="col-12">
-                    <label className="form-label text-light fw-semibold">Description *</label>
+                    <label className="form-label text-light fw-semibold">
+                      Description *
+                    </label>
                     <textarea
-                      className={`form-control rounded-3 px-4 py-3 ${formErrors.description ? 'is-invalid' : ''}`}
+                      className={`form-control rounded-3 px-4 py-3 ${
+                        formErrors.description ? "is-invalid" : ""
+                      }`}
                       placeholder="Enter game description"
                       rows="3"
                       style={{
                         backgroundColor: "#495057",
-                        border: formErrors.description ? "2px solid #dc3545" : "2px solid transparent",
+                        border: formErrors.description
+                          ? "2px solid #dc3545"
+                          : "2px solid transparent",
                         color: "#fff",
                         fontSize: "0.95rem",
-                        resize: "vertical"
+                        resize: "vertical",
                       }}
                       value={gameForm.description}
                       onChange={(e) => {
-                        setGameForm({ ...gameForm, description: e.target.value });
+                        setGameForm({
+                          ...gameForm,
+                          description: e.target.value,
+                        });
                         if (formErrors.description) {
-                          setFormErrors(prev => ({ ...prev, description: null }));
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            description: null,
+                          }));
                         }
                       }}
                     />
-                    {formErrors.description && <div className="invalid-feedback d-block">{formErrors.description}</div>}
+                    {formErrors.description && (
+                      <div className="invalid-feedback d-block">
+                        {formErrors.description}
+                      </div>
+                    )}
                   </div>
 
                   {/* Image Upload */}
                   <div className="col-12">
                     <label className="form-label text-light fw-semibold">
-                      Game Thumbnail {!editingGame && '*'}
+                      {/* Game Thumbnail {!editingGame && '*'} */}
                     </label>
                     <div
                       className={`border-2 border-dashed rounded-3 p-4 text-center position-relative ${
-                        isDragOver ? 'border-primary bg-primary bg-opacity-10' : 
-                        formErrors.thumbnail ? 'border-danger' : 'border-secondary'
+                        isDragOver
+                          ? "border-primary bg-primary bg-opacity-10"
+                          : formErrors.thumbnail
+                          ? "border-danger"
+                          : "border-secondary"
                       }`}
                       style={{
-                        backgroundColor: isDragOver ? 'rgba(13, 110, 253, 0.1)' : '#495057',
-                        transition: 'all 0.3s ease',
-                        cursor: 'pointer'
+                        backgroundColor: isDragOver
+                          ? "rgba(13, 110, 253, 0.1)"
+                          : "#495057",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
                       }}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
@@ -619,9 +708,9 @@ const handleGameSubmit = async () => {
                         className="d-none"
                         onChange={(e) => handleImageChange(e.target.files[0])}
                       />
-                      
+
                       {!imagePreview ? (
-                        <div>
+                        <div className="text-center justify-center flex flex-col items-center">
                           <Upload size={40} color="#6c757d" className="mb-3" />
                           <p className="mb-2 text-light">
                             <strong>Click to upload</strong> or drag and drop
@@ -635,8 +724,8 @@ const handleGameSubmit = async () => {
                           <img
                             src={imagePreview}
                             alt="Preview"
-                            className="img-fluid rounded-2"
-                            style={{ maxHeight: '200px', objectFit: 'contain' }}
+                            className="img-fluid rounded-2 bg-amber-50 mx-auto"
+                            style={{ maxHeight: "200px", objectFit: "contain" }}
                           />
                           <button
                             type="button"
@@ -645,14 +734,18 @@ const handleGameSubmit = async () => {
                               e.stopPropagation();
                               removeImage();
                             }}
-                            style={{ transform: 'translate(50%, -50%)' }}
+                            style={{ transform: "translate(50%, -50%)" }}
                           >
                             <X size={14} />
                           </button>
                         </div>
                       )}
                     </div>
-                    {formErrors.thumbnail && <div className="text-danger small mt-2">{formErrors.thumbnail}</div>}
+                    {formErrors.thumbnail && (
+                      <div className="text-danger small mt-2">
+                        {formErrors.thumbnail}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -672,23 +765,26 @@ const handleGameSubmit = async () => {
                   onClick={handleGameSubmit}
                   disabled={addGameLoading}
                   style={{
-                    background: editingGame ? 
-                      'linear-gradient(45deg, #ffc107, #ffdb4d)' : 
-                      'linear-gradient(45deg, #007bff, #0056b3)',
-                    border: 'none',
-                    boxShadow: '0 4px 15px rgba(0,123,255,0.3)'
+                    background: editingGame
+                      ? "linear-gradient(45deg, #ffc107, #ffdb4d)"
+                      : "linear-gradient(45deg, #007bff, #0056b3)",
+                    border: "none",
+                    boxShadow: "0 4px 15px rgba(0,123,255,0.3)",
                   }}
                 >
                   {addGameLoading ? (
                     <>
-                      <div className="spinner-border spinner-border-sm me-2" role="status"></div>
-                      {editingGame ? 'Updating...' : 'Adding...'}
+                      <div
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                      ></div>
+                      {editingGame ? "Updating..." : "Adding..."}
                     </>
                   ) : (
-                    <>
+                    <div className="flex gap-1 items-center">
                       <Save size={16} className="me-2" />
-                      {editingGame ? 'Update Game' : 'Add Game'}
-                    </>
+                      {editingGame ? "Update Game" : "Add Game"}
+                    </div>
                   )}
                 </button>
               </div>
@@ -699,27 +795,27 @@ const handleGameSubmit = async () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && gameToDelete && (
-        <div 
+        <div
           className="modal fade show d-block"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeDeleteModal();
           }}
         >
           <div className="modal-dialog modal-dialog-centered">
-            <div 
+            <div
               className="modal-content border-0 shadow-lg"
-              style={{ backgroundColor: '#2c3e50' }}
+              style={{ backgroundColor: "#2c3e50" }}
             >
               <div className="modal-header border-0 pb-2">
                 <div className="d-flex align-items-center">
-                  <div 
+                  <div
                     className="rounded-circle d-flex align-items-center justify-content-center me-3"
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      backgroundColor: '#dc3545',
-                      color: '#fff'
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: "#dc3545",
+                      color: "#fff",
                     }}
                   >
                     <AlertTriangle size={18} />
@@ -728,9 +824,9 @@ const handleGameSubmit = async () => {
                     Delete Game
                   </h5>
                 </div>
-                <button 
-                  type="button" 
-                  className="btn-close btn-close-white" 
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
                   onClick={closeDeleteModal}
                 ></button>
               </div>
@@ -742,28 +838,32 @@ const handleGameSubmit = async () => {
                       src={gameToDelete.thumbnail}
                       alt={gameToDelete.title}
                       className="rounded-3 mb-3"
-                      style={{ 
-                        width: '120px', 
-                        height: '120px', 
-                        objectFit: 'cover',
-                        border: '3px solid #495057'
+                      style={{
+                        width: "120px",
+                        height: "120px",
+                        objectFit: "cover",
+                        border: "3px solid #495057",
                       }}
                       onError={(e) => {
-                        e.target.style.display = 'none';
+                        e.target.style.display = "none";
                       }}
                     />
                   )}
-                  <h6 className="text-white fw-bold mb-2">{gameToDelete.title}</h6>
-                  <p className="text-white mb-3" style={{ fontSize: '0.9rem' }}>
-                    Are you sure you want to delete this game? This action cannot be undone.
+                  <h6 className="text-white fw-bold mb-2">
+                    {gameToDelete.title}
+                  </h6>
+                  <p className="text-white mb-3" style={{ fontSize: "0.9rem" }}>
+                    Are you sure you want to delete this game? This action
+                    cannot be undone.
                   </p>
-                  <div 
+                  <div
                     className="alert alert-danger border-0 py-2"
-                    style={{ backgroundColor: 'rgba(220, 53, 69, 0.1)' }}
+                    style={{ backgroundColor: "rgba(220, 53, 69, 0.1)" }}
                   >
                     <small className="text-danger">
                       <AlertTriangle size={14} className="me-1 mb-1 me-3" />
-                      This will permanently remove the game from your collection.
+                      This will permanently remove the game from your
+                      collection.
                     </small>
                   </div>
                 </div>
@@ -784,14 +884,17 @@ const handleGameSubmit = async () => {
                   onClick={handleDeleteConfirm}
                   disabled={deleteGameLoading}
                   style={{
-                    background: 'linear-gradient(45deg, #dc3545, #c82333)',
-                    border: 'none',
-                    boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)'
+                    background: "linear-gradient(45deg, #dc3545, #c82333)",
+                    border: "none",
+                    boxShadow: "0 4px 15px rgba(220, 53, 69, 0.3)",
                   }}
                 >
                   {deleteGameLoading ? (
                     <>
-                      <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+                      <div
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                      ></div>
                       Deleting...
                     </>
                   ) : (

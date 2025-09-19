@@ -21,7 +21,7 @@ export default function AdminLoginClient() {
     password: false,
   });
 
-  const { mutate: loginMutate, isLoading, error, data } = useLogin();
+  const { mutate: loginMutate,isPending:isLoading, error, data } = useLogin();
   // Validate form
   const validateForm = () => {
     const errors = {};

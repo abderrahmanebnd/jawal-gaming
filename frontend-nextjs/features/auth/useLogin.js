@@ -1,6 +1,6 @@
 "use client";
 
-import { apiEndPoints } from "@/routes";
+import { apiEndPoints, RoutePaths } from "@/routes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -21,11 +21,10 @@ export const useLogin = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["authCheck"] });
 
-      // Save email in sessionStorage
       sessionStorage.setItem("email", data.data.email);
 
-      // ✅ redirect to verifyOtp page
-      router.push(apiEndPoints.verifyOtp);
+      console.log('otp sent, redirecting to :...',apiEndPoints)
+      router.push(RoutePaths.verifyOtp);
     },
     onError: (error) => console.error("Login error:", error),
   });

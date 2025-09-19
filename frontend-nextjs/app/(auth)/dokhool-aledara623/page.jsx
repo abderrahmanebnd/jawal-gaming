@@ -1,4 +1,4 @@
-import AdminDashboardClient from "@/auth/AdminDashboardClient";
+import AdminDashboardClient from "@/features/auth/AdminDashboardClient";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 
 export const metadata = {
