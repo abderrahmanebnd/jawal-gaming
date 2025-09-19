@@ -30,7 +30,6 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState("/");
   const [selectedGame, setSelectedGame] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { get: getNav, data: NavResponse } = useApi();
@@ -38,6 +37,15 @@ const App = () => {
   const [navLinks, setNavLinks] = useState([]);
   const [footerLinks, setFooterLinks] = useState([]);
   const [theme, setTheme] = useState(false);
+
+  useEffect(() => {
+    if (typeof gtag !== "undefined") {
+      gtag("config", "G-HPVDD3B6EK", {
+        page_path: location.pathname + location.search,
+        page_location: window.location.href,
+      });
+    }
+  }, [location]);
 
   useEffect(() => {
     const url = apiEndPoints.viewFooter;
