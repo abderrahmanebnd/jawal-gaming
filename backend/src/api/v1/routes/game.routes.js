@@ -1,18 +1,14 @@
 const { commonMiddleware } = require("../middlewares");
 const controller = require("../controllers/game.controller");
+const authController = require("../controllers/auth.controller");
+
+//TODO: we should add authMiddleware to protect these routes only for admin users
 
 //TODO: we should add authMiddleware to protect these routes only for admin users
 
 module.exports = function (app) {
   // Current API version in use
   const apiVersion = "v1";
-
-  // Add game route
-  app.post(
-    `/api/${apiVersion}/game/add-game`,
-    [commonMiddleware.requestErrorHandler],
-    controller.addGame
-  );
 
   //get game route
   app.get(
@@ -32,9 +28,11 @@ module.exports = function (app) {
     controller.getTopGames
   );
 
-  app.get(`/api/${apiVersion}/game/by-ids`,
+  app.get(
+    `/api/${apiVersion}/game/by-ids`,
     [commonMiddleware.requestErrorHandler],
-    controller.getByIdsPaged);
+    controller.getByIdsPaged
+  );
 
   //get game by id route
   app.get(
@@ -43,12 +41,17 @@ module.exports = function (app) {
     controller.getById
   );
 
+  // Add game route
+  app.post(
+    `/api/${apiVersion}/game/add-game`,
+    [authController.protect,authController.restrictTo('admin'),commonMiddleware.requestErrorHandler],
+    controller.addGame
+  );
 
   //Delete game route
   app.delete(
     `/api/${apiVersion}/game/delete-game`,
-    [commonMiddleware.requestErrorHandler],
+    [authController.protect,authController.restrictTo('admin'),commonMiddleware.requestErrorHandler],
     controller.deleteGame
   );
-
 };

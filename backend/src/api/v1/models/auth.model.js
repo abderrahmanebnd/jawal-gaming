@@ -53,6 +53,7 @@ async function findUserByEmail(email, activeOnly = false) {
 }
 
 // Find user by id (safe, excludes password)
+
 let cachedAdmin = null;
 
 async function findUserById(id) {
@@ -67,10 +68,8 @@ async function findUserById(id) {
   if (user && user.role === "admin") {
     cachedAdmin = user; // ✅ Only cache admins
   }
-
   return user;
 }
-
 
 const updateUserOtp = async (id, otp, otpExpiry) => {
   const pool = getPool();

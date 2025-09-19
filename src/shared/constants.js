@@ -15,9 +15,5 @@ export const CONSTANTS = {
   },
   GAMES_PER_PAGE: 20,
   MORE_GAMES_COUNT: 15,
-  ADMIN_CREDENTIALS: {
-    username: "admin",
-    password: "admin123",
-  },
 };
 

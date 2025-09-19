@@ -1,18 +1,13 @@
 const { commonMiddleware } = require("../middlewares");
 const controller = require("../controllers/nav.controller");
+const authController = require("../controllers/auth.controller");
 //TODO: we should add authMiddleware to protect these routes only for admin users
 
 module.exports = function (app) {
   // Current API version in use
   const apiVersion = "v1";
 
-  // Add game route
-  app.post(
-    `/api/${apiVersion}/nav/add-nav`,
-    [commonMiddleware.requestErrorHandler],
-    controller.addNav
-  );
-
+  
   //Draft game route
   app.get(
     `/api/${apiVersion}/nav/view-nav`,
@@ -20,10 +15,17 @@ module.exports = function (app) {
     controller.viewNav
   );
 
+  // Add game route
+  app.post(
+    `/api/${apiVersion}/nav/add-nav`,
+    [authController.protect,authController.restrictTo('admin'),commonMiddleware.requestErrorHandler],
+    controller.addNav
+  );
+
   //Delete game route
   app.delete(
     `/api/${apiVersion}/nav/delete-nav`,
-    [commonMiddleware.requestErrorHandler],
+    [authController.protect,authController.restrictTo('admin'),commonMiddleware.requestErrorHandler],
     controller.deleteNav
   );
 
