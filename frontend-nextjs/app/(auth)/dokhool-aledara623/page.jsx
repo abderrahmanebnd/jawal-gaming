@@ -1,4 +1,5 @@
 import AdminDashboardClient from "@/auth/AdminDashboardClient";
+import ProtectedRoute from "@/features/auth/ProtectedRoute";
 
 export const metadata = {
   title: "Admin Dashboard - Jawal Games",
@@ -29,7 +30,10 @@ export const metadata = {
   },
 };
 
-
 export default function AdminDashboardPage() {
-  return <AdminDashboardClient />;
+  return (
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <AdminDashboardClient />
+    </ProtectedRoute>
+  );
 }

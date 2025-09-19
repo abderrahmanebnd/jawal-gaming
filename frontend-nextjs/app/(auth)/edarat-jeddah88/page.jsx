@@ -1,4 +1,5 @@
 import AdminLoginClient from "@/features/auth/AdminLoginClient";
+import GuestRoute from "@/features/auth/GuestRoute";
 
 export const metadata = {
   title: "Login - Jawal Games",
@@ -30,5 +31,9 @@ export const metadata = {
 };
 
 export default function AdminLoginPage() {
-  return <AdminLoginClient />;
+  return (
+    <GuestRoute>
+      <AdminLoginClient />
+    </GuestRoute>
+  );
 }

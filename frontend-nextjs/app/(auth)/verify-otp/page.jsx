@@ -33,5 +33,9 @@ export const metadata = {
 };
 
 export default function VerifyOtpPage() {
-  return <VerifyOtpClient />;
+  return (
+    <GuestRoute>
+      <VerifyOtpClient />
+    </GuestRoute>
+  );
 }

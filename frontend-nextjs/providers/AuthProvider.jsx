@@ -1,7 +1,9 @@
+"use client";
+
 import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { apiEndPoints } from "../api/api";
 import axios from "axios";
+import { apiEndPoints } from "@/routes";
 
 async function getMeApi() {
   const response = await axios.get(apiEndPoints.getMe, {
@@ -9,6 +11,7 @@ async function getMeApi() {
   });
   return response.data.data.user;
 }
+
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
@@ -28,7 +31,6 @@ export const AuthProvider = ({ children }) => {
         user: user || null,
         loading: isPending,
         error,
-        //   setUser: ,
       }}
     >
       {children}

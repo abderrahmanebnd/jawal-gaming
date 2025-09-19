@@ -1,18 +1,44 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
-import { RoutePaths } from "../routes";
-import Loader from "../components/Loader";
+"use client";
 
-export default function ProtectedRoute({ children, allowedRoles }) {
+import { useAuth } from "@/providers/AuthProvider";
+import { RoutePaths } from "@/routes";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user, loading } = useAuth();
-  if (loading) return <Loader />;
-  if (!user) {
-    return <Navigate to={RoutePaths.login} replace />;
-  }
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
-    //TODO: create unauthorized page
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push(RoutePaths.login);
+        return;
+      }
+      
+      if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+        router.push("/unauthorized");
+        //TODO
+        return;
+      }
+    }
+  }, [user, loading, router, allowedRoles]);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
-  return <Outlet />;
+  if (!user) return null;
+  
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return null;
+  }
+
+  return children;
 }

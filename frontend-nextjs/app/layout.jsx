@@ -11,8 +11,8 @@ async function getNavLinks() {
       `${apiEndPoints.viewNav}?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate:2*86400, // Revalidate once per 2-day (48 hours)
-          tags: ["navigation"], 
+          revalidate: 2 * 86400, // Revalidate once per 2-day (48 hours)
+          tags: ["navigation"],
         },
       }
     );
@@ -29,12 +29,10 @@ async function getNavLinks() {
 async function getFooterLinks() {
   try {
     const response = await fetch(
-      `${
-        apiEndPoints.viewFooter
-      }?pageNo=1&pageSize=50`,
+      `${apiEndPoints.viewFooter}?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 10*86400, // Revalidate once per 10-day
+          revalidate: 10 * 86400, // Revalidate once per 10-day
           tags: ["footer"], // For manual revalidation
         },
       }
@@ -49,7 +47,7 @@ async function getFooterLinks() {
   }
 }
 export const metadata = {
-  // Global metadata 
+  // Global metadata
 
   // Icons (applies to all pages)
   icons: {
@@ -105,9 +103,9 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         <QueryProvider>
-          <ClientLayout navLinks={navLinks} footerLinks={footerLinks}>
-            {children}
-          </ClientLayout>
+            <ClientLayout navLinks={navLinks} footerLinks={footerLinks}>
+              {children}
+            </ClientLayout>
         </QueryProvider>
       </body>
     </html>
