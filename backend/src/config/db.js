@@ -18,12 +18,6 @@ const dbConfig = {
   idleTimeout: 30000,
 
   connectTimeout: 10000, 
-  acquireTimeout: 10000, 
-  timeout: 10000, 
-
-  // CONNECTION MANAGEMENT
-  removeNodeErrorCount: 3, 
-  restoreNodeTimeout: 0,
 };
 
 let pool;
