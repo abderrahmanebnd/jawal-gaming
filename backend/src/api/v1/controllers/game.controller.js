@@ -25,7 +25,6 @@ const { updateViewsModel } = require("../models/count.model");
 exports.addGame = async (req, res) => {
   try {
     let { id, title, description, url, thumbnail } = req.body;
-
     let imageUrl = null;
 
     if (thumbnail) {
@@ -34,19 +33,22 @@ exports.addGame = async (req, res) => {
         return res.status(400).json({ error: "Invalid base64 image format" });
       }
 
-      const ext = matches[1];
+      const originalFormat = matches[1];
       const base64Data = matches[2];
       const buffer = Buffer.from(base64Data, "base64");
 
-      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${ext}`;
+      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
       const uploadPath = path.join(__dirname, "../uploads", fileName);
 
-      // Resize to 256x256 and save
       await sharp(buffer)
-        .resize(256, 256) // width, height
+        .resize(256, 256)
+        .webp({
+          effort: 4,
+          lossless: true,
+        })
         .toFile(uploadPath);
 
-      // Build full URL dynamically
+      const fs = require("fs");      
       const baseUrl = process.env.BASE_URL || `https://jawalgames.net`;
       imageUrl = `${baseUrl}/uploads/${fileName}`;
     }
@@ -70,7 +72,6 @@ exports.viewGame = async (req, res) => {
   try {
     const { pageNo, pageSize, all } = req.query;
     if (all === "true") {
-      // Return all games without pagination
       const result = await getGames(null,null,all); // fetch all from DB
       const Count = await gameCount();
 
@@ -80,7 +81,6 @@ exports.viewGame = async (req, res) => {
       });
     }
 
-    // Default paginated response
     let page = parseInt(pageNo) || 1;
     let limit = parseInt(pageSize) || 10;
     page = Math.max(1, page);

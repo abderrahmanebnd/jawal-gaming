@@ -90,6 +90,7 @@ const GameCard = memo(
       <div
         className="mb-3 pt-2 col-4 col-md-3 col-xl-2"
         ref={isLast ? lastGameRef : undefined}
+        title={game.title}
       >
         {/* Next.js Link for proper navigation */}
         <Link
@@ -131,7 +132,7 @@ const GameCard = memo(
               />
             </div>
 
-            {/* Play Button Overlay */}
+            {/* Play Button Overlay
             <div
               className="position-absolute top-50 start-50 translate-middle d-flex align-items-center justify-content-center rounded-circle"
               style={{
@@ -147,7 +148,7 @@ const GameCard = memo(
               aria-hidden="true"
             >
               <Play size={24} color="#fff" fill="#fff" />
-            </div>
+            </div> */}
 
             {/* Top Games Like Badge */}
             {inTopGames && typeof game.liked === "number" && (
