@@ -25,7 +25,6 @@ const { updateViewsModel } = require("../models/count.model");
 exports.addGame = async (req, res) => {
   try {
     let { id, title, description, url, thumbnail } = req.body;
-
     let imageUrl = null;
 
     if (thumbnail) {
@@ -34,19 +33,22 @@ exports.addGame = async (req, res) => {
         return res.status(400).json({ error: "Invalid base64 image format" });
       }
 
-      const ext = matches[1];
+      const originalFormat = matches[1];
       const base64Data = matches[2];
       const buffer = Buffer.from(base64Data, "base64");
 
-      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${ext}`;
+      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
       const uploadPath = path.join(__dirname, "../uploads", fileName);
 
-      // Resize to 256x256 and save
       await sharp(buffer)
-        .resize(256, 256) // width, height
+        .resize(256, 256)
+        .webp({
+          effort: 4,
+          lossless: true,
+        })
         .toFile(uploadPath);
 
-      // Build full URL dynamically
+      const fs = require("fs");
       const baseUrl = process.env.BASE_URL || `https://jawalgames.net`;
       imageUrl = `${baseUrl}/uploads/${fileName}`;
     }
@@ -60,7 +62,6 @@ exports.addGame = async (req, res) => {
   }
 };
 
-
 /**
  * This function use to view article
  * @param {*} req : HTTP request
@@ -70,8 +71,7 @@ exports.viewGame = async (req, res) => {
   try {
     const { pageNo, pageSize, all } = req.query;
     if (all === "true") {
-      // Return all games without pagination
-      const result = await getGames(null,null,all); // fetch all from DB
+      const result = await getGames(null, null, all); // fetch all from DB
       const Count = await gameCount();
 
       return commonResponse(res, 200, {
@@ -80,7 +80,6 @@ exports.viewGame = async (req, res) => {
       });
     }
 
-    // Default paginated response
     let page = parseInt(pageNo) || 1;
     let limit = parseInt(pageSize) || 10;
     page = Math.max(1, page);
@@ -134,21 +133,11 @@ exports.getGameStats = async (req, res) => {
     return commonResponse(res, 200, {
       data: { views: result.viewed || 0, likes: result.liked || 0 },
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.log("getGameStats ERROR::", error);
-    return commonResponse(
-      res,
-      500,
-      null,
-      error?.message,
-      "v1-game-server-017"
-    );
+    return commonResponse(res, 500, null, error?.message, "v1-game-server-017");
   }
 };
-
-
-
 
 /**
  * This function use to view game by ID (slug)
@@ -158,8 +147,8 @@ exports.getGameStats = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     let title = req.query.id; // This is the slug, like "call-of-duty"
-    
-    console.log({title},"from getById")
+
+    console.log({ title }, "from getById");
     // Validate title
     if (!title || typeof title !== "string") {
       return commonResponse(
@@ -194,16 +183,9 @@ exports.getById = async (req, res) => {
     return commonResponse(res, 200, { data: result });
   } catch (error) {
     console.log("getById ERROR::", error);
-    return commonResponse(
-      res,
-      500,
-      null,
-      error?.message,
-      "v1-game-server-003"
-    );
+    return commonResponse(res, 500, null, error?.message, "v1-game-server-003");
   }
 };
-
 
 /**
  * This function use to delete article
@@ -213,14 +195,20 @@ exports.getById = async (req, res) => {
 exports.deleteGame = async (req, res) => {
   try {
     const id = req.query.id;
-    
+
     // Validate ID parameter
     if (!id || isNaN(parseInt(id))) {
-      return commonResponse(res, 400, null, "Valid ID parameter is required", "v1-game-server-008");
+      return commonResponse(
+        res,
+        400,
+        null,
+        "Valid ID parameter is required",
+        "v1-game-server-008"
+      );
     }
-    
+
     const result = await deleteGames(id);
-    
+
     // Note: For MySQL, we check the message instead of modifiedCount
     if (result.message === "Game deleted successfully") {
       commonResponse(res, 200, result);
@@ -245,7 +233,7 @@ exports.deleteGame = async (req, res) => {
         "v1-game-server-004"
       );
     }
-    
+
     commonResponse(res, 500, null, error?.message, "v1-game-server-005");
   }
 };
@@ -261,10 +249,10 @@ exports.viewAllGames = async (req, res) => {
     const result = await getGames(1, 1000);
     const Count = await gameCount();
 
-    commonResponse(res, 200, { 
-      data: result, 
+    commonResponse(res, 200, {
+      data: result,
       total: Count,
-      note: "All games without pagination"
+      note: "All games without pagination",
     });
   } catch (error) {
     console.log("viewAllGames ERROR::", error);
