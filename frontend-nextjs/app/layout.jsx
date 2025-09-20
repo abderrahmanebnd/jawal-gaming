@@ -11,7 +11,7 @@ async function getNavLinks() {
       `${apiEndPoints.viewNav}?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 2 * 86400, // Revalidate once per 2-day (48 hours)
+          revalidate: 7 * 86400, // Revalidate once per 7-day 
           tags: ["navigation"],
         },
       }
@@ -32,7 +32,7 @@ async function getFooterLinks() {
       `${apiEndPoints.viewFooter}?pageNo=1&pageSize=50`,
       {
         next: {
-          revalidate: 10 * 86400, // Revalidate once per 10-day
+          revalidate: 7 * 86400, // Revalidate once per 10-day
           tags: ["footer"], // For manual revalidation
         },
       }

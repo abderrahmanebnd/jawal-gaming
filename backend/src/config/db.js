@@ -8,17 +8,22 @@ const dbConfig = {
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "JAWALDB",
-  waitForConnections: true,
-  connectionLimit: 12,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  idleTimeout: 60000,
-  keepAliveInitialDelay: 0,
-  maxIdle: 4, // Keep 8 idle connections max
 
-  // acquireTimeout: 60000,
-  connectTimeout: 60000,
-  // reconnect: true
+  waitForConnections: true,
+  connectionLimit: 5,
+  queueLimit: 0,
+
+  enableKeepAlive: false, 
+  maxIdle: 2, 
+  idleTimeout: 30000,
+
+  connectTimeout: 10000, 
+  acquireTimeout: 10000, 
+  timeout: 10000, 
+
+  // CONNECTION MANAGEMENT
+  removeNodeErrorCount: 3, 
+  restoreNodeTimeout: 0,
 };
 
 let pool;
